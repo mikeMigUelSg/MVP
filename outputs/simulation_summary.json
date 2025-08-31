@@ -1,0 +1,22 @@
+{
+  "period_days": 30,
+  "total_consumption_kwh": 316.7170481,
+  "total_cost_without_battery_eur": 52.95024439584516,
+  "total_cost_with_battery_eur": 51.97889584501637,
+  "total_savings_eur": 0.9713485508287887,
+  "savings_percentage": 1.8344552738362947,
+  "daily_avg_savings_eur": 0.03237828502762629,
+  "annual_projected_savings_eur": 11.818074035083596,
+  "battery_total_charged_kwh": 35.28680917061739,
+  "battery_total_discharged_kwh": 28.238562721353606,
+  "battery_cycles": 3.1621032592330174,
+  "battery_round_trip_efficiency": 0.8002583227294828,
+  "battery_utilization_pct": 9.040333796940194,
+  "peak_consumption_kw": 0.70260018,
+  "peak_with_battery_kw": 0.70260018,
+  "peak_reduction_kw": 0.0,
+  "peak_reduction_pct": 0.0,
+  "avg_price_eur_kwh": 0.16455976689847013,
+  "avg_charge_price_eur_kwh": 0.12899431714285717,
+  "avg_discharge_price_eur_kwh": 0.19154090266666662
+}
