@@ -192,7 +192,7 @@ class OptimalArbitrageStrategy:
     Fixed optimal arbitrage strategy with robust handling of time series issues.
     """
     
-    def __init__(self, optimization_window_hours: int = 24, use_simple_optimization: bool = False):
+    def __init__(self, optimization_window_hours: int = 48, use_simple_optimization: bool = False):
         """
         Parameters
         ----------
