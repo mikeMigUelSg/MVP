@@ -156,33 +156,100 @@ class OptimalArbitrageStrategy:
         # Get 48 hours of data
         end_time = start_time + timedelta(hours=47, minutes=45)
         
+        index = pd.date_range(start_time, end_time, freq='15min')
         prices = prices_df.loc[start_time:end_time, 'price_eur_per_kwh'].values
-        consumptions = consumption_df.loc[start_time:end_time, 'kw'].values
-        
+        consumption_kw = consumption_df.loc[start_time:end_time, 'kw'].values
+
         n_periods = len(prices)
         if n_periods == 0:
             return pd.DataFrame()
-        
-        # Simple greedy algorithm: charge in cheapest hours, discharge in most expensive
-        schedule = pd.DataFrame(index=pd.date_range(start_time, end_time, freq='15min')[:n_periods])
-        schedule['price'] = prices[:n_periods]
-        schedule['consumption_kw'] = consumptions[:n_periods] if len(consumptions) >= n_periods else 0
+
+        # Pad consumption array if shorter than prices
+        if len(consumption_kw) < n_periods:
+            consumption_kw = np.pad(
+                consumption_kw, (0, n_periods - len(consumption_kw)),
+                constant_values=0
+            )
+
+        # Dynamic programming over discrete SOC levels
+        dt = 0.25  # hours per period
+        soc_min = battery.soc_min * battery.capacity_kwh
+        soc_max = battery.soc_max * battery.capacity_kwh
+        soc_step = battery.capacity_kwh * 0.05  # 5% increments
+        soc_levels = np.arange(soc_min, soc_max + 1e-6, soc_step)
+        n_levels = len(soc_levels)
+
+        values = np.full((n_periods + 1, n_levels), -np.inf)
+        actions = np.full((n_periods, n_levels), 'idle', dtype=object)
+        powers = np.zeros((n_periods, n_levels))
+        next_idx = np.zeros((n_periods, n_levels), dtype=int)
+
+        start_soc = battery.soc_kwh
+        start_level = int(np.clip(np.round((start_soc - soc_min) / soc_step), 0, n_levels - 1))
+        values[-1, start_level] = 0
+
+        for t in range(n_periods - 1, -1, -1):
+            price = prices[t]
+            cons_kw = consumption_kw[t]
+            cons_energy = cons_kw * dt
+
+            for i, soc in enumerate(soc_levels):
+                best_val = values[t + 1, i]
+                best_action = 'idle'
+                best_power = 0.0
+                best_next = i
+
+                # Charge at maximum power
+                max_charge = min(
+                    battery.max_charge_kw * dt,
+                    (soc_max - soc) / battery.efficiency_charge
+                )
+                if max_charge > 1e-6:
+                    next_soc = soc + max_charge * battery.efficiency_charge
+                    j = int(np.clip(np.round((next_soc - soc_min) / soc_step), 0, n_levels - 1))
+                    profit = -price * max_charge - self.efficiency_penalty * max_charge
+                    val = profit + values[t + 1, j]
+                    if val > best_val:
+                        best_val = val
+                        best_action = 'charge'
+                        best_power = max_charge / dt
+                        best_next = j
+
+                # Discharge at maximum power (limited by consumption)
+                max_discharge = min(
+                    battery.max_discharge_kw * dt,
+                    (soc - soc_min) * battery.efficiency_discharge,
+                    cons_energy
+                )
+                if max_discharge > 1e-6:
+                    next_soc = soc - max_discharge / battery.efficiency_discharge
+                    j = int(np.clip(np.round((next_soc - soc_min) / soc_step), 0, n_levels - 1))
+                    profit = price * max_discharge - self.efficiency_penalty * max_discharge
+                    val = profit + values[t + 1, j]
+                    if val > best_val:
+                        best_val = val
+                        best_action = 'discharge'
+                        best_power = max_discharge / dt
+                        best_next = j
+
+                values[t, i] = best_val
+                actions[t, i] = best_action
+                powers[t, i] = best_power
+                next_idx[t, i] = best_next
+
+        # Build schedule
+        schedule = pd.DataFrame(index=index)
+        schedule['price'] = prices
+        schedule['consumption_kw'] = consumption_kw
         schedule['action'] = 'idle'
         schedule['power_kw'] = 0.0
-        
-        # Rank hours by price
-        schedule['price_rank'] = schedule['price'].rank(pct=True)
-        
-        # Charge in bottom 30% of prices, discharge in top 30%
-        charge_mask = schedule['price_rank'] <= 0.3
-        discharge_mask = schedule['price_rank'] >= 0.7
-        
-        schedule.loc[charge_mask, 'action'] = 'charge'
-        schedule.loc[charge_mask, 'power_kw'] = battery.max_charge_kw
-        
-        schedule.loc[discharge_mask, 'action'] = 'discharge'
-        schedule.loc[discharge_mask, 'power_kw'] = schedule.loc[discharge_mask, 'consumption_kw'].clip(upper=battery.max_discharge_kw)
-        
+
+        level = start_level
+        for t in range(n_periods):
+            schedule.iloc[t, schedule.columns.get_loc('action')] = actions[t, level]
+            schedule.iloc[t, schedule.columns.get_loc('power_kw')] = powers[t, level]
+            level = next_idx[t, level]
+
         return schedule
     
     def decide_action(self,

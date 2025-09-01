@@ -115,13 +115,23 @@ class EnergyArbitrageSimulator:
             final_price = price_with_margin * (1 + vat_rate)
             
             # Get strategy decision
-            action, power_kw = self.strategy.decide_action(
-                current_time,
-                base_price,  # Use base price for decisions
-                consumption_kw,
-                self.battery,
-                prices_df
-            )
+            if isinstance(self.strategy, OptimalArbitrageStrategy):
+                action, power_kw = self.strategy.decide_action(
+                    current_time,
+                    base_price,  # Use base price for decisions
+                    consumption_kw,
+                    self.battery,
+                    prices_df,
+                    consumption_df,
+                )
+            else:
+                action, power_kw = self.strategy.decide_action(
+                    current_time,
+                    base_price,  # Use base price for decisions
+                    consumption_kw,
+                    self.battery,
+                    prices_df,
+                )
             
             # Execute battery action
             battery_charge_kwh = 0
