@@ -190,12 +190,12 @@ class EnergyArbitrageSimulator:
             try:
                 if isinstance(self.strategy, OptimalArbitrageStrategy):
                     action, power_kw = self.strategy.decide_action(
-                        current_time, base_price, consumption_kw, 
+                        current_time, final_price, consumption_kw,
                         self.battery, prices_df, consumption_df
                     )
                 else:
                     action, power_kw = self.strategy.decide_action(
-                        current_time, base_price, consumption_kw,
+                        current_time, final_price, consumption_kw,
                         self.battery, prices_df
                     )
             except Exception as e:

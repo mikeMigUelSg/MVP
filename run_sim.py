@@ -164,14 +164,20 @@ def main():
     
     # Create strategy
     strategy_type = config['strategy']['type']
+    allow_export = config['strategy'].get('allow_grid_export', False)
     if strategy_type == 'arbitrage':
         strategy = ArbitrageStrategy(
             charge_threshold_percentile=config['strategy']['arbitrage']['charge_threshold_percentile'],
             discharge_threshold_percentile=config['strategy']['arbitrage']['discharge_threshold_percentile'],
-            min_price_spread=config['strategy']['arbitrage']['min_price_spread_eur_mwh']
+            min_price_spread=config['strategy']['arbitrage']['min_price_spread_eur_mwh'],
+            allow_grid_export=allow_export
         )
     elif strategy_type == 'optimal':
-        strategy = OptimalArbitrageStrategy()
+        strategy = OptimalArbitrageStrategy(
+            optimization_window_hours=config['strategy']['optimal']['optimization_window_hours'],
+            use_simple_optimization=config['strategy']['optimal']['use_simple_optimization'],
+            allow_grid_export=allow_export
+        )
     else:
         raise ValueError(f"Unknown strategy type: {strategy_type}")
     
@@ -179,14 +185,20 @@ def main():
     
     # Create and run simulator
     simulator = EnergyArbitrageSimulator(battery, strategy)
-    
+
     # Get tariff parameters
     if config['tariff']['type'] == 'indexed':
         tariff_margin = config['tariff']['indexed']['margin_eur_mwh'] / 1000
         grid_fees = config['tariff']['indexed']['grid_fees_eur_kwh']
     else:
         raise NotImplementedError("Only indexed tariff is implemented for now")
-    
+
+    # Add final price column for strategy lookahead
+    prices_df['price_final_eur_kwh'] = (
+        (prices_df['price_eur_per_kwh'] + tariff_margin + grid_fees) *
+        (1 + config['tariff']['vat_rate'])
+    )
+
     print("\nRunning simulation...")
     results_df = simulator.run(
         consumption_df,

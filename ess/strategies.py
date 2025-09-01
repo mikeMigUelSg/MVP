@@ -23,11 +23,12 @@ class ArbitrageStrategy:
     Enhanced energy arbitrage strategy with D+1 price visibility.
     """
     
-    def __init__(self, 
+    def __init__(self,
                  charge_threshold_percentile: float = 30,
                  discharge_threshold_percentile: float = 70,
                  min_price_spread: float = 20,  # EUR/MWh
-                 lookahead_hours: int = 24):
+                 lookahead_hours: int = 24,
+                 allow_grid_export: bool = False):
         """
         Parameters
         ----------
@@ -44,6 +45,7 @@ class ArbitrageStrategy:
         self.discharge_threshold_percentile = discharge_threshold_percentile
         self.min_price_spread = min_price_spread / 1000  # Convert to EUR/kWh
         self.lookahead_hours = lookahead_hours
+        self.allow_grid_export = allow_grid_export
         
     def decide_action(self,
                      current_time: datetime,
@@ -60,34 +62,37 @@ class ArbitrageStrategy:
         try:
             # Filter prices for lookahead window - handle index issues
             lookahead_prices = self._safe_slice_prices(prices_df, current_time, lookahead_end)
-            
+
             if len(lookahead_prices) < 8:  # Need at least 2 hours of data
                 return self._simple_decision(current_price, consumption_kw, battery)
-            
-            # Calculate dynamic thresholds
+
+            # Calculate dynamic thresholds on final prices
             price_low = lookahead_prices.quantile(self.charge_threshold_percentile / 100)
             price_high = lookahead_prices.quantile(self.discharge_threshold_percentile / 100)
-            
-            # Check if spread is worth it
-            if (price_high - price_low) < self.min_price_spread:
+
+            # Check if spread justifies cycling considering efficiency
+            effective_spread = (price_high - price_low) * battery.round_trip_efficiency
+            if effective_spread < self.min_price_spread:
                 return ('idle', 0)
-            
+
             # Get battery constraints
             max_charge_kw, max_discharge_kw = battery.get_max_power(0.25)
-            
+
             # Enhanced decision logic
             if current_price <= price_low and max_charge_kw > 0.1:
-                # Low price - consider charging
-                return self._decide_charge(current_price, price_low, price_high, 
-                                         lookahead_prices, battery, max_charge_kw)
-            
+                action, power_kw = self._decide_charge(
+                    current_price, price_low, price_high, lookahead_prices, battery, max_charge_kw
+                )
             elif current_price >= price_high and max_discharge_kw > 0.1:
-                # High price - consider discharging
-                return self._decide_discharge(current_price, price_low, price_high,
-                                            lookahead_prices, battery, consumption_kw, max_discharge_kw)
-            
+                action, power_kw = self._decide_discharge(
+                    current_price, price_low, price_high, lookahead_prices, battery, consumption_kw, max_discharge_kw
+                )
             else:
-                return ('idle', 0)
+                action, power_kw = ('idle', 0)
+
+            if not self.allow_grid_export and action == 'discharge':
+                power_kw = min(power_kw, consumption_kw)
+            return action, power_kw
                 
         except Exception as e:
             print(f"Error in arbitrage decision at {current_time}: {e}")
@@ -105,7 +110,8 @@ class ArbitrageStrategy:
             
             # Get the slice
             mask = (prices_df.index >= start_time) & (prices_df.index <= end_time)
-            result = prices_df.loc[mask, 'price_eur_per_kwh']
+            price_col = 'price_final_eur_kwh' if 'price_final_eur_kwh' in prices_df.columns else 'price_eur_per_kwh'
+            result = prices_df.loc[mask, price_col]
             
             return result
             
@@ -155,7 +161,7 @@ class ArbitrageStrategy:
         future_low_hours = lookahead_prices[lookahead_prices <= price_low]
         
         # Base discharge to cover consumption
-        base_discharge = min(consumption_kw * 1.2, max_discharge_kw)  # 20% buffer
+        base_discharge = min(consumption_kw, max_discharge_kw)
         
         # Adjust based on recharge opportunities
         if len(future_low_hours) >= 6:  # Plenty of cheap hours to recharge
@@ -172,17 +178,20 @@ class ArbitrageStrategy:
             discharge_factor *= (0.5 + price_percentile * 0.5)
         
         discharge_power = base_discharge * discharge_factor
+        if not self.allow_grid_export:
+            discharge_power = min(discharge_power, consumption_kw)
         return ('discharge', max(0.1, min(discharge_power, max_discharge_kw)))
     
     def _simple_decision(self, current_price: float, consumption_kw: float, battery: Battery) -> Tuple[str, float]:
         """Fallback decision when not enough lookahead data."""
         max_charge_kw, max_discharge_kw = battery.get_max_power(0.25)
         
-        # Simple thresholds (EUR/kWh)
-        if current_price < 0.05 and max_charge_kw > 0.1:  # Below 50 EUR/MWh
+        # Simple thresholds using final prices (EUR/kWh)
+        if current_price < 0.10 and max_charge_kw > 0.1:  # Below ~100 EUR/MWh
             return ('charge', max_charge_kw * 0.8)
-        elif current_price > 0.15 and max_discharge_kw > 0.1:  # Above 150 EUR/MWh
-            return ('discharge', min(consumption_kw * 1.1, max_discharge_kw))
+        elif current_price > 0.25 and max_discharge_kw > 0.1:  # Above ~250 EUR/MWh
+            power = min(max_discharge_kw, consumption_kw) if not self.allow_grid_export else max_discharge_kw
+            return ('discharge', power)
         else:
             return ('idle', 0)
 
@@ -192,7 +201,8 @@ class OptimalArbitrageStrategy:
     Fixed optimal arbitrage strategy with robust handling of time series issues.
     """
     
-    def __init__(self, optimization_window_hours: int = 48, use_simple_optimization: bool = False):
+    def __init__(self, optimization_window_hours: int = 48, use_simple_optimization: bool = False,
+                 allow_grid_export: bool = False):
         """
         Parameters
         ----------
@@ -203,6 +213,7 @@ class OptimalArbitrageStrategy:
         """
         self.optimization_window_hours = optimization_window_hours
         self.use_simple_optimization = use_simple_optimization or not HAS_PULP
+        self.allow_grid_export = allow_grid_export
         self.current_schedule = None
         self.schedule_start_time = None
         
@@ -240,7 +251,8 @@ class OptimalArbitrageStrategy:
             consumption_clean = consumption_clean[~consumption_clean.index.duplicated(keep='first')]
             
             # Reindex both series to our clean time index
-            prices_series = prices_clean['price_eur_per_kwh'].reindex(time_index, method='ffill')
+            price_col = 'price_final_eur_kwh' if 'price_final_eur_kwh' in prices_clean.columns else 'price_eur_per_kwh'
+            prices_series = prices_clean[price_col].reindex(time_index, method='ffill')
             consumption_series = consumption_clean['kw'].reindex(time_index, method='ffill')
             
             # Fill any remaining NaN values
@@ -285,7 +297,9 @@ class OptimalArbitrageStrategy:
             soc_kwh = pulp.LpVariable.dicts("soc", range(n_periods + 1),
                                           lowBound=battery.min_energy_kwh,
                                           upBound=battery.max_energy_kwh)
-            grid_import = pulp.LpVariable.dicts("grid", range(n_periods), lowBound=0)
+            grid_import = pulp.LpVariable.dicts(
+                "grid", range(n_periods), lowBound=None if self.allow_grid_export else 0
+            )
             
             # Objective: Minimize electricity cost
             total_cost = pulp.lpSum([grid_import[t] * prices[t] * dt for t in range(n_periods)])
@@ -304,13 +318,14 @@ class OptimalArbitrageStrategy:
             
             # Energy balance
             for t in range(n_periods):
-                prob += grid_import[t] == (consumption_kw[t] * dt + 
-                                         charge_power[t] * dt - 
-                                         discharge_power[t] * dt)
-            
-            # Cannot discharge more than available
-            for t in range(n_periods):
-                prob += discharge_power[t] * dt <= consumption_kw[t] * dt + charge_power[t] * dt
+                prob += grid_import[t] == (
+                    consumption_kw[t] * dt + charge_power[t] * dt - discharge_power[t] * dt
+                )
+
+            # Cannot discharge more than consumption when export disabled
+            if not self.allow_grid_export:
+                for t in range(n_periods):
+                    prob += discharge_power[t] <= consumption_kw[t]
             
             # Solve with timeout
             solver = pulp.PULP_CBC_CMD(msg=0, timeLimit=30)  # 30 second timeout
@@ -369,9 +384,10 @@ class OptimalArbitrageStrategy:
             if available_discharge > 0:
                 max_discharge = min(
                     battery.max_discharge_kw,
-                    consumption_kw[t],
                     available_discharge * battery.efficiency_discharge / dt
                 )
+                if not self.allow_grid_export:
+                    max_discharge = min(max_discharge, consumption_kw[t])
                 discharge_power[t] = max_discharge
                 available_discharge -= max_discharge * dt / battery.efficiency_discharge
         
@@ -488,6 +504,8 @@ class OptimalArbitrageStrategy:
                 return ('charge', power)
             elif planned_discharge > 0.01 and max_discharge_kw > 0.01:
                 power = min(planned_discharge, max_discharge_kw)
+                if not self.allow_grid_export:
+                    power = min(power, consumption_kw)
                 return ('discharge', power)
             else:
                 return ('idle', 0)
