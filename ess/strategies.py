@@ -3,6 +3,8 @@ ess/strategies.py - Control strategies for battery operation
 Focus: Energy arbitrage with D+1 lookahead
 """
 
+
+# each day the day ahed prices are released at 13:00
 import pandas as pd
 import numpy as np
 from typing import Optional, Tuple
@@ -157,8 +159,9 @@ class OptimalArbitrageStrategy:
         end_time = start_time + timedelta(hours=47, minutes=45)
         
         index = pd.date_range(start_time, end_time, freq='15min')
-        prices = prices_df.loc[start_time:end_time, 'price_eur_per_kwh'].values
-        consumption_kw = consumption_df.loc[start_time:end_time, 'kw'].values
+        prices_series = prices_df.loc[start_time:end_time, 'price_eur_per_kwh'].reindex(index, method='ffill')
+        prices = prices_series.values
+        consumption_kw = consumption_df.loc[start_time:end_time, 'kw'].reindex(index, method='ffill').values
 
         n_periods = len(prices)
         if n_periods == 0:
@@ -237,8 +240,9 @@ class OptimalArbitrageStrategy:
                 powers[t, i] = best_power
                 next_idx[t, i] = best_next
 
-        # Build schedule
-        schedule = pd.DataFrame(index=index)
+        # Build schedule - only use the actual data periods
+        actual_index = index[:n_periods]
+        schedule = pd.DataFrame(index=actual_index)
         schedule['price'] = prices
         schedule['consumption_kw'] = consumption_kw
         schedule['action'] = 'idle'

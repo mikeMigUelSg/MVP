@@ -3,7 +3,7 @@
 # Simulation period
 period:
   start_date: "2024-03-01"
-  num_days: 100  # Or use end_date instead
+  num_days: 2  # Or use end_date instead
   # end_date: "2024-01-31"
 
 # Household consumption
