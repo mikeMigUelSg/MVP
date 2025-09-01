@@ -2,15 +2,15 @@
 
 # Simulation period
 period:
-  start_date: "2024-01-01"
-  num_days: 30  # Or use end_date instead
+  start_date: "2024-03-01"
+  num_days: 100  # Or use end_date instead
   # end_date: "2024-01-31"
 
 # Household consumption
 consumption:
   profile_file: "data/e_redes_perfil_consumo.xlsx"
   profile_column: "BTN A"  # Residential profile
-  annual_consumption_kwh: 3650  # 10 kWh/day average
+  annual_consumption_kwh: 14650  # 10 kWh/day average
 
 # Electricity tariff
 tariff:
@@ -34,13 +34,13 @@ power_contract:
 
 # Battery specifications
 battery:
-  capacity_kwh: 10.0
+  capacity_kwh: 40.0
   soc_init: 0.5  # Start at 50% charge
   max_charge_kw: 5.0
   max_discharge_kw: 5.0
   efficiency: 0.9  # 90% round-trip efficiency
   soc_min: 0.2  # 20% minimum SOC
-  soc_max: 0.9  # 90% maximum SOC
+  soc_max: 0.8  # 90% maximum SOC
   
   # Economic parameters
   capex_eur: 8000  # Total investment cost
@@ -49,7 +49,7 @@ battery:
 
 # Control strategy
 strategy:
-  type: "arbitrage"  # "arbitrage", "optimal", or "peak_shaving"
+  type: "optimal"  # "arbitrage", "optimal", or "peak_shaving"
   
   arbitrage:
     charge_threshold_percentile: 30  # Charge when price is in bottom 30%

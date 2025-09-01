@@ -139,6 +139,7 @@ class OptimalArbitrageStrategy:
         efficiency_penalty : float
             Small penalty to discourage unnecessary cycling (EUR/kWh)
         """
+        
         self.efficiency_penalty = efficiency_penalty
         self.daily_schedule = None
         self.last_schedule_date = None
