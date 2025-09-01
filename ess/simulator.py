@@ -83,12 +83,15 @@ class EnergyArbitrageSimulator:
               f"Power: {self.battery.max_charge_kw}/{self.battery.max_discharge_kw} kW")
         
         step_count = 0
-        total_steps = int((end_time - current_time).total_seconds() / (self.time_step_minutes * 60)) + 1
-        
+        total_steps = int((end_time - current_time).total_seconds() /
+                          (self.time_step_minutes * 60)) + 1
+        last_logged_date = None
+
         while current_time <= end_time:
-            # Progress indicator
-            if step_count % 96 == 0:  # Every day
+            # Progress indicator - log once per day based on the date
+            if current_time.date() != last_logged_date:
                 print(f"Simulating {current_time.date()}...")
+                last_logged_date = current_time.date()
             
             # Get current consumption and price
             try:
@@ -102,8 +105,9 @@ class EnergyArbitrageSimulator:
             try:
                 base_price = prices_df.loc[current_time, 'price_eur_per_kwh']
             except KeyError:
-                # No price data - skip this timestep
+                # No price data - skip this timestep but count the step
                 current_time += timedelta(minutes=self.time_step_minutes)
+                step_count += 1
                 continue
             
             # Calculate final price with margin and taxes

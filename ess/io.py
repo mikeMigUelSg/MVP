@@ -50,12 +50,11 @@ def fetch_ren_prices(start_date: datetime, end_date: datetime, culture: str = "p
             pt_prices = pt_series["data"]
             
             for hour_str, price in zip(hours, pt_prices):
-                hour = int(hour_str)
-                if hour == 24:
-                    # Hour 24 means midnight of the next day
-                    timestamp = datetime.strptime(date_str, "%Y-%m-%d") + timedelta(days=1)
-                else:
-                    timestamp = datetime.strptime(f"{date_str} {hour:02d}:00", "%Y-%m-%d %H:%M")
+                # REN provides hours numbered 1-24 where "1" corresponds to 00:00
+                # of the given date. Convert to 0-23 range to avoid missing the first
+                # hour of each day and to keep timestamps within the same day.
+                hour = int(hour_str) - 1
+                timestamp = datetime.strptime(f"{date_str} {hour:02d}:00", "%Y-%m-%d %H:%M")
                 pt_data.append({
                     "datetime": timestamp,
                     "price_eur_per_mwh": price
