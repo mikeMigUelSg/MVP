@@ -50,6 +50,7 @@ battery:
 # Control strategy - LESS AGGRESSIVE settings
 strategy:
   type: "optimal"  # Start with arbitrage, not optimal
+  allow_grid_export: false
   
   arbitrage:
     charge_threshold_percentile: 20  # Only charge in bottom 20% of prices
