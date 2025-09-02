@@ -8,7 +8,11 @@ import numpy as np
 import requests
 from datetime import datetime, timedelta
 from typing import Optional, Tuple, Dict
+from pathlib import Path
 import warnings
+
+
+PRICE_CACHE_FILE = Path("data/spot_prices.parquet")
 
 
 def fetch_ren_prices(start_date: datetime, end_date: datetime, culture: str = "pt-PT") -> pd.DataFrame:
@@ -175,6 +179,19 @@ def clean_price_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         # df.loc[extreme_low, price_col] = -100
         # df.loc[extreme_high, price_col] = 1000
     
+    return df
+
+
+def load_cached_prices(start_year: int = 2015, refresh: bool = False) -> pd.DataFrame:
+    """Load cached price data or fetch and cache if missing."""
+    if PRICE_CACHE_FILE.exists() and not refresh:
+        return pd.read_parquet(PRICE_CACHE_FILE)
+
+    start_date = datetime(start_year, 1, 1)
+    end_date = datetime.utcnow()
+    df = fetch_ren_prices(start_date, end_date)
+    PRICE_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(PRICE_CACHE_FILE)
     return df
 
 
@@ -452,12 +469,13 @@ def prepare_simulation_data(
         avg_daily_kwh = consumption_df["kwh"].sum() * 96 / len(consumption_df) if len(consumption_df) > 0 else 0
         print(f"   Estimated average daily consumption: {avg_daily_kwh:.1f} kWh")
         
-        # Fetch prices (add buffer days for lookahead)
-        print(f"\n3. Fetching OMIE prices from {start_date.date()} to {(end_date + timedelta(days=2)).date()}")
-        prices_df = fetch_ren_prices(start_date, end_date + timedelta(days=2))
-        
+        # Load prices from cache (add buffer days for lookahead)
+        print("\n3. Loading OMIE prices from cache")
+        all_prices = load_cached_prices()
+        prices_df = all_prices.loc[start_date:end_date + timedelta(days=2)]
+
         if prices_df.empty:
-            raise ValueError("No price data was fetched successfully")
+            raise ValueError("No price data available in cache for requested period")
         
         # Convert to EUR/kWh
         prices_df["price_eur_per_kwh"] = prices_df["price_eur_per_mwh"] / 1000

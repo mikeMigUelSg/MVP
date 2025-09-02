@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 """Utility script to fetch and cache REN spot prices since 2015.
 
 This script fetches all available OMIE electricity prices from the REN API
@@ -36,6 +37,7 @@ def load_cached() -> pd.DataFrame:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fetch and cache REN spot prices")
+
     parser.add_argument(
         "--refresh",
         action="store_true",
@@ -43,11 +45,14 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    if CACHE_FILE.exists() and not args.refresh:
-        df = load_cached()
-        print(f"Loaded {len(df)} records from {CACHE_FILE}")
+
+    existed = PRICE_CACHE_FILE.exists()
+    df = load_cached_prices(refresh=args.refresh)
+    if args.refresh or not existed:
+        print(f"Saved {len(df)} records to {PRICE_CACHE_FILE}")
     else:
-        df = fetch_and_cache()
+        print(f"Loaded {len(df)} records from {PRICE_CACHE_FILE}")
+
 
     # Display a brief preview so users know it worked
     print(df.head())
