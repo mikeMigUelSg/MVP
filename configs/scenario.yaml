@@ -11,6 +11,7 @@ consumption:
   profile_file: "data/e_redes_perfil_consumo.xlsx"
   profile_column: "BTN A"  # Residential profile
   annual_consumption_kwh: 7000  # More typical residential consumption
+  consumption_model: true  # Use 2024 profile for any simulation year
 
 # Electricity tariff
 tariff:
