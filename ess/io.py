@@ -442,7 +442,8 @@ def prepare_simulation_data(
     start_date: datetime,
     end_date: datetime,
     profile_column: str = "BTN A",
-    fill_missing: bool = True
+    fill_missing: bool = True,
+    consumption_model: bool = False
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Prepare all data needed for simulation with enhanced error handling.
@@ -486,7 +487,21 @@ def prepare_simulation_data(
         
         # Align both datasets to simulation period
         print("5. Aligning data to simulation period")
-        consumption_aligned = align_data_to_period(consumption_df, start_date, end_date)
+
+        # When using a consumption model based on 2024 data, shift the
+        # requested period to 2024 and later map it back to the desired year
+        cons_start = start_date
+        cons_end = end_date
+        if consumption_model:
+            cons_start = cons_start.replace(year=2024)
+            cons_end = cons_end.replace(year=2024)
+
+        consumption_aligned = align_data_to_period(consumption_df, cons_start, cons_end)
+
+        # Map the aligned consumption back to the original requested period
+        if consumption_model:
+            shift = start_date - cons_start
+            consumption_aligned.index = consumption_aligned.index + shift
         
         # Keep extra days for lookahead in prices
         prices_aligned = align_data_to_period(prices_15min, start_date, end_date + timedelta(days=2))

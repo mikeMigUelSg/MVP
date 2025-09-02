@@ -148,7 +148,8 @@ def main():
         config['consumption']['annual_consumption_kwh'],
         start_date,
         end_date,
-        config['consumption']['profile_column']
+        config['consumption']['profile_column'],
+        consumption_model=config['consumption'].get('consumption_model', False)
     )
     
     # Create battery
