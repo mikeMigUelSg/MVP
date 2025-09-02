@@ -2,26 +2,26 @@
 
 # Simulation period - avoiding DST transition
 period:
-  start_date: "2024-04-10"  # Avoid March DST transition
-  num_days: 10  # Shorter period for testing
+  start_date: "2024-01-10"  # Avoid March DST transition
+  num_days: 300  # Shorter period for testing
   # end_date: "2024-01-31"
 
 # Household consumption
 consumption:
   profile_file: "data/e_redes_perfil_consumo.xlsx"
   profile_column: "BTN A"  # Residential profile
-  annual_consumption_kwh: 10950  # More realistic 30 kWh/day average
+  annual_consumption_kwh: 7000  # More typical residential consumption
 
 # Electricity tariff
 tariff:
   type: "indexed"  # or "bi_horaria"
   
   indexed:
-    margin_eur_mwh: 15  # Slightly higher retailer margin
-    grid_fees_eur_kwh: 0.05  # Grid access and system fees
+    margin_eur_mwh: 0  # Slightly higher retailer margin
+    grid_fees_eur_kwh: 0.00  # Grid access and system fees
     
   bi_horaria:
-    peak_price_eur_kwh: 0.20
+    peak_price_eur_kwh: 0.20 
     off_peak_price_eur_kwh: 0.10
     peak_hours: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
     
@@ -43,7 +43,7 @@ battery:
   soc_max: 0.80  # 95% maximum SOC (avoid overcharging)
   
   # Economic parameters
-  capex_eur: 12000  # More realistic cost for 20kWh system
+  capex_eur: 5000  
   lifetime_years: 12
   degradation_cost_eur_kwh: 0.01  # Lower degradation cost
 
