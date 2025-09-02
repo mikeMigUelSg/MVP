@@ -65,25 +65,13 @@ def fetch_ren_prices(start_date: datetime, end_date: datetime, culture: str = "p
                 continue
             
             pt_prices = pt_series["data"]
-
+            
             if len(hours) != len(pt_prices):
                 print(f"Mismatched hours/prices length for {date_str}: {len(hours)} vs {len(pt_prices)}")
                 failed_dates.append(date_str)
                 current_date += timedelta(days=1)
                 continue
-
-            # Detect units: REN typically returns EUR/MWh (~40-100).
-            # Some responses may already be in EUR/kWh (~0.04-0.10).
-            valid_prices = [p for p in pt_prices if isinstance(p, (int, float))]
-            unit_factor = 1.0
-            if valid_prices:
-                avg_price = sum(valid_prices) / len(valid_prices)
-                if avg_price < 5:  # Likely EUR/kWh
-                    warnings.warn(
-                        "Price data appears to be in EUR/kWh; converting to EUR/MWh"
-                    )
-                    unit_factor = 1000.0
-
+            
             # Process hourly data
             daily_data = []
             for hour_str, price in zip(hours, pt_prices):
@@ -103,13 +91,11 @@ def fetch_ren_prices(start_date: datetime, end_date: datetime, culture: str = "p
                     if price is None or not isinstance(price, (int, float)):
                         print(f"Invalid price {price} for {date_str} {hour:02d}:00")
                         continue
-
-                    price_mwh = float(price) * unit_factor
-
+                    
                     # Store valid data point
                     daily_data.append({
                         "datetime": timestamp,
-                        "price_eur_per_mwh": price_mwh
+                        "price_eur_per_mwh": float(price)
                     })
                     
                 except (ValueError, TypeError) as e:
@@ -137,30 +123,22 @@ def fetch_ren_prices(start_date: datetime, end_date: datetime, culture: str = "p
     
     # Create DataFrame
     df = pd.DataFrame(pt_data)
-
+    
     if df.empty:
         print("WARNING: No price data was successfully fetched!")
         return df
-
+    
     # Clean and validate DataFrame
     df = clean_price_dataframe(df)
-
-    # Basic unit sanity check
-    if not df.empty:
-        avg_mwh = df['price_eur_per_mwh'].mean()
-        if avg_mwh < 20 or avg_mwh > 200:
-            warnings.warn(
-                f"Average price {avg_mwh:.2f} EUR/MWh outside expected range (20-200). Check units."
-            )
-
+    
     # Report summary
     total_days = (end_date - start_date).days + 1
     successful_days = total_days - len(failed_dates)
     print(f"Price data fetch summary: {successful_days}/{total_days} days successful")
-
+    
     if failed_dates:
         print(f"Failed dates: {', '.join(failed_dates[:5])}{'...' if len(failed_dates) > 5 else ''}")
-
+    
     return df
 
 
