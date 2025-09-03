@@ -384,6 +384,32 @@ def align_data_to_period(df: pd.DataFrame, start_date: datetime, end_date: datet
     except Exception as e:
         print(f"Error aligning data to period: {e}")
         return df
+    
+def align_consumption_by_calendar(cons_df: pd.DataFrame, start_date: datetime, end_date: datetime) -> pd.DataFrame:
+    """Alinha o consumo para [start_date, end_date] casando por MM-DD HH:MM (ignora o ano)."""
+    # índice alvo no ano pedido
+    target_idx = pd.date_range(start_date.replace(second=0, microsecond=0),
+                               end_date.replace(hour=23, minute=45, second=0, microsecond=0),
+                               freq="15min")
+    target = pd.DataFrame(index=target_idx)
+    target["key"] = target.index.strftime("%m-%d %H:%M")
+
+    # chave na origem (qualquer ano)
+    src = cons_df.copy()
+    src = src.sort_index()
+    src["key"] = src.index.strftime("%m-%d %H:%M")
+
+    # mantém só colunas de consumo que existirem
+    cols = [c for c in ["permil", "kwh", "kw"] if c in src.columns]
+    aligned = (
+        target.reset_index()
+              .merge(src.reset_index()[["key"] + cols], on="key", how="left")
+              .set_index("index")[cols]
+              .sort_index()
+    )
+    aligned.index.name = "datetime"
+    return aligned
+
 
 
 def fill_missing_data(df: pd.DataFrame, start_date: datetime, end_date: datetime, 
@@ -493,15 +519,11 @@ def prepare_simulation_data(
         cons_start = start_date
         cons_end = end_date
         if consumption_model:
-            cons_start = cons_start.replace(year=2024)
-            cons_end = cons_end.replace(year=2024)
+            # alinha por calendário, evitando leap-year e DST traps
+            consumption_aligned = align_consumption_by_calendar(consumption_df, start_date, end_date)
+        else:
+            consumption_aligned = align_data_to_period(consumption_df, start_date, end_date)
 
-        consumption_aligned = align_data_to_period(consumption_df, cons_start, cons_end)
-
-        # Map the aligned consumption back to the original requested period
-        if consumption_model:
-            shift = start_date - cons_start
-            consumption_aligned.index = consumption_aligned.index + shift
         
         # Keep extra days for lookahead in prices
         prices_aligned = align_data_to_period(prices_15min, start_date, end_date + timedelta(days=2))
