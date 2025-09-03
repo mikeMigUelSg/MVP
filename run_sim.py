@@ -151,7 +151,20 @@ def main():
         config['consumption']['profile_column'],
         consumption_model=config['consumption'].get('consumption_model', False)
     )
-    
+
+    # Rename price column for clarity
+    if 'price_eur_per_kwh' in prices_df.columns:
+        prices_df = prices_df.rename(columns={'price_eur_per_kwh': 'price_omie_eur_kwh'})
+
+    # Apply tariff to compute final prices
+    from ess.tariff import apply_indexed_tariff
+    if config['tariff']['type'] == 'indexed':
+        prices_df = apply_indexed_tariff(prices_df, config['tariff']['indexed'], config['tariff']['vat_rate'])
+        idx_cfg = config['tariff']['indexed']
+        daily_fixed_cost = idx_cfg['k3_eur_day'] + idx_cfg['tariff_power_eur_kva_day'] * config['power_contract']['contracted_power_kva']
+    else:
+        raise NotImplementedError("Only indexed tariff is implemented for now")
+
     # Create battery
     battery = Battery(
         capacity_kwh=config['battery']['capacity_kwh'],
@@ -187,28 +200,14 @@ def main():
     # Create and run simulator
     simulator = EnergyArbitrageSimulator(battery, strategy)
 
-    # Get tariff parameters
-    if config['tariff']['type'] == 'indexed':
-        tariff_margin = config['tariff']['indexed']['margin_eur_mwh'] / 1000
-        grid_fees = config['tariff']['indexed']['grid_fees_eur_kwh']
-    else:
-        raise NotImplementedError("Only indexed tariff is implemented for now")
-
-    # Add final price column for strategy lookahead
-    prices_df['price_final_eur_kwh'] = (
-        (prices_df['price_eur_per_kwh'] + tariff_margin + grid_fees) *
-        (1 + config['tariff']['vat_rate'])
-    )
-
     print("\nRunning simulation...")
     results_df = simulator.run(
         consumption_df,
         prices_df,
         start_date,
         end_date,
-        tariff_margin_eur_kwh=tariff_margin,
-        grid_fees_eur_kwh=grid_fees,
-        vat_rate=config['tariff']['vat_rate']
+        vat_rate=config['tariff']['vat_rate'],
+        daily_fixed_cost_eur=daily_fixed_cost
     )
     
     # Calculate and display metrics

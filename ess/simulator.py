@@ -79,8 +79,9 @@ class EnergyArbitrageSimulator:
             if max_consumption > 10:  # Reasonable limit for 15-min residential consumption
                 warnings_list.append(f"Very high consumption values detected (max: {max_consumption:.2f} kWh/15min)")
                 
-        if 'price_eur_per_kwh' in prices_df.columns:
-            price_range = prices_df['price_eur_per_kwh']
+        price_col = 'price_final_eur_kwh' if 'price_final_eur_kwh' in prices_df.columns else 'price_omie_eur_kwh'
+        if price_col in prices_df.columns:
+            price_range = prices_df[price_col]
             if price_range.min() < -0.1:
                 warnings_list.append(f"Negative prices detected (min: {price_range.min():.4f} EUR/kWh)")
             if price_range.max() > 1.0:
@@ -103,11 +104,8 @@ class EnergyArbitrageSimulator:
             prices_df: pd.DataFrame,
             start_date: datetime,
             end_date: datetime,
-            tariff_margin_eur_kwh: float = 0.01,
-            grid_fees_eur_kwh: float = 0.05,
             vat_rate: float = 0.23,
-            contracted_power_kva: float = 6.9,
-            daily_fixed_cost_eur: float = 0.30) -> pd.DataFrame:
+            daily_fixed_cost_eur: float = 0.0) -> pd.DataFrame:
         """
         Run the CORRECTED simulation with proper energy flow calculations.
         """
@@ -135,6 +133,8 @@ class EnergyArbitrageSimulator:
         total_steps = int((end_time - current_time).total_seconds() / (self.time_step_minutes * 60)) + 1
         last_logged_date = None
 
+        self.daily_fixed_cost_eur = daily_fixed_cost_eur
+
         while current_time <= end_time:
             self.performance_stats['total_periods'] += 1
             
@@ -160,7 +160,8 @@ class EnergyArbitrageSimulator:
             
             try:
                 if current_time in prices_df.index:
-                    base_price = prices_df.loc[current_time, 'price_eur_per_kwh']
+                    base_price = prices_df.loc[current_time, 'price_omie_eur_kwh']
+                    final_price = prices_df.loc[current_time, 'price_final_eur_kwh']
                 else:
                     current_time += timedelta(minutes=self.time_step_minutes)
                     step_count += 1
@@ -176,10 +177,6 @@ class EnergyArbitrageSimulator:
             if base_price < -0.5 or base_price > 2.0:
                 print(f"WARNING: Extreme price {base_price:.4f} EUR/kWh at {current_time}")
             
-            # Calculate final price with all components
-            price_with_margin = base_price + tariff_margin_eur_kwh + grid_fees_eur_kwh
-            final_price = price_with_margin * (1 + vat_rate)
-            
             # Store battery state before action
             battery_state_before = self.battery.get_state()
             
@@ -190,12 +187,12 @@ class EnergyArbitrageSimulator:
             try:
                 if isinstance(self.strategy, OptimalArbitrageStrategy):
                     action, power_kw = self.strategy.decide_action(
-                        current_time, base_price, consumption_kw, 
+                        current_time, final_price, consumption_kw,
                         self.battery, prices_df, consumption_df
                     )
                 else:
                     action, power_kw = self.strategy.decide_action(
-                        current_time, base_price, consumption_kw,
+                        current_time, final_price, consumption_kw,
                         self.battery, prices_df
                     )
             except Exception as e:
@@ -285,10 +282,7 @@ class EnergyArbitrageSimulator:
                 
                 # Prices
                 'price_omie_eur_kwh': base_price,
-                'price_with_margin_eur_kwh': price_with_margin,
                 'price_final_eur_kwh': final_price,
-                'tariff_margin_eur_kwh': tariff_margin_eur_kwh,
-                'grid_fees_eur_kwh': grid_fees_eur_kwh,
                 'vat_rate': vat_rate,
                 
                 # Battery actions
@@ -386,7 +380,10 @@ class EnergyArbitrageSimulator:
         # Cost metrics
         total_cost_without_battery = results_df['cost_without_battery_eur'].sum()
         total_cost_with_battery = results_df['cost_with_battery_eur'].sum()
-        total_savings = results_df['savings_eur'].sum()
+        fixed_cost_total = self.daily_fixed_cost_eur * n_days
+        total_cost_without_battery += fixed_cost_total
+        total_cost_with_battery += fixed_cost_total
+        total_savings = total_cost_without_battery - total_cost_with_battery
         
         # Battery metrics
         battery_final_state = self.battery.get_state()
@@ -417,8 +414,8 @@ class EnergyArbitrageSimulator:
         charge_periods = results_df[results_df['battery_action'] == 'charge']
         discharge_periods = results_df[results_df['battery_action'] == 'discharge']
         
-        avg_charge_price = charge_periods['price_omie_eur_kwh'].mean() if len(charge_periods) > 0 else 0
-        avg_discharge_price = discharge_periods['price_omie_eur_kwh'].mean() if len(discharge_periods) > 0 else 0
+        avg_charge_price = charge_periods['price_final_eur_kwh'].mean() if len(charge_periods) > 0 else 0
+        avg_discharge_price = discharge_periods['price_final_eur_kwh'].mean() if len(discharge_periods) > 0 else 0
         price_spread = avg_discharge_price - avg_charge_price
         
         # Advanced metrics
@@ -463,6 +460,8 @@ class EnergyArbitrageSimulator:
             'savings_percentage': (total_savings / total_cost_without_battery * 100) if total_cost_without_battery > 0 else 0,
             'daily_avg_savings_eur': daily_avg_savings,
             'annual_projected_savings_eur': annual_projected_savings,
+            'daily_fixed_cost_eur': self.daily_fixed_cost_eur,
+            'total_fixed_cost_eur': fixed_cost_total,
             
             # Battery performance
             'battery_total_charged_kwh': total_charged,
@@ -482,7 +481,7 @@ class EnergyArbitrageSimulator:
             'peak_reduction_pct': (peak_reduction_kw / peak_house_consumption * 100) if peak_house_consumption > 0 else 0,
             
             # Price arbitrage
-            'avg_price_eur_kwh': results_df['price_omie_eur_kwh'].mean(),
+            'avg_price_eur_kwh': results_df['price_final_eur_kwh'].mean(),
             'avg_charge_price_eur_kwh': avg_charge_price,
             'avg_discharge_price_eur_kwh': avg_discharge_price,
             'arbitrage_spread_eur_kwh': price_spread,
