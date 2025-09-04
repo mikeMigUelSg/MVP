@@ -21,7 +21,7 @@ tariff:
     k1: 1.28
     k2_eur_kwh: 0.0172
     k3_eur_day: 0.09410
-    losses_pct: 0.035
+    losses_pct: 0.085
     option: "bi"           # simples, bi or tri
     cycle: "daily"         # daily or weekly
     tariff_energy_eur_kwh:
@@ -33,7 +33,7 @@ tariff:
         ponta: 0.2469
         cheias: 0.0388
         vazio: 0.0149
-    tariff_power_eur_kva_day: 0.0460
+    tariff_power_eur_kva_day: 0.31
     
   vat_rate: 0.23  # 23% VAT in Portugal
 

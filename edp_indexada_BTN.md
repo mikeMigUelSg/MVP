@@ -17,7 +17,7 @@ $$
 - \(N_{\text{dias}}\): número de dias do período de faturação
 
 ---
-
+Consumo de energia (kWh): com potência até 6,9 kVA, aplica-se 6% aos primeiros 200 kWh por 30 dias
 ## Componentes comerciais (EDP — oferta indexada)
 
 | Componente | Valor | Unidade | Observação |
