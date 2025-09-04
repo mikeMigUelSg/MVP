@@ -79,6 +79,7 @@ def get_tariff_period(ts: datetime, option: str, cycle: str) -> str:
     return _period_weekly(ts, option, season)
 
 
+
 def apply_indexed_tariff(prices_df: pd.DataFrame, tariff_cfg: dict) -> pd.DataFrame:
     idx_cfg = tariff_cfg['indexed']
     option = idx_cfg['option']
@@ -98,6 +99,7 @@ def apply_indexed_tariff(prices_df: pd.DataFrame, tariff_cfg: dict) -> pd.DataFr
     iec_list = []
     final_prices = []
 
+
     for ts, row in prices_df.iterrows():
         period = get_tariff_period(ts, option, cycle)
         periods.append(period)
@@ -110,6 +112,7 @@ def apply_indexed_tariff(prices_df: pd.DataFrame, tariff_cfg: dict) -> pd.DataFr
         else:
             tar = 0.0
         tariffs.append(tar)
+
         energy_base = row['price_omie_eur_kwh'] * (1 + losses) * k1 + k2 + tar
         price_energy_with_vat = energy_base * (1 + vat_rate)
         price_iec_with_vat = iec_tax * (1 + iec_vat)
@@ -121,5 +124,6 @@ def apply_indexed_tariff(prices_df: pd.DataFrame, tariff_cfg: dict) -> pd.DataFr
     prices_df['tariff_energy_eur_kwh'] = tariffs
     prices_df['price_energy_pre_vat_eur_kwh'] = energy_pre_vat
     prices_df['iec_tax_eur_kwh'] = iec_list
+
     prices_df['price_final_eur_kwh'] = final_prices
     return prices_df

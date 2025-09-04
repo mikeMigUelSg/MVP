@@ -105,12 +105,14 @@ class EnergyArbitrageSimulator:
             start_date: datetime,
             end_date: datetime,
             vat_rate: float = 0.23,
+
             reduced_vat_rate: float = 0.06,
             reduced_vat_kwh_per_cycle: float = 200.0,
             vat_cycle_days: int = 30,
             iec_vat_rate: float = 0.23,
             contracted_power_kva: float = 6.9,
             vat_reduced_power_threshold_kva: float = 6.9,
+
             daily_fixed_cost_eur: float = 0.0) -> pd.DataFrame:
         """
         Run the CORRECTED simulation with proper energy flow calculations.
@@ -140,9 +142,11 @@ class EnergyArbitrageSimulator:
         last_logged_date = None
 
         self.daily_fixed_cost_eur = daily_fixed_cost_eur
+
         cycle_consumption_with = 0.0
         cycle_consumption_without = 0.0
         cycle_start = start_date
+
 
         while current_time <= end_time:
             self.performance_stats['total_periods'] += 1
@@ -173,6 +177,7 @@ class EnergyArbitrageSimulator:
                     final_price = prices_df.loc[current_time, 'price_final_eur_kwh']
                     energy_price = prices_df.loc[current_time, 'price_energy_pre_vat_eur_kwh']
                     iec_tax = prices_df.loc[current_time, 'iec_tax_eur_kwh']
+
                 else:
                     current_time += timedelta(minutes=self.time_step_minutes)
                     step_count += 1

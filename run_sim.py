@@ -159,6 +159,7 @@ def main():
     # Apply tariff to compute final prices
     from ess.tariff import apply_indexed_tariff
     if config['tariff']['type'] == 'indexed':
+
         prices_df = apply_indexed_tariff(prices_df, config['tariff'])
         idx_cfg = config['tariff']['indexed']
         tcfg = config['tariff']
@@ -170,6 +171,7 @@ def main():
             + cav_daily
             + dgeg_daily
         )
+
     else:
         raise NotImplementedError("Only indexed tariff is implemented for now")
 
@@ -221,6 +223,7 @@ def main():
         iec_vat_rate=config['tariff']['iec_vat_rate'],
         contracted_power_kva=config['power_contract']['contracted_power_kva'],
         vat_reduced_power_threshold_kva=config['tariff']['reduced_vat_power_threshold_kva'],
+
         daily_fixed_cost_eur=daily_fixed_cost
     )
     
