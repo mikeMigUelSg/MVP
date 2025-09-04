@@ -18,20 +18,38 @@ tariff:
   type: "indexed"  # or "bi_horaria"
   
   indexed:
-    margin_eur_mwh: 0  # Slightly higher retailer margin
-    grid_fees_eur_kwh: 0.00  # Grid access and system fees
-    
-  bi_horaria:
-    peak_price_eur_kwh: 0.20 
-    off_peak_price_eur_kwh: 0.10
-    peak_hours: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
-    
-  vat_rate: 0.23  # 23% VAT in Portugal
+    k1: 1.28
+    k2_eur_kwh: 0.0172
+    k3_eur_day: 0.09410
+    losses_pct: 0.035
+    option: "bi"           # simples, bi or tri
+    cycle: "daily"         # daily or weekly
+    tariff_energy_eur_kwh:
+      simples: 0.0600
+      bi:
+        fora_vazio: 0.0830
+        vazio: 0.0149
+      tri:
+        ponta: 0.2469
+        cheias: 0.0388
+        vazio: 0.0149
+    tariff_power_eur_kva_day: 0.0460
+
+  vat_rate: 0.23  # Standard VAT for energy beyond reduced tier
+  reduced_vat_rate: 0.06  # Reduced VAT for first block of consumption
+  reduced_vat_kwh_per_30_days: 200  # kWh per 30-day cycle eligible for reduced VAT
+  reduced_vat_power_threshold_kva: 6.9  # Apply reduced VAT only if contracted power <= threshold
+  vat_cycle_days: 30
+  iec_tax_eur_kwh: 0.001  # IEC consumption tax
+  iec_vat_rate: 0.23
+  cav_fee_eur_month: 2.85  # CAV fixed monthly fee
+  cav_vat_rate: 0.06
+  dgeg_fee_eur_month: 0.07  # DGEG fixed monthly fee
+  dgeg_vat_rate: 0.23
 
 # Contracted power
 power_contract:
   contracted_power_kva: 6.9  # Typical residential
-  daily_fixed_cost_eur: 0.30  # Fixed daily charge
 
 # Battery specifications - more realistic sizing
 battery:
