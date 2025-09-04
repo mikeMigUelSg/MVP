@@ -21,7 +21,9 @@ tariff:
     k1: 1.28
     k2_eur_kwh: 0.0172
     k3_eur_day: 0.09410
-    losses_pct: 0.085
+
+    losses_pct: 0
+
     option: "bi"           # simples, bi or tri
     cycle: "daily"         # daily or weekly
     tariff_energy_eur_kwh:
@@ -33,9 +35,21 @@ tariff:
         ponta: 0.2469
         cheias: 0.0388
         vazio: 0.0149
-    tariff_power_eur_kva_day: 0.31
-    
-  vat_rate: 0.23  # 23% VAT in Portugal
+
+    tariff_power_eur_kva_day: 0.0460
+
+  vat_rate: 0.23  # Standard VAT for energy beyond reduced tier
+  reduced_vat_rate: 0.06  # Reduced VAT for first block of consumption
+  reduced_vat_kwh_per_30_days: 200  # kWh per 30-day cycle eligible for reduced VAT
+  reduced_vat_power_threshold_kva: 6.9  # Apply reduced VAT only if contracted power <= threshold
+  vat_cycle_days: 30
+  iec_tax_eur_kwh: 0.001  # IEC consumption tax
+  iec_vat_rate: 0.23
+  cav_fee_eur_month: 2.85  # CAV fixed monthly fee
+  cav_vat_rate: 0.06
+  dgeg_fee_eur_month: 0.07  # DGEG fixed monthly fee
+  dgeg_vat_rate: 0.23
+
 
 # Contracted power
 power_contract:

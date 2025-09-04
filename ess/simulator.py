@@ -105,6 +105,14 @@ class EnergyArbitrageSimulator:
             start_date: datetime,
             end_date: datetime,
             vat_rate: float = 0.23,
+
+            reduced_vat_rate: float = 0.06,
+            reduced_vat_kwh_per_cycle: float = 200.0,
+            vat_cycle_days: int = 30,
+            iec_vat_rate: float = 0.23,
+            contracted_power_kva: float = 6.9,
+            vat_reduced_power_threshold_kva: float = 6.9,
+
             daily_fixed_cost_eur: float = 0.0) -> pd.DataFrame:
         """
         Run the CORRECTED simulation with proper energy flow calculations.
@@ -135,6 +143,11 @@ class EnergyArbitrageSimulator:
 
         self.daily_fixed_cost_eur = daily_fixed_cost_eur
 
+        cycle_consumption_with = 0.0
+        cycle_consumption_without = 0.0
+        cycle_start = start_date
+
+
         while current_time <= end_time:
             self.performance_stats['total_periods'] += 1
             
@@ -162,6 +175,9 @@ class EnergyArbitrageSimulator:
                 if current_time in prices_df.index:
                     base_price = prices_df.loc[current_time, 'price_omie_eur_kwh']
                     final_price = prices_df.loc[current_time, 'price_final_eur_kwh']
+                    energy_price = prices_df.loc[current_time, 'price_energy_pre_vat_eur_kwh']
+                    iec_tax = prices_df.loc[current_time, 'iec_tax_eur_kwh']
+
                 else:
                     current_time += timedelta(minutes=self.time_step_minutes)
                     step_count += 1
@@ -257,11 +273,28 @@ class EnergyArbitrageSimulator:
             # CORRECTED COST CALCULATIONS
             # ===========================
             
-            # Cost without battery = house consumption at final price
-            cost_without_battery = house_consumption_kwh * final_price
-            
-            # Cost with battery = total grid import at final price
-            cost_with_battery = total_grid_import_kwh * final_price
+            # Reset VAT cycle if needed
+            if (current_time - cycle_start).days >= vat_cycle_days:
+                cycle_start += timedelta(days=vat_cycle_days)
+                cycle_consumption_with = 0.0
+                cycle_consumption_without = 0.0
+
+            def compute_cost(amount_kwh: float, cycle_consumption: float) -> Tuple[float, float]:
+                reduced_kwh = 0.0
+                if contracted_power_kva <= vat_reduced_power_threshold_kva:
+                    reduced_remaining = max(0.0, reduced_vat_kwh_per_cycle - cycle_consumption)
+                    reduced_kwh = min(amount_kwh, reduced_remaining)
+                standard_kwh = amount_kwh - reduced_kwh
+                cost_energy = (
+                    energy_price * reduced_kwh * (1 + reduced_vat_rate)
+                    + energy_price * standard_kwh * (1 + vat_rate)
+                )
+                cost_iec = iec_tax * amount_kwh * (1 + iec_vat_rate)
+                cycle_consumption += amount_kwh
+                return cost_energy + cost_iec, cycle_consumption
+
+            cost_without_battery, cycle_consumption_without = compute_cost(house_consumption_kwh, cycle_consumption_without)
+            cost_with_battery, cycle_consumption_with = compute_cost(total_grid_import_kwh, cycle_consumption_with)
             
             # Savings = difference
             savings = cost_without_battery - cost_with_battery
