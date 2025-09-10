@@ -418,7 +418,7 @@ class EnergyArbitrageSimulator:
         total_cost_with_battery += fixed_cost_total
         total_savings = total_cost_without_battery - total_cost_with_battery
         
-        # Battery metrics
+        # Battery metrics 
         battery_final_state = self.battery.get_state()
         total_charged = battery_final_state['total_charged_kwh']
         total_discharged = battery_final_state['total_discharged_kwh']

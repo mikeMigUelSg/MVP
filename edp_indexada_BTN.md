@@ -12,8 +12,8 @@ $$
 - \(POMIE_i\): preço OMIE em €/kWh  
 - **Perdas**: coeficiente médio de perdas de rede  
 - **K1, K2, K3**: componentes comerciais do comercializador  
-- **TAR\(_{\text{Energia},i}\)**: Tarifa de Acesso às Redes — energia (BTN) do período \(i\)  
-- **TAR\(_{\text{Potência}}\)**: Tarifa de Acesso às Redes — potência (BTN) por dia  
+- **TAREnergia_i: Tarifa de Acesso às R√edes — energia (BTN) do período \(i\)  
+- **TARPotência_i: Tarifa de Acesso às Redes — potência (BTN) por dia  
 - \(N_{\text{dias}}\): número de dias do período de faturação
 
 ---
@@ -58,7 +58,7 @@ Consumo de energia (kWh): com potência até 6,9 kVA, aplica-se 6% aos primeiros
 | 17,25 | 0,7935 |
 | 20,70 | 0,9522 |
 
----
+---√
 
 ### Notas
 - Os valores de **TAR** são definidos pela **ERSE** e variam por ciclo horário e potência contratada.

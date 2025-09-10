@@ -3,14 +3,14 @@
 # Simulation period - avoiding DST transition
 period:
   start_date: "2023-01-10"  # Avoid March DST transition
-  num_days: 900  # Shorter period for testing
+  num_days: 30  # Shorter period for testing
   # end_date: "2024-01-31"
 
 # Household consumption
 consumption:
   profile_file: "data/e_redes_perfil_consumo.xlsx"
   profile_column: "BTN A"  # Residential profile
-  annual_consumption_kwh: 7000  # More typical residential consumption
+  annual_consumption_kwh: 1900  # More typical residential consumption
   consumption_model: true  # Use 2024 profile for any simulation year
 
 # Electricity tariff
@@ -20,7 +20,7 @@ tariff:
   indexed:
     k1: 1.28
     k2_eur_kwh: 0.0172
-    k3_eur_day: 0.09410
+    k3_eur_day: 0.094
 
     losses_pct: 0
 
@@ -37,23 +37,26 @@ tariff:
         vazio: 0.0149
 
     tariff_power_eur_kva_day: 0.0460
-
+ #0.2758
   vat_rate: 0.23  # Standard VAT for energy beyond reduced tier
   reduced_vat_rate: 0.06  # Reduced VAT for first block of consumption
   reduced_vat_kwh_per_30_days: 200  # kWh per 30-day cycle eligible for reduced VAT
   reduced_vat_power_threshold_kva: 6.9  # Apply reduced VAT only if contracted power <= threshold
   vat_cycle_days: 30
+
   iec_tax_eur_kwh: 0.001  # IEC consumption tax
   iec_vat_rate: 0.23
+
   cav_fee_eur_month: 2.85  # CAV fixed monthly fee
   cav_vat_rate: 0.06
+
   dgeg_fee_eur_month: 0.07  # DGEG fixed monthly fee
   dgeg_vat_rate: 0.23
 
 
 # Contracted power
 power_contract:
-  contracted_power_kva: 6.9  # Typical residential
+  contracted_power_kva: 3.45  # Typical residential
 
 # Battery specifications - more realistic sizing
 battery:
@@ -66,7 +69,7 @@ battery:
   soc_max: 0.80  # 95% maximum SOC (avoid overcharging)
   
   # Economic parameters
-  capex_eur: 5000  
+  capex_eur: 3000  
   lifetime_years: 12
   degradation_cost_eur_kwh: 0.01  # Lower degradation cost
 
