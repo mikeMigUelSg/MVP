@@ -10,6 +10,7 @@ import warnings
 class EnergyArbitrageSimulator:
     """
     CORRECTED simulator for battery energy arbitrage operations.
+    Updated with simplified energy VAT logic - no 200 kWh limit.
     """
     
     def __init__(self,
@@ -105,17 +106,13 @@ class EnergyArbitrageSimulator:
             start_date: datetime,
             end_date: datetime,
             vat_rate: float = 0.23,
-
             reduced_vat_rate: float = 0.06,
-            reduced_vat_kwh_per_cycle: float = 200.0,
-            vat_cycle_days: int = 30,
             iec_vat_rate: float = 0.23,
             contracted_power_kva: float = 6.9,
             vat_reduced_power_threshold_kva: float = 6.9,
-
             daily_fixed_cost_eur: float = 0.0) -> pd.DataFrame:
         """
-        Run the CORRECTED simulation with proper energy flow calculations.
+        Run the CORRECTED simulation with simplified energy VAT logic.
         """
         
         # Validate input data
@@ -137,16 +134,19 @@ class EnergyArbitrageSimulator:
               f"SOC limits: {self.battery.soc_min*100:.0f}%-{self.battery.soc_max*100:.0f}%")
         print(f"Strategy: {type(self.strategy).__name__}")
         
+        # Determine energy VAT rate based on contracted power
+        if contracted_power_kva <= vat_reduced_power_threshold_kva:
+            energy_vat_rate = reduced_vat_rate
+            print(f"✓ Using reduced energy VAT ({energy_vat_rate:.0%}) - contracted power: {contracted_power_kva} kVA <= {vat_reduced_power_threshold_kva} kVA")
+        else:
+            energy_vat_rate = vat_rate
+            print(f"✓ Using standard energy VAT ({energy_vat_rate:.0%}) - contracted power: {contracted_power_kva} kVA > {vat_reduced_power_threshold_kva} kVA")
+        
         step_count = 0
         total_steps = int((end_time - current_time).total_seconds() / (self.time_step_minutes * 60)) + 1
         last_logged_date = None
 
         self.daily_fixed_cost_eur = daily_fixed_cost_eur
-
-        cycle_consumption_with = 0.0
-        cycle_consumption_without = 0.0
-        cycle_start = start_date
-
 
         while current_time <= end_time:
             self.performance_stats['total_periods'] += 1
@@ -177,7 +177,6 @@ class EnergyArbitrageSimulator:
                     final_price = prices_df.loc[current_time, 'price_final_eur_kwh']
                     energy_price = prices_df.loc[current_time, 'price_energy_pre_vat_eur_kwh']
                     iec_tax = prices_df.loc[current_time, 'iec_tax_eur_kwh']
-
                 else:
                     current_time += timedelta(minutes=self.time_step_minutes)
                     step_count += 1
@@ -270,31 +269,17 @@ class EnergyArbitrageSimulator:
             # This can be negative if battery discharges more than house consumes, but we limit to 0 for import
             net_grid_power_kw = max(0, house_consumption_kw + battery_charge_kw - battery_discharge_kw)
             
-            # CORRECTED COST CALCULATIONS
-            # ===========================
+            # SIMPLIFIED COST CALCULATIONS
+            # ============================
             
-            # Reset VAT cycle if needed
-            if (current_time - cycle_start).days >= vat_cycle_days:
-                cycle_start += timedelta(days=vat_cycle_days)
-                cycle_consumption_with = 0.0
-                cycle_consumption_without = 0.0
-
-            def compute_cost(amount_kwh: float, cycle_consumption: float) -> Tuple[float, float]:
-                reduced_kwh = 0.0
-                if contracted_power_kva <= vat_reduced_power_threshold_kva:
-                    reduced_remaining = max(0.0, reduced_vat_kwh_per_cycle - cycle_consumption)
-                    reduced_kwh = min(amount_kwh, reduced_remaining)
-                standard_kwh = amount_kwh - reduced_kwh
-                cost_energy = (
-                    energy_price * reduced_kwh * (1 + reduced_vat_rate)
-                    + energy_price * standard_kwh * (1 + vat_rate)
-                )
+            def compute_cost(amount_kwh: float) -> float:
+                """Simplified cost calculation - all energy gets same VAT rate based on contracted power."""
+                cost_energy = energy_price * amount_kwh * (1 + energy_vat_rate)
                 cost_iec = iec_tax * amount_kwh * (1 + iec_vat_rate)
-                cycle_consumption += amount_kwh
-                return cost_energy + cost_iec, cycle_consumption
+                return cost_energy + cost_iec
 
-            cost_without_battery, cycle_consumption_without = compute_cost(house_consumption_kwh, cycle_consumption_without)
-            cost_with_battery, cycle_consumption_with = compute_cost(total_grid_import_kwh, cycle_consumption_with)
+            cost_without_battery = compute_cost(house_consumption_kwh)
+            cost_with_battery = compute_cost(total_grid_import_kwh)
             
             # Savings = difference
             savings = cost_without_battery - cost_with_battery
@@ -316,7 +301,7 @@ class EnergyArbitrageSimulator:
                 # Prices
                 'price_omie_eur_kwh': base_price,
                 'price_final_eur_kwh': final_price,
-                'vat_rate': vat_rate,
+                'energy_vat_rate': energy_vat_rate,
                 
                 # Battery actions
                 'battery_action': action,
@@ -471,6 +456,9 @@ class EnergyArbitrageSimulator:
         elif simple_payback_years > 20:
             results_quality = "poor - payback too long"
         
+        # Energy VAT rate used
+        energy_vat_rate = results_df['energy_vat_rate'].iloc[0] if len(results_df) > 0 else 0.23
+        
         return {
             # Period information
             'simulation_start': results_df.index[0],
@@ -479,6 +467,7 @@ class EnergyArbitrageSimulator:
             'total_periods': n_periods,
             'time_step_hours': self.time_step_hours,
             'results_quality': results_quality,
+            'energy_vat_rate_used': energy_vat_rate,
             
             # CORRECTED energy metrics
             'total_house_consumption_kwh': total_house_consumption_kwh,
@@ -550,6 +539,7 @@ class EnergyArbitrageSimulator:
         print(f"\nPeriod: {metrics['simulation_start'].strftime('%Y-%m-%d')} to {metrics['simulation_end'].strftime('%Y-%m-%d')} ({metrics['period_days']} days)")
         print(f"Total periods: {metrics['total_periods']} ({metrics['time_step_hours']:.2f}h intervals)")
         print(f"Data completeness: {metrics['data_completeness_pct']:.1f}%")
+        print(f"Energy VAT rate used: {metrics.get('energy_vat_rate_used', 0.23):.0%}")
         
         print("\n--- CORRECTED ENERGY FLOWS ---")
         print(f"House consumption:        {metrics['total_house_consumption_kwh']:.1f} kWh")
