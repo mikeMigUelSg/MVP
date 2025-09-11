@@ -104,15 +104,10 @@ class EnergyArbitrageSimulator:
             consumption_df: pd.DataFrame,
             prices_df: pd.DataFrame,
             start_date: datetime,
-            end_date: datetime,
-            vat_rate: float = 0.23,
-            reduced_vat_rate: float = 0.06,
-            iec_vat_rate: float = 0.23,
-            contracted_power_kva: float = 6.9,
-            vat_reduced_power_threshold_kva: float = 6.9,
-            daily_fixed_cost_eur: float = 0.0) -> pd.DataFrame:
+            end_date: datetime) -> pd.DataFrame:
         """
-        Run the CORRECTED simulation with simplified energy VAT logic.
+        Run the simulation and return only physical energy flows.
+        Monetary calculations are handled by the billing engine.
         """
         
         # Validate input data
@@ -134,19 +129,9 @@ class EnergyArbitrageSimulator:
               f"SOC limits: {self.battery.soc_min*100:.0f}%-{self.battery.soc_max*100:.0f}%")
         print(f"Strategy: {type(self.strategy).__name__}")
         
-        # Determine energy VAT rate based on contracted power
-        if contracted_power_kva <= vat_reduced_power_threshold_kva:
-            energy_vat_rate = reduced_vat_rate
-            print(f"✓ Using reduced energy VAT ({energy_vat_rate:.0%}) - contracted power: {contracted_power_kva} kVA <= {vat_reduced_power_threshold_kva} kVA")
-        else:
-            energy_vat_rate = vat_rate
-            print(f"✓ Using standard energy VAT ({energy_vat_rate:.0%}) - contracted power: {contracted_power_kva} kVA > {vat_reduced_power_threshold_kva} kVA")
-        
         step_count = 0
         total_steps = int((end_time - current_time).total_seconds() / (self.time_step_minutes * 60)) + 1
         last_logged_date = None
-
-        self.daily_fixed_cost_eur = daily_fixed_cost_eur
 
         while current_time <= end_time:
             self.performance_stats['total_periods'] += 1
@@ -175,9 +160,6 @@ class EnergyArbitrageSimulator:
                 if current_time in prices_df.index:
                     base_price = prices_df.loc[current_time, 'price_omie_eur_kwh']
                     final_price = prices_df.loc[current_time, 'price_final_eur_kwh']
-                    energy_price = prices_df.loc[current_time, 'price_energy_pre_vat_eur_kwh']
-                    iec_tax = prices_df.loc[current_time, 'iec_tax_eur_kwh']
-                    tariff_energy = prices_df.loc[current_time, 'tariff_energy_eur_kwh']
                 else:
                     current_time += timedelta(minutes=self.time_step_minutes)
                     step_count += 1
@@ -257,9 +239,10 @@ class EnergyArbitrageSimulator:
             
             # Grid supply to house = house consumption - battery discharge (cannot be negative)
             grid_to_house_kwh = max(0, house_consumption_kwh - battery_discharge_kwh)
-            
+
             # Total grid import = grid to house + battery charging
             total_grid_import_kwh = grid_to_house_kwh + battery_charge_kwh
+            grid_export_kwh = max(0, battery_discharge_kwh - house_consumption_kwh)
             
             # Instantaneous powers (kW) - CORRECTED
             house_consumption_kw = consumption_kw  # This stays the same
@@ -269,21 +252,6 @@ class EnergyArbitrageSimulator:
             # Net grid power = house consumption + battery charging - battery discharge
             # This can be negative if battery discharges more than house consumes, but we limit to 0 for import
             net_grid_power_kw = max(0, house_consumption_kw + battery_charge_kw - battery_discharge_kw)
-            
-            # SIMPLIFIED COST CALCULATIONS
-            # ============================
-            
-            def compute_cost(amount_kwh: float) -> float:
-                """Simplified cost calculation - all energy gets same VAT rate based on contracted power."""
-                cost_energy = energy_price * amount_kwh * (1 + energy_vat_rate)
-                cost_iec = iec_tax * amount_kwh * (1 + iec_vat_rate)
-                return cost_energy + cost_iec
-
-            cost_without_battery = compute_cost(house_consumption_kwh)
-            cost_with_battery = compute_cost(total_grid_import_kwh)
-            
-            # Savings = difference
-            savings = cost_without_battery - cost_with_battery
             
             # Additional metrics
             battery_state_after = self.battery.get_state()
@@ -298,12 +266,6 @@ class EnergyArbitrageSimulator:
                 'datetime': current_time,
                 'house_consumption_kwh': house_consumption_kwh,
                 'house_consumption_kw': house_consumption_kw,
-                
-                # Prices
-                'price_omie_eur_kwh': base_price,
-                'price_final_eur_kwh': final_price,
-                'tariff_energy_eur_kwh': tariff_energy,
-                'energy_vat_rate': energy_vat_rate,
                 
                 # Battery actions
                 'battery_action': action,
@@ -324,20 +286,15 @@ class EnergyArbitrageSimulator:
                 # CORRECTED energy flows
                 'grid_to_house_kwh': grid_to_house_kwh,
                 'total_grid_import_kwh': total_grid_import_kwh,
+                'grid_export_kwh': grid_export_kwh,
                 'net_grid_power_kw': net_grid_power_kw,
-                
+
                 # Legacy columns for compatibility (but with correct values)
                 'consumption_kwh': house_consumption_kwh,  # For backward compatibility
                 'consumption_kw': house_consumption_kw,    # For backward compatibility
                 'grid_consumption_kwh': total_grid_import_kwh,
                 'grid_consumption_kw': net_grid_power_kw,
-                
-                # CORRECTED costs and savings
-                'cost_without_battery_eur': cost_without_battery,
-                'cost_with_battery_eur': cost_with_battery,
-                'savings_eur': savings,
-                'savings_pct': (savings / cost_without_battery * 100) if cost_without_battery > 0 else 0,
-                
+
                 # Performance tracking
                 'battery_efficiency_charge': self.battery.efficiency_charge,
                 'battery_efficiency_discharge': self.battery.efficiency_discharge,

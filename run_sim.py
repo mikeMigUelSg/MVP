@@ -23,6 +23,7 @@ from ess.battery import Battery
 from ess.io import prepare_simulation_data, save_results
 from ess.strategies import ArbitrageStrategy, OptimalArbitrageStrategy
 from ess.simulator import EnergyArbitrageSimulator
+from ess.billing import BillingEngine
 
 
 def load_config(config_path: str = "configs/scenario.yaml") -> dict:
@@ -365,16 +366,16 @@ def plot_cost_breakdown_invoice(results_df: pd.DataFrame, config: dict, metrics:
     }
 
 
-def plot_results(results_df: pd.DataFrame, config: dict):
+def plot_results(results_df: pd.DataFrame, price_df: pd.DataFrame, config: dict):
     """Generate visualization plots."""
     plots_dir = config['output']['plots_dir']
-    
-    # Create figure with subplots
-    fig, axes = plt.subplots(4, 1, figsize=(14, 12), sharex=True)
-    
-    # Plot 1: Prices and battery action
+
+    df = results_df.join(price_df[['price_omie_eur_kwh']], how='left')
+
+    fig, axes = plt.subplots(3, 1, figsize=(14, 9), sharex=True)
+
     ax1 = axes[0]
-    ax1.plot(results_df.index, results_df['price_omie_eur_kwh'] * 1000, 
+    ax1.plot(df.index, df['price_omie_eur_kwh'] * 1000,
              label='OMIE Price', color='blue', alpha=0.7)
     
     # Highlight battery actions
@@ -382,12 +383,12 @@ def plot_results(results_df: pd.DataFrame, config: dict):
     discharge_mask = results_df['battery_action'] == 'discharge'
     
     if charge_mask.any():
-        ax1.scatter(results_df.index[charge_mask], 
-                   results_df.loc[charge_mask, 'price_omie_eur_kwh'] * 1000,
+        ax1.scatter(df.index[charge_mask],
+                   df.loc[charge_mask, 'price_omie_eur_kwh'] * 1000,
                    color='green', alpha=0.5, s=10, label='Charging')
     if discharge_mask.any():
-        ax1.scatter(results_df.index[discharge_mask], 
-                   results_df.loc[discharge_mask, 'price_omie_eur_kwh'] * 1000,
+        ax1.scatter(df.index[discharge_mask],
+                   df.loc[discharge_mask, 'price_omie_eur_kwh'] * 1000,
                    color='red', alpha=0.5, s=10, label='Discharging')
     
     ax1.set_ylabel('Price (EUR/MWh)')
@@ -421,32 +422,10 @@ def plot_results(results_df: pd.DataFrame, config: dict):
     ax3.grid(True, alpha=0.3)
     ax3.set_title('Battery State of Charge')
     
-    # Plot 4: Cumulative savings
-    ax4 = axes[3]
-    cumulative_savings = results_df['savings_eur'].cumsum()
-    ax4.plot(results_df.index, cumulative_savings, 
-             label='Cumulative Savings', color='darkgreen', linewidth=2)
-    ax4.fill_between(results_df.index, 0, cumulative_savings, 
-                     color='green', alpha=0.2)
-    ax4.set_ylabel('Savings (EUR)')
-    ax4.set_xlabel('Time')
-    ax4.legend(loc='upper left')
-    ax4.grid(True, alpha=0.3)
-    ax4.set_title('Cumulative Savings')
-    
     # Adjust layout and save
     plt.tight_layout()
     plt.savefig(f"{plots_dir}/simulation_overview.png", dpi=150, bbox_inches='tight')
     plt.show()
-    
-    # Daily summary plot
-    fig2, ax = plt.subplots(figsize=(12, 6))
-    daily_savings = results_df['savings_eur'].resample('D').sum()
-    daily_savings.plot(kind='bar', ax=ax, color='green', alpha=0.7)
-    ax.set_ylabel('Daily Savings (EUR)')
-    ax.set_xlabel('Date')
-    ax.set_title('Daily Savings from Energy Arbitrage')
-    ax.grid(True, alpha=0.3)
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.savefig(f"{plots_dir}/daily_savings.png", dpi=150, bbox_inches='tight')
@@ -541,70 +520,39 @@ def main():
         prices_df,
         start_date,
         end_date,
-        vat_rate=config['tariff']['vat_rate'],
-        reduced_vat_rate=config['tariff']['reduced_vat_rate'],
-        iec_vat_rate=config['tariff']['iec_vat_rate'],
+    )
+
+    # Billing
+    n_days = (end_date - start_date).days + 1
+    billing = BillingEngine(
+        tariff_cfg=config['tariff'],
         contracted_power_kva=config['power_contract']['contracted_power_kva'],
-        vat_reduced_power_threshold_kva=config['tariff']['reduced_vat_power_threshold_kva'],
         daily_fixed_cost_eur=fixed_costs['total_daily']
     )
-    
-    # Calculate and display metrics
-    metrics = simulator.calculate_summary_metrics(results_df)
-    
-    # Add fixed costs breakdown to metrics
-    metrics['fixed_costs_breakdown'] = fixed_costs
-    
-    simulator.print_summary(metrics)
-    
-    # Print additional fixed costs summary
-    n_days = (end_date - start_date).days + 1
-    print(f"\n--- FIXED COSTS BREAKDOWN ({n_days} days) ---")
-    print(f"K3 term:         €{fixed_costs['k3_daily'] * n_days:.2f}")
-    print(f"Power term:      €{fixed_costs['power_daily'] * n_days:.2f}")
-    print(f"CAV fees:        €{fixed_costs['cav_daily'] * n_days:.2f}")
-    print(f"DGEG fees:       €{fixed_costs['dgeg_daily'] * n_days:.2f}")
-    print(f"Total fixed:     €{fixed_costs['total_daily'] * n_days:.2f}")
-    
-    # Save results
+    ledger = billing.generate_ledger(results_df, prices_df)
+    invoice = billing.invoice_from_ledger(ledger)
+    metrics = billing.metrics_from_ledger(ledger)
+
+    # Save timeline and summary
     if config['output']['save_timeline']:
         save_results(results_df, config['output']['timeline_file'])
-    
+
     if config['output']['save_summary']:
+        summary = {**metrics, 'fixed_costs_breakdown': fixed_costs}
         with open(config['output']['summary_file'], 'w') as f:
-            json.dump(metrics, f, indent=2, default=str)
+            json.dump(summary, f, indent=2, default=str)
         print(f"\nSummary saved to {config['output']['summary_file']}")
-    
+
+    # Print billing summary
+    print("\n--- BILLING SUMMARY ---")
+    print(f"Cost without battery:  €{invoice.total_without_battery:.2f}")
+    print(f"Cost with battery:     €{invoice.total_with_battery:.2f}")
+    print(f"Savings:               €{invoice.savings:.2f}")
+
     # Generate plots
     if config['output']['generate_plots']:
         print("\nGenerating plots...")
-        plot_results(results_df, config)
-        
-        # Generate the new invoice-style cost breakdown
-        print("\nGenerating cost breakdown invoice...")
-        cost_breakdown = plot_cost_breakdown_invoice(results_df, config, metrics, fixed_costs)
-        
-        # Print cost breakdown summary
-        print("\n--- DETAILED COST BREAKDOWN ---")
-        print("\nWITHOUT BATTERY:")
-        for component, cost in cost_breakdown['without_battery'].items():
-            if abs(cost) > 0.01:
-                print(f"  {component:.<30} €{cost:>8.2f}")
-        print(f"  {'TOTAL':.<30} €{cost_breakdown['total_without']:>8.2f}")
-        
-        print("\nWITH BATTERY:")
-        for component, cost in cost_breakdown['with_battery'].items():
-            if abs(cost) > 0.01:
-                print(f"  {component:.<30} €{cost:>8.2f}")
-        print(f"  {'TOTAL':.<30} €{cost_breakdown['total_with']:>8.2f}")
-        
-        print(f"\n  {'SAVINGS':.<30} €{cost_breakdown['savings']:>8.2f}")
-        
-        # Save cost breakdown to JSON
-        breakdown_file = config['output']['summary_file'].replace('.json', '_cost_breakdown.json')
-        with open(breakdown_file, 'w') as f:
-            json.dump(cost_breakdown, f, indent=2, default=str)
-        print(f"\nCost breakdown saved to {breakdown_file}")
+        plot_results(results_df, prices_df, config)
     
     print("\n" + "="*60)
     print("SIMULATION COMPLETED SUCCESSFULLY")
