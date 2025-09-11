@@ -177,6 +177,7 @@ class EnergyArbitrageSimulator:
                     final_price = prices_df.loc[current_time, 'price_final_eur_kwh']
                     energy_price = prices_df.loc[current_time, 'price_energy_pre_vat_eur_kwh']
                     iec_tax = prices_df.loc[current_time, 'iec_tax_eur_kwh']
+                    tariff_energy = prices_df.loc[current_time, 'tariff_energy_eur_kwh']
                 else:
                     current_time += timedelta(minutes=self.time_step_minutes)
                     step_count += 1
@@ -301,6 +302,7 @@ class EnergyArbitrageSimulator:
                 # Prices
                 'price_omie_eur_kwh': base_price,
                 'price_final_eur_kwh': final_price,
+                'tariff_energy_eur_kwh': tariff_energy,
                 'energy_vat_rate': energy_vat_rate,
                 
                 # Battery actions
