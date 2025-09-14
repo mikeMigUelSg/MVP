@@ -1,0 +1,35 @@
+{
+  "without_battery": {
+    "OMIE Market": 14.034173392216498,
+    "Network Access (K2)": 2.8730466998760003,
+    "Time-of-Use Tariff": 10.604995541862,
+    "Energy VAT": 1.6507329380372697,
+    "IEC Tax": 0.16703759883000002,
+    "IEC VAT": 0.03841864773090001,
+    "K3 Daily Fee": 2.82,
+    "Contracted Power": 4.761,
+    "Power VAT": 0.28565999999999997,
+    "CAV Fee": 2.85,
+    "CAV VAT": 0.17099999999999999,
+    "DGEG Fee": 0.07,
+    "DGEG VAT": 0.016100000000000003
+  },
+  "with_battery": {
+    "OMIE Market": 8.801745164725489,
+    "Network Access (K2)": 2.8094444631516473,
+    "Time-of-Use Tariff": 3.0425960820904185,
+    "Energy VAT": 0.8792271425980532,
+    "IEC Tax": 0.16333979436928184,
+    "IEC VAT": 0.037568152704934826,
+    "K3 Daily Fee": 2.82,
+    "Contracted Power": 4.761,
+    "Power VAT": 0.28565999999999997,
+    "CAV Fee": 2.85,
+    "CAV VAT": 0.17099999999999999,
+    "DGEG Fee": 0.07,
+    "DGEG VAT": 0.016100000000000003
+  },
+  "total_without": 40.342164818552675,
+  "total_with": 26.707680799639828,
+  "savings": 13.634484018912847
+}
