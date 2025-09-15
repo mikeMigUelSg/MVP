@@ -42,7 +42,6 @@ tariff:
   vat_rate: 0.23  # Standard VAT for energy beyond reduced tier
   reduced_vat_rate: 0.06  # Reduced VAT for first block of consumption
   reduced_vat_kwh_per_30_days: 200  # kWh per 30-day cycle eligible for reduced VAT
-  reduced_vat_power_threshold_kva: 6.9  # Apply reduced VAT only if contracted power <= threshold
   vat_cycle_days: 30
 
   # VAT settings for fixed power term
