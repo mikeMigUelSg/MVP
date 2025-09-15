@@ -289,7 +289,7 @@ class EnergyArbitrageSimulator:
                 'grid_export_kwh': grid_export_kwh,
                 'net_grid_power_kw': net_grid_power_kw,
 
-                # Legacy columns for compatibility (but with correct values)
+                # Legacy columns for compatibility 
                 'consumption_kwh': house_consumption_kwh,  # For backward compatibility
                 'consumption_kw': house_consumption_kw,    # For backward compatibility
                 'grid_consumption_kwh': total_grid_import_kwh,
@@ -336,6 +336,148 @@ class EnergyArbitrageSimulator:
         if stats['data_missing_periods'] > 0:
             print(f"Missing data periods: {stats['data_missing_periods']} ({stats['data_missing_periods']/stats['total_periods']*100:.1f}%)")
     
+    def calculate_summary_metrics(self, results_df: pd.DataFrame) -> Dict:
+        """
+        Calculate summary metrics from simulation results.
+        """
+        if results_df.empty:
+            return {}
+        
+        # Basic metrics
+        n_periods = len(results_df)
+        n_days = (results_df.index[-1] - results_df.index[0]).days + 1
+        
+        # CORRECTED energy and consumption metrics
+        total_house_consumption_kwh = results_df['house_consumption_kwh'].sum()
+        total_grid_import_kwh = results_df['total_grid_import_kwh'].sum()
+        
+        # Grid consumption REDUCTION (should be positive if battery helps)
+        grid_consumption_reduction_kwh = total_house_consumption_kwh - total_grid_import_kwh
+        
+        # Cost metrics
+        total_cost_without_battery = results_df['cost_without_battery_eur'].sum()
+        total_cost_with_battery = results_df['cost_with_battery_eur'].sum()
+        fixed_cost_total = self.daily_fixed_cost_eur * n_days
+        total_cost_without_battery += fixed_cost_total
+        total_cost_with_battery += fixed_cost_total
+        total_savings = total_cost_without_battery - total_cost_with_battery
+        
+        # Battery metrics 
+        battery_final_state = self.battery.get_state()
+        total_charged = battery_final_state['total_charged_kwh']
+        total_discharged = battery_final_state['total_discharged_kwh']
+        battery_cycles = battery_final_state['cycles']
+        
+        # Efficiency calculations
+        if total_charged > 0:
+            actual_round_trip_efficiency = total_discharged / total_charged
+        else:
+            actual_round_trip_efficiency = 0
+        
+        # CORRECTED peak analysis - use instantaneous power correctly
+        peak_house_consumption = results_df['house_consumption_kw'].max()
+        peak_grid_import = results_df['net_grid_power_kw'].max()
+        peak_reduction_kw = max(0, peak_house_consumption - peak_grid_import)
+        
+        # Time-based analysis
+        daily_avg_savings = total_savings / n_days if n_days > 0 else 0
+        annual_projected_savings = daily_avg_savings * 365
+        
+        # Battery utilization
+        battery_active_periods = (results_df['battery_action'] != 'idle').sum()
+        battery_utilization_pct = battery_active_periods / n_periods * 100 if n_periods > 0 else 0
+        
+        # Price analysis
+        charge_periods = results_df[results_df['battery_action'] == 'charge']
+        discharge_periods = results_df[results_df['battery_action'] == 'discharge']
+        
+        avg_charge_price = charge_periods['price_final_eur_kwh'].mean() if len(charge_periods) > 0 else 0
+        avg_discharge_price = discharge_periods['price_final_eur_kwh'].mean() if len(discharge_periods) > 0 else 0
+        price_spread = avg_discharge_price - avg_charge_price
+        
+        # Advanced metrics
+        energy_throughput = total_charged + total_discharged
+        capacity_factor_charge = (total_charged / (self.battery.max_charge_kw * n_periods * 0.25)) * 100 if n_periods > 0 else 0
+        capacity_factor_discharge = (total_discharged / (self.battery.max_discharge_kw * n_periods * 0.25)) * 100 if n_periods > 0 else 0
+        
+        # Economic metrics
+        if annual_projected_savings > 0:
+            simple_payback_years = 8000 / annual_projected_savings  # Assuming 8000 EUR investment
+        else:
+            simple_payback_years = float('inf')
+        
+        # Check if results make sense
+        results_quality = "good"
+        if grid_consumption_reduction_kwh < 0:
+            results_quality = "poor - battery increasing grid consumption"
+        elif total_savings < 0:
+            results_quality = "poor - negative savings"
+        elif simple_payback_years > 20:
+            results_quality = "poor - payback too long"
+        
+        # Energy VAT rate used
+        energy_vat_rate = results_df['energy_vat_rate'].iloc[0] if len(results_df) > 0 else 0.23
+        
+        return {
+            # Period information
+            'simulation_start': results_df.index[0],
+            'simulation_end': results_df.index[-1],
+            'period_days': n_days,
+            'total_periods': n_periods,
+            'time_step_hours': self.time_step_hours,
+            'results_quality': results_quality,
+            'energy_vat_rate_used': energy_vat_rate,
+            
+            # CORRECTED energy metrics
+            'total_house_consumption_kwh': total_house_consumption_kwh,
+            'total_grid_import_kwh': total_grid_import_kwh,
+            'grid_consumption_reduction_kwh': grid_consumption_reduction_kwh,
+            'grid_consumption_reduction_pct': (grid_consumption_reduction_kwh / total_house_consumption_kwh * 100) if total_house_consumption_kwh > 0 else 0,
+            
+            # Cost metrics
+            'total_cost_without_battery_eur': total_cost_without_battery,
+            'total_cost_with_battery_eur': total_cost_with_battery,
+            'total_savings_eur': total_savings,
+            'savings_percentage': (total_savings / total_cost_without_battery * 100) if total_cost_without_battery > 0 else 0,
+            'daily_avg_savings_eur': daily_avg_savings,
+            'annual_projected_savings_eur': annual_projected_savings,
+            'daily_fixed_cost_eur': self.daily_fixed_cost_eur,
+            'total_fixed_cost_eur': fixed_cost_total,
+            
+            # Battery performance
+            'battery_total_charged_kwh': total_charged,
+            'battery_total_discharged_kwh': total_discharged,
+            'battery_energy_throughput_kwh': energy_throughput,
+            'battery_cycles': battery_cycles,
+            'battery_theoretical_efficiency': battery_final_state['round_trip_efficiency'],
+            'battery_actual_efficiency': actual_round_trip_efficiency,
+            'battery_utilization_pct': battery_utilization_pct,
+            'battery_capacity_factor_charge_pct': capacity_factor_charge,
+            'battery_capacity_factor_discharge_pct': capacity_factor_discharge,
+            
+            # CORRECTED peak management
+            'peak_house_consumption_kw': peak_house_consumption,
+            'peak_grid_import_kw': peak_grid_import,
+            'peak_reduction_kw': peak_reduction_kw,
+            'peak_reduction_pct': (peak_reduction_kw / peak_house_consumption * 100) if peak_house_consumption > 0 else 0,
+            
+            # Price arbitrage
+            'avg_price_eur_kwh': results_df['price_final_eur_kwh'].mean(),
+            'avg_charge_price_eur_kwh': avg_charge_price,
+            'avg_discharge_price_eur_kwh': avg_discharge_price,
+            'arbitrage_spread_eur_kwh': price_spread,
+            'arbitrage_spread_eur_mwh': price_spread * 1000,
+            
+            # Economic analysis
+            'simple_payback_years': simple_payback_years,
+            'degradation_cost_eur': battery_final_state.get('degradation_cost_eur', 0),
+            'net_savings_after_degradation_eur': total_savings - battery_final_state.get('degradation_cost_eur', 0),
+            
+            # Performance statistics
+            'successful_periods_pct': (self.performance_stats['successful_periods'] / self.performance_stats['total_periods'] * 100) if self.performance_stats['total_periods'] > 0 else 0,
+            'strategy_error_rate_pct': (self.performance_stats['strategy_errors'] / self.performance_stats['total_periods'] * 100) if self.performance_stats['total_periods'] > 0 else 0,
+            'data_completeness_pct': ((self.performance_stats['total_periods'] - self.performance_stats['data_missing_periods']) / self.performance_stats['total_periods'] * 100) if self.performance_stats['total_periods'] > 0 else 0,
+        }
     
     def print_summary(self, metrics: Dict):
         """Print CORRECTED comprehensive formatted summary."""
