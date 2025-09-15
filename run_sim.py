@@ -10,9 +10,6 @@ import yaml
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-from matplotlib.patches import FancyBboxPatch
-import numpy as np
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -102,9 +99,10 @@ def print_tariff_summary(config: dict, fixed_costs: dict):
     
     print(f"\nEnergy VAT rates:")
     print(f"  Standard VAT: {tcfg['vat_rate']:.0%}")
-    print(f"  Reduced VAT: {tcfg['reduced_vat_rate']:.0%}")
-    print(f"  Reduced VAT threshold: {tcfg['reduced_vat_power_threshold_kva']} kVA")
-    print(f"  Reduced VAT allowance: {tcfg['reduced_vat_kwh_per_30_days']} kWh per {tcfg['vat_cycle_days']} days")
+    print(
+        f"  Reduced VAT: {tcfg['reduced_vat_rate']:.0%} "
+        f"(up to {tcfg['reduced_vat_kwh_per_30_days']} kWh per {tcfg['vat_cycle_days']} days)"
+    )
     
     print(f"\nFixed power term VAT rates:")
     power_threshold = tcfg.get('fixed_power_reduced_vat_threshold_kva', 6.9)
@@ -124,246 +122,50 @@ def print_tariff_summary(config: dict, fixed_costs: dict):
     print("="*50)
 
 
-def plot_cost_breakdown_invoice(results_df: pd.DataFrame, config: dict, metrics: dict, fixed_costs: dict):
-    """
-    Generate an invoice-style cost breakdown comparison plot.
-    Shows all cost components for scenarios with and without battery.
-    """
+def plot_cost_breakdown_invoice(results_df: pd.DataFrame, invoice, config: dict):
+    """Generate invoice-style cost breakdown plot using invoice data."""
     plots_dir = config['output']['plots_dir']
-    
-    # Calculate period information
+
     n_days = (results_df.index[-1] - results_df.index[0]).days + 1
     start_date = results_df.index[0].strftime('%Y-%m-%d')
     end_date = results_df.index[-1].strftime('%Y-%m-%d')
-    
-    # Get tariff configuration
-    tcfg = config['tariff']
-    contracted_power = config['power_contract']['contracted_power_kva']
-    
-    # Calculate energy consumption totals
-    total_house_consumption_kwh = results_df['house_consumption_kwh'].sum()
-    total_grid_import_kwh = results_df['total_grid_import_kwh'].sum()
-    
-    # Calculate average prices
-    avg_omie_price = results_df['price_omie_eur_kwh'].mean()
-    avg_final_price = results_df['price_final_eur_kwh'].mean()
-    
-    # WITHOUT BATTERY - Cost Components
-    without_battery = {}
-    
-    # Energy costs (simplified - all at same VAT rate based on contracted power)
-    energy_vat_rate = tcfg['reduced_vat_rate'] if contracted_power <= tcfg['reduced_vat_power_threshold_kva'] else tcfg['vat_rate']
-    
-    # Base energy cost components
-    omie_cost = (results_df['price_omie_eur_kwh'] * results_df['house_consumption_kwh']).sum()
-    energy_tariff_cost = (results_df['tariff_energy_eur_kwh'] * results_df['house_consumption_kwh']).sum()
-    k2_cost = tcfg['indexed']['k2_eur_kwh'] * total_house_consumption_kwh
-    
-    without_battery['OMIE Market'] = omie_cost
-    without_battery['Network Access (K2)'] = k2_cost
-    without_battery['Time-of-Use Tariff'] = energy_tariff_cost
-    without_battery['Energy VAT'] = (omie_cost + k2_cost + energy_tariff_cost) * energy_vat_rate
-    
-    # IEC tax
-    iec_cost = tcfg['iec_tax_eur_kwh'] * total_house_consumption_kwh
-    without_battery['IEC Tax'] = iec_cost
-    without_battery['IEC VAT'] = iec_cost * tcfg['iec_vat_rate']
-    
-    # Fixed costs
-    without_battery['K3 Daily Fee'] = fixed_costs['k3_daily'] * n_days
-    without_battery['Contracted Power'] = tcfg['indexed']['tariff_power_eur_kva_day'] * contracted_power * n_days
-    
-    # Power VAT (conditional)
-    power_vat_rate = tcfg['fixed_power_reduced_vat_rate'] if contracted_power <= tcfg['fixed_power_reduced_vat_threshold_kva'] else tcfg['fixed_power_vat_rate']
-    without_battery['Power VAT'] = without_battery['Contracted Power'] * power_vat_rate
-    
-    # Other fees
-    without_battery['CAV Fee'] = tcfg['cav_fee_eur_month'] / 30 * n_days
-    without_battery['CAV VAT'] = without_battery['CAV Fee'] * tcfg['cav_vat_rate']
-    without_battery['DGEG Fee'] = tcfg['dgeg_fee_eur_month'] / 30 * n_days
-    without_battery['DGEG VAT'] = without_battery['DGEG Fee'] * tcfg['dgeg_vat_rate']
-    
-    # WITH BATTERY - Cost Components
-    with_battery = {}
-    
-    # Energy costs with battery (reduced grid import)
-    omie_cost_battery = (results_df['price_omie_eur_kwh'] * results_df['total_grid_import_kwh']).sum()
-    energy_tariff_cost_battery = (results_df['tariff_energy_eur_kwh'] * results_df['total_grid_import_kwh']).sum()
-    k2_cost_battery = tcfg['indexed']['k2_eur_kwh'] * total_grid_import_kwh
-    
-    with_battery['OMIE Market'] = omie_cost_battery
-    with_battery['Network Access (K2)'] = k2_cost_battery
-    with_battery['Time-of-Use Tariff'] = energy_tariff_cost_battery
-    with_battery['Energy VAT'] = (omie_cost_battery + k2_cost_battery + energy_tariff_cost_battery) * energy_vat_rate
-    
-    # IEC tax
-    iec_cost_battery = tcfg['iec_tax_eur_kwh'] * total_grid_import_kwh
-    with_battery['IEC Tax'] = iec_cost_battery
-    with_battery['IEC VAT'] = iec_cost_battery * tcfg['iec_vat_rate']
-    
-    # Fixed costs (same as without battery)
-    with_battery['K3 Daily Fee'] = without_battery['K3 Daily Fee']
-    with_battery['Contracted Power'] = without_battery['Contracted Power']
-    with_battery['Power VAT'] = without_battery['Power VAT']
-    with_battery['CAV Fee'] = without_battery['CAV Fee']
-    with_battery['CAV VAT'] = without_battery['CAV VAT']
-    with_battery['DGEG Fee'] = without_battery['DGEG Fee']
-    with_battery['DGEG VAT'] = without_battery['DGEG VAT']
-    
-    # Create the invoice-style plot
+
+    without_battery = invoice.without_battery
+    with_battery = invoice.with_battery
+
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 10))
-    fig.suptitle(f'Energy Cost Breakdown - Invoice Style\nPeriod: {start_date} to {end_date} ({n_days} days)', 
-                 fontsize=16, fontweight='bold')
-    
-    # Define colors for different cost categories
+    fig.suptitle(
+        f"Energy Cost Breakdown - Invoice Style\nPeriod: {start_date} to {end_date} ({n_days} days)",
+        fontsize=16,
+        fontweight='bold',
+    )
+
     colors = {
         'OMIE Market': '#1f77b4',
-        'Network Access (K2)': '#ff7f0e', 
+        'Network Access (K2)': '#ff7f0e',
         'Time-of-Use Tariff': '#2ca02c',
         'Energy VAT': '#d62728',
         'IEC Tax': '#9467bd',
         'IEC VAT': '#8c564b',
-        'K3 Daily Fee': '#e377c2',
-        'Contracted Power': '#7f7f7f',
-        'Power VAT': '#bcbd22',
-        'CAV Fee': '#17becf',
-        'CAV VAT': '#aec7e8',
-        'DGEG Fee': '#ffbb78',
-        'DGEG VAT': '#98df8a'
+        'Fixed Costs': '#7f7f7f',
     }
-    
-    def plot_invoice(ax, costs_dict, title, total_consumption_kwh):
-        """Helper function to plot one invoice."""
-        # Sort costs by value for better visualization
-        sorted_costs = sorted(costs_dict.items(), key=lambda x: abs(x[1]), reverse=True)
-        
-        labels = []
-        values = []
-        bar_colors = []
-        
-        for label, value in sorted_costs:
-            if abs(value) > 0.01:  # Only show costs > 1 cent
-                labels.append(label)
-                values.append(value)
-                bar_colors.append(colors.get(label, '#666666'))
-        
-        # Create horizontal bar chart
-        y_pos = np.arange(len(labels))
-        bars = ax.barh(y_pos, values, color=bar_colors, alpha=0.8, edgecolor='black', linewidth=0.5)
-        
-        # Add value labels on bars
-        for i, (bar, value) in enumerate(zip(bars, values)):
-            width = bar.get_width()
-            label_x = width + 0.5 if width > 0 else width - 0.5
-            ha = 'left' if width > 0 else 'right'
-            ax.text(label_x, bar.get_y() + bar.get_height()/2, 
-                   f'€{value:.2f}', 
-                   ha=ha, va='center', fontsize=9, fontweight='bold')
-        
-        ax.set_yticks(y_pos)
-        ax.set_yticklabels(labels)
-        ax.set_xlabel('Cost (EUR)', fontsize=11, fontweight='bold')
-        ax.set_title(title, fontsize=13, fontweight='bold', pad=20)
+
+    def plot_invoice_bar(ax, data, title):
+        labels = list(data.keys())
+        values = list(data.values())
+        ax.barh(labels, values, color=[colors.get(label, '#333333') for label in labels])
+        ax.set_title(title, fontsize=14, fontweight='bold')
+        ax.set_xlabel('Cost (€)')
         ax.grid(True, axis='x', alpha=0.3)
-        ax.axvline(x=0, color='black', linewidth=0.8)
-        
-        # Add total box
-        total = sum(values)
-        box_text = f'TOTAL: €{total:.2f}\n'
-        box_text += f'Consumption: {total_consumption_kwh:.1f} kWh\n'
-        box_text += f'Avg cost: €{total/total_consumption_kwh:.4f}/kWh'
-        
-        # Create fancy box for total
-        fancy_box = FancyBboxPatch((0.02, 0.02), 0.35, 0.15,
-                                   boxstyle="round,pad=0.02",
-                                   transform=ax.transAxes,
-                                   facecolor='lightgray',
-                                   edgecolor='black',
-                                   linewidth=2,
-                                   alpha=0.9)
-        ax.add_patch(fancy_box)
-        ax.text(0.195, 0.095, box_text, transform=ax.transAxes,
-               fontsize=10, fontweight='bold', ha='center', va='center')
-        
-        return total
-    
-    # Plot both invoices
-    total_without = plot_invoice(ax1, without_battery, 'WITHOUT BATTERY', total_house_consumption_kwh)
-    total_with = plot_invoice(ax2, with_battery, 'WITH BATTERY', total_grid_import_kwh)
-    
-    # Add savings information at the bottom
-    savings = total_without - total_with
-    savings_pct = (savings / total_without * 100) if total_without > 0 else 0
-    
-    fig.text(0.5, 0.02, 
-            f'SAVINGS: €{savings:.2f} ({savings_pct:.1f}%) | Grid Reduction: {total_house_consumption_kwh - total_grid_import_kwh:.1f} kWh',
-            ha='center', fontsize=14, fontweight='bold',
-            bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.7, edgecolor='darkgreen', linewidth=2))
-    
-    plt.tight_layout(rect=[0, 0.05, 1, 0.96])
+        for i, (label, value) in enumerate(zip(labels, values)):
+            ax.text(value, i, f" €{value:.2f}", va='center')
+
+    plot_invoice_bar(ax1, without_battery, 'WITHOUT BATTERY')
+    plot_invoice_bar(ax2, with_battery, 'WITH BATTERY')
+
+    plt.tight_layout()
     plt.savefig(f"{plots_dir}/cost_breakdown_invoice.png", dpi=150, bbox_inches='tight')
     plt.show()
-    
-    # Create a second detailed comparison plot
-    fig2, ax = plt.subplots(figsize=(14, 8))
-    
-    # Prepare data for grouped bar chart
-    cost_categories = list(without_battery.keys())
-    without_values = [without_battery[cat] for cat in cost_categories]
-    with_values = [with_battery[cat] for cat in cost_categories]
-    
-    x = np.arange(len(cost_categories))
-    width = 0.35
-    
-    bars1 = ax.bar(x - width/2, without_values, width, label='Without Battery', 
-                   color='coral', alpha=0.8, edgecolor='black', linewidth=0.5)
-    bars2 = ax.bar(x + width/2, with_values, width, label='With Battery',
-                   color='lightgreen', alpha=0.8, edgecolor='black', linewidth=0.5)
-    
-    # Add value labels on bars
-    for bars in [bars1, bars2]:
-        for bar in bars:
-            height = bar.get_height()
-            if abs(height) > 0.5:  # Only label bars > €0.50
-                ax.text(bar.get_x() + bar.get_width()/2., height,
-                       f'€{height:.1f}',
-                       ha='center', va='bottom' if height > 0 else 'top',
-                       fontsize=8)
-    
-    ax.set_xlabel('Cost Component', fontsize=12, fontweight='bold')
-    ax.set_ylabel('Cost (EUR)', fontsize=12, fontweight='bold')
-    ax.set_title(f'Detailed Cost Comparison - {start_date} to {end_date}', 
-                fontsize=14, fontweight='bold')
-    ax.set_xticks(x)
-    ax.set_xticklabels(cost_categories, rotation=45, ha='right')
-    ax.legend(loc='upper right', fontsize=11)
-    ax.grid(True, axis='y', alpha=0.3)
-    
-    # Add difference annotations for major components
-    for i, cat in enumerate(cost_categories):
-        diff = with_values[i] - without_values[i]
-        if abs(diff) > 1:  # Only show differences > €1
-            y_pos = max(without_values[i], with_values[i]) + 2
-            ax.annotate(f'Δ €{diff:.1f}',
-                       xy=(i, y_pos),
-                       ha='center',
-                       fontsize=9,
-                       color='darkred' if diff > 0 else 'darkgreen',
-                       fontweight='bold')
-    
-    plt.tight_layout()
-    plt.savefig(f"{plots_dir}/cost_comparison_detailed.png", dpi=150, bbox_inches='tight')
-    plt.show()
-    
-    print(f"\nCost breakdown plots saved to {plots_dir}")
-    
-    return {
-        'without_battery': without_battery,
-        'with_battery': with_battery,
-        'total_without': total_without,
-        'total_with': total_with,
-        'savings': savings
-    }
 
 
 def plot_results(results_df: pd.DataFrame, price_df: pd.DataFrame, config: dict):
@@ -526,7 +328,6 @@ def main():
     n_days = (end_date - start_date).days + 1
     billing = BillingEngine(
         tariff_cfg=config['tariff'],
-        contracted_power_kva=config['power_contract']['contracted_power_kva'],
         daily_fixed_cost_eur=fixed_costs['total_daily']
     )
     ledger = billing.generate_ledger(results_df, prices_df)
@@ -553,6 +354,7 @@ def main():
     if config['output']['generate_plots']:
         print("\nGenerating plots...")
         plot_results(results_df, prices_df, config)
+        plot_cost_breakdown_invoice(results_df, invoice, config)
     
     print("\n" + "="*60)
     print("SIMULATION COMPLETED SUCCESSFULLY")
