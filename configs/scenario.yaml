@@ -2,8 +2,8 @@
 
 # Simulation period - avoiding DST transition
 period:
-  start_date: "2025-09-01"  # Avoid March DST transition
-  num_days: 18  # Shorter period for testing
+  start_date: "2025-01-01"  # Avoid March DST transition
+  num_days: 250  # Shorter period for testing
   # end_date: "2024-01-31"
 
 # Household consumption
@@ -15,7 +15,7 @@ consumption:
   
   # NEW: Real consumption data support
   real_consumption: true  # Set to true to use real consumption data
-  real_consumption_file: "data/saida.xlsx"  # Path to real consumption file
+  real_consumption_file: "data/merged_consumos.xlsx"  # Path to real consumption file
 
 # Electricity tariff
 tariff:
@@ -40,7 +40,7 @@ tariff:
         cheias: 0.0388
         vazio: 0.0149
 
-    tariff_power_eur_kva_day: 0.0460
+    tariff_power_eur_kva_day: 0.0460  # 0.2116/ 4.6 
 
   # VAT settings for energy consumption
   vat_rate: 0.23  # Standard VAT for energy beyond reduced tier

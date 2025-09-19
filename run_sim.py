@@ -2,6 +2,7 @@
 """
 run_sim.py - Main entry point for ESS energy arbitrage simulation
 Updated with invoice-style cost breakdown visualization
+FIXED: All plots now appear simultaneously
 """
 
 import os
@@ -128,6 +129,7 @@ def plot_cost_breakdown_invoice(results_df: pd.DataFrame, prices_df: pd.DataFram
     """
     Generate an invoice-style cost breakdown comparison plot using the **ledger**
     (ensures Energy VAT is the dynamic, cycle-based value and matches billing).
+    FIXED: Returns figures without showing them immediately.
     """
     plots_dir = config['output']['plots_dir']
 
@@ -168,11 +170,6 @@ def plot_cost_breakdown_invoice(results_df: pd.DataFrame, prices_df: pd.DataFram
         'CAV (incl. VAT)': float(fixed_costs['cav_daily'] * n_days),
         'DGEG (incl. VAT)': float(fixed_costs['dgeg_daily'] * n_days),
     }
-
-    # Create the invoice-style plot
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 10))
-    fig.suptitle(f'Energy Cost Breakdown - Invoice Style\nPeriod: {start_date} to {end_date} ({n_days} days)', 
-                 fontsize=16, fontweight='bold')
 
     colors = {
         'OMIE Market': '#1f77b4',
@@ -215,12 +212,17 @@ def plot_cost_breakdown_invoice(results_df: pd.DataFrame, prices_df: pd.DataFram
         ax.text(0.195, 0.095, box_text, transform=ax.transAxes, fontsize=10, fontweight='bold', ha='center', va='center')
         return total
 
+    # Create the invoice-style plot
+    fig1, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 10))
+    fig1.suptitle(f'Energy Cost Breakdown - Invoice Style\nPeriod: {start_date} to {end_date} ({n_days} days)', 
+                 fontsize=16, fontweight='bold')
+
     total_without = plot_invoice(ax1, without_battery, 'WITHOUT BATTERY', total_house_consumption_kwh)
     total_with = plot_invoice(ax2, with_battery, 'WITH BATTERY', total_grid_import_kwh)
     savings = total_without - total_with
     savings_pct = (savings / total_without * 100) if total_without > 0 else 0
 
-    fig.text(0.5, 0.02, f'SAVINGS: €{savings:.2f} ({savings_pct:.1f}%) | Grid Reduction: {total_house_consumption_kwh - total_grid_import_kwh:.1f} kWh',
+    fig1.text(0.5, 0.02, f'SAVINGS: €{savings:.2f} ({savings_pct:.1f}%) | Grid Reduction: {total_house_consumption_kwh - total_grid_import_kwh:.1f} kWh',
              ha='center', fontsize=14, fontweight='bold', bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.7, edgecolor='darkgreen', linewidth=2))
 
     plt.tight_layout(rect=[0, 0.05, 1, 0.96])
@@ -254,11 +256,11 @@ def plot_cost_breakdown_invoice(results_df: pd.DataFrame, prices_df: pd.DataFram
             ax.annotate(f'Δ €{diff:.1f}', xy=(i, y_pos), ha='center', fontsize=9, color='darkred' if diff > 0 else 'darkgreen', fontweight='bold')
     plt.tight_layout()
     plt.savefig(f"{plots_dir}/cost_comparison_detailed.png", dpi=150, bbox_inches='tight')
-    plt.show()
 
     print(f"\nCost breakdown plots saved to {plots_dir}")
 
-    return {
+    # Return figures for later display
+    return fig1, fig2, {
         'without_battery': without_battery,
         'with_battery': with_battery,
         'total_without': total_without,
@@ -268,7 +270,7 @@ def plot_cost_breakdown_invoice(results_df: pd.DataFrame, prices_df: pd.DataFram
 
 
 def plot_results(results_df: pd.DataFrame, price_df: pd.DataFrame, config: dict):
-    """Generate visualization plots."""
+    """Generate visualization plots. FIXED: Returns figure without showing immediately."""
     plots_dir = config['output']['plots_dir']
 
     df = results_df.join(price_df[['price_omie_eur_kwh']], how='left')
@@ -323,14 +325,16 @@ def plot_results(results_df: pd.DataFrame, price_df: pd.DataFrame, config: dict)
     ax3.grid(True, alpha=0.3)
     ax3.set_title('Battery State of Charge')
     
-    # Adjust layout and save (single window)
+    # Adjust layout and save
     for ax in axes:
         for label in ax.get_xticklabels():
             label.set_rotation(45)
             label.set_horizontalalignment('right')
     plt.tight_layout()
     plt.savefig(f"{plots_dir}/simulation_overview.png", dpi=150, bbox_inches='tight')
-    plt.show()
+    
+    # Return figure for later display
+    return fig
 
 
 def main():
@@ -474,11 +478,30 @@ def main():
     print(f"Savings:               €{invoice.savings:.2f}")
     print(f"Data source:           {consumption_type}")
 
-    # Generate plots
+    # Generate plots - FIXED: All plots created but not shown yet
     if config['output']['generate_plots']:
         print("\nGenerating plots...")
-        plot_results(results_df, prices_df, config)
-        plot_cost_breakdown_invoice(results_df, prices_df, config, metrics, fixed_costs, ledger)
+        
+        # Create all figures first
+        fig_results = plot_results(results_df, prices_df, config)
+        fig_invoice, fig_detailed, cost_breakdown = plot_cost_breakdown_invoice(
+            results_df, prices_df, config, metrics, fixed_costs, ledger
+        )
+        
+        # Show all plots simultaneously using non-blocking mode
+        plt.ion()  # Turn on interactive mode
+        
+        # Show all figures
+        fig_results.show()
+        fig_invoice.show()
+        fig_detailed.show()
+        
+        # Keep plots open
+        print("\nAll plots are now displayed simultaneously!")
+        print("Close individual plot windows when done viewing.")
+        
+        # Optional: Wait for user input before continuing
+        input("Press Enter to continue (plots will remain open)...")
   
     print("\n" + "="*60)
     print("SIMULATION COMPLETED SUCCESSFULLY")
@@ -489,5 +512,3 @@ def main():
 
 if __name__ == "__main__":
     results, metrics = main()
-
-

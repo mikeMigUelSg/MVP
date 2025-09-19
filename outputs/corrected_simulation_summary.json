@@ -1,8 +1,8 @@
 {
-  "cost_without_battery_eur": 19.556542819,
-  "cost_with_battery_eur": 14.263248630404522,
-  "savings_eur": 5.293294188595478,
-  "savings_pct": 27.066615186467523,
+  "cost_without_battery_eur": 769.7153765355001,
+  "cost_with_battery_eur": 622.2774069491765,
+  "savings_eur": 147.43796958632367,
+  "savings_pct": 19.154868680153445,
   "fixed_costs_breakdown": {
     "k3_daily": 0.094,
     "power_daily": 0.224296,
