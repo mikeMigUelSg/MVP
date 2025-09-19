@@ -1,13 +1,15 @@
 {
-  "cost_without_battery_eur": 509.1773587618175,
-  "cost_with_battery_eur": 461.4821553839199,
-  "savings_eur": 47.6952033778976,
-  "savings_pct": 9.367110017200982,
+  "cost_without_battery_eur": 19.556542819,
+  "cost_with_battery_eur": 14.263248630404522,
+  "savings_eur": 5.293294188595478,
+  "savings_pct": 27.066615186467523,
   "fixed_costs_breakdown": {
     "k3_daily": 0.094,
-    "power_daily": 0.168222,
+    "power_daily": 0.224296,
     "cav_daily": 0.10070000000000001,
     "dgeg_daily": 0.00287,
-    "total_daily": 0.365792
-  }
+    "total_daily": 0.421866
+  },
+  "consumption_data_type": "REAL DATA",
+  "real_consumption_used": true
 }

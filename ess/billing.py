@@ -102,6 +102,7 @@ class BillingEngine:
                     # Split this interval's energy between reduced and standard blocks
                     reduced_kwh = min(e, max(0.0, remaining_reduced))
                     standard_kwh = max(0.0, e - reduced_kwh)
+                    #--somando os dois tem que dar e
 
                     # Allocate the base amount proportionally
                     base_per_kwh = base / e
@@ -142,32 +143,9 @@ class BillingEngine:
         # Aggregate base components (excluding Energy VAT; we handle it below)
         without_comps = self._aggregate_components(ledger, 'without')
         with_comps = self._aggregate_components(ledger, 'with')
-
-        # Prefer dynamic, per-interval Energy VAT if available; otherwise, fall back
-        if 'energy_vat_without_eur' in ledger.columns and 'energy_vat_with_eur' in ledger.columns:
-            energy_vat_without = float(ledger['energy_vat_without_eur'].sum())
-            energy_vat_with = float(ledger['energy_vat_with_eur'].sum())
-        else:
-            # Fallback to static VAT calculation (legacy behaviour)
-            tcfg = self.tariff_cfg
-            threshold = tcfg['reduced_vat_kwh_per_30_days'] * n_days / tcfg['vat_cycle_days']
-            total_without_energy = float(ledger['energy_without_kwh'].sum())
-            total_with_energy = float(ledger['energy_with_kwh'].sum())
-            rate_without = tcfg.get('reduced_vat_rate', 0.06) if total_without_energy <= threshold else tcfg.get('vat_rate', 0.23)
-            rate_with = tcfg.get('reduced_vat_rate', 0.06) if total_with_energy <= threshold else tcfg.get('vat_rate', 0.23)
-
-            without_energy_subtotal = (
-                without_comps['OMIE Market'] +
-                without_comps['Network Access (K2)'] +
-                without_comps['Time-of-Use Tariff']
-            )
-            with_energy_subtotal = (
-                with_comps['OMIE Market'] +
-                with_comps['Network Access (K2)'] +
-                with_comps['Time-of-Use Tariff']
-            )
-            energy_vat_without = without_energy_subtotal * rate_without
-            energy_vat_with = with_energy_subtotal * rate_with
+      
+        energy_vat_without = float(ledger['energy_vat_without_eur'].sum())
+        energy_vat_with = float(ledger['energy_vat_with_eur'].sum())
 
         # Insert Energy VAT component
         without_comps['Energy VAT'] = energy_vat_without

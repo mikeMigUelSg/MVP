@@ -203,7 +203,7 @@ class EnergyArbitrageSimulator:
                 print(f"WARNING: Negative power {power_kw} kW from strategy at {current_time}")
                 power_kw = 0
             
-            # Execute battery action with validation
+            # do lado AC 
             battery_charge_kwh = 0
             battery_discharge_kwh = 0
             action_success = True

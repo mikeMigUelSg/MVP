@@ -194,6 +194,93 @@ def load_cached_prices(start_year: int = 2015, refresh: bool = False) -> pd.Data
     df.to_parquet(PRICE_CACHE_FILE)
     return df
 
+def load_real_consumption(filepath: str) -> pd.DataFrame:
+    """
+    Load real consumption data from merged_consumos.xlsx
+    
+    Expected format:
+    Data | Hora | Consumo registado (kW) | Estado | ficheiro
+    2025/01/01 | 00:15 | 0.564 | Real | c01
+    """
+    try:
+        print(f"Loading real consumption data from {filepath}")
+        
+        # Read Excel file
+        try:
+            df = pd.read_excel(filepath, engine='openpyxl')
+        except:
+            df = pd.read_excel(filepath, engine='xlrd')
+        
+        if df.empty:
+            raise ValueError("Real consumption file is empty")
+        
+        print(f"Loaded {len(df)} rows from real consumption file")
+        print("Columns:", df.columns.tolist())
+        print("First few rows:")
+        print(df.head())
+        
+        # Identify columns (handle potential variations in column names)
+        date_col = None
+        time_col = None
+        consumption_col = None
+        
+        for col in df.columns:
+            col_lower = str(col).lower()
+            if 'data' in col_lower:
+                date_col = col
+            elif 'hora' in col_lower:
+                time_col = col
+            elif 'consumo' in col_lower and 'kw' in col_lower:
+                consumption_col = col
+        
+        if not all([date_col, time_col, consumption_col]):
+            raise ValueError(f"Could not identify required columns. Found: {df.columns.tolist()}")
+        
+        print(f"Identified columns: Date='{date_col}', Time='{time_col}', Consumption='{consumption_col}'")
+        
+        # Create datetime from Data and Hora columns
+        df['datetime'] = pd.to_datetime(
+            df[date_col].astype(str) + ' ' + df[time_col].astype(str),
+            format='%Y/%m/%d %H:%M',
+            errors='coerce'
+        )
+        
+        # Clean consumption data
+        df[consumption_col] = pd.to_numeric(df[consumption_col], errors='coerce')
+        
+        # Remove rows with invalid data
+        valid_mask = df['datetime'].notna() & df[consumption_col].notna()
+        df_clean = df.loc[valid_mask].copy()
+        
+        if df_clean.empty:
+            raise ValueError("No valid data after cleaning")
+        
+        print(f"After cleaning: {len(df_clean)} valid records")
+        
+        # Create result DataFrame with standard columns
+        result = pd.DataFrame({
+            'datetime': df_clean['datetime'],
+            'kw': df_clean[consumption_col],  # Already in kW
+            'kwh': df_clean[consumption_col] * 0.25  # Convert to kWh for 15-min intervals
+        })
+        
+        # Set index and sort
+        result.set_index('datetime', inplace=True)
+        result.sort_index(inplace=True)
+        
+        # Remove duplicates (keep first)
+        result = result[~result.index.duplicated(keep='first')]
+        
+        print(f"Real consumption data loaded: {len(result)} points from {result.index[0]} to {result.index[-1]}")
+        
+        return result
+        
+    except Exception as e:
+        print(f"Error loading real consumption data: {e}")
+        raise
+
+
+
 
 def load_consumption_profile(filepath: str, profile_column: str = "BTN A") -> pd.DataFrame:
     """
@@ -469,35 +556,49 @@ def prepare_simulation_data(
     end_date: datetime,
     profile_column: str = "BTN A",
     fill_missing: bool = True,
-    consumption_model: bool = False
+    consumption_model: bool = False,
+    real_consumption: bool = False,  # NOVA OPÇÃO
+    real_consumption_file: str = None  # NOVA OPÇÃO
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Prepare all data needed for simulation with enhanced error handling.
+    Prepare all data needed for simulation with support for real consumption data.
     """
     try:
         print("="*50)
         print("PREPARING SIMULATION DATA")
         print("="*50)
         
-        # Load consumption profile
-        print(f"\n1. Loading consumption profile from {consumption_profile_path}")
-        consumption_df = load_consumption_profile(consumption_profile_path, profile_column)
-        
-        # Unnormalize to actual kWh
-        print("2. Converting normalized consumption to actual kWh")
-        consumption_df["kwh"] = consumption_df["permil"].apply(
-            lambda x: unnormalize_consumption(annual_consumption_kwh, x)
-        )
-        
-        # Calculate power in kW (15 min = 0.25 hours)
-        consumption_df["kw"] = consumption_df["kwh"] / 0.25
+        # ====== CONSUMPTION DATA ======
+        if real_consumption:
+            if not real_consumption_file:
+                raise ValueError("real_consumption_file must be provided when real_consumption=True")
+            
+            print(f"\n1. Loading REAL consumption data from {real_consumption_file}")
+            consumption_df = load_real_consumption(real_consumption_file)
+            
+            # No need for unnormalization - data is already in kW and kWh
+            print("   Real consumption data loaded - no normalization needed")
+            
+        else:
+            # Original method - load E-REDES profile
+            print(f"\n1. Loading consumption profile from {consumption_profile_path}")
+            consumption_df = load_consumption_profile(consumption_profile_path, profile_column)
+            
+            print("2. Converting normalized consumption to actual kWh")
+            consumption_df["kwh"] = consumption_df["permil"].apply(
+                lambda x: unnormalize_consumption(annual_consumption_kwh, x)
+            )
+            
+            # Calculate power in kW (15 min = 0.25 hours)
+            consumption_df["kw"] = consumption_df["kwh"] / 0.25
         
         # Validate consumption data
         avg_daily_kwh = consumption_df["kwh"].sum() * 96 / len(consumption_df) if len(consumption_df) > 0 else 0
         print(f"   Estimated average daily consumption: {avg_daily_kwh:.1f} kWh")
         
-        # Load prices from cache (add buffer days for lookahead)
-        print("\n3. Loading OMIE prices from cache")
+        # ====== PRICE DATA ======
+        step_num = 3 if real_consumption else 3
+        print(f"\n{step_num}. Loading OMIE prices from cache")
         all_prices = load_cached_prices()
         prices_df = all_prices.loc[start_date:end_date + timedelta(days=2)]
 
@@ -508,38 +609,42 @@ def prepare_simulation_data(
         prices_df["price_eur_per_kwh"] = prices_df["price_eur_per_mwh"] / 1000
         
         # Resample to 15 minutes
-        print("4. Resampling prices to 15-minute intervals")
+        step_num += 1
+        print(f"{step_num}. Resampling prices to 15-minute intervals")
         prices_15min = resample_prices_to_15min(prices_df)
         
-        # Align both datasets to simulation period
-        print("5. Aligning data to simulation period")
+        # ====== ALIGN DATA ======
+        step_num += 1
+        print(f"{step_num}. Aligning data to simulation period")
 
-        # When using a consumption model based on 2024 data, shift the
-        # requested period to 2024 and later map it back to the desired year
-        cons_start = start_date
-        cons_end = end_date
-        if consumption_model:
-            # alinha por calendário, evitando leap-year e DST traps
-            consumption_aligned = align_consumption_by_calendar(consumption_df, start_date, end_date)
-        else:
+        if real_consumption:
+            # For real consumption, just filter to the requested period
             consumption_aligned = align_data_to_period(consumption_df, start_date, end_date)
-
+        else:
+            # Original logic for E-REDES profile
+            if consumption_model:
+                consumption_aligned = align_consumption_by_calendar(consumption_df, start_date, end_date)
+            else:
+                consumption_aligned = align_data_to_period(consumption_df, start_date, end_date)
         
         # Keep extra days for lookahead in prices
         prices_aligned = align_data_to_period(prices_15min, start_date, end_date + timedelta(days=2))
         
-        # Fill missing data if requested
+        # ====== FILL MISSING DATA ======
         if fill_missing:
-            print("6. Filling missing data points")
+            step_num += 1
+            print(f"{step_num}. Filling missing data points")
             consumption_aligned = fill_missing_data(consumption_aligned, start_date, end_date, method='interpolate')
             prices_aligned = fill_missing_data(prices_aligned, start_date, end_date + timedelta(days=2), method='ffill')
         
-        # Final validation
-        print("\n7. Final data validation")
+        # ====== FINAL VALIDATION ======
+        step_num += 1
+        print(f"\n{step_num}. Final data validation")
         cons_start, cons_end = consumption_aligned.index[0], consumption_aligned.index[-1]
         price_start, price_end = prices_aligned.index[0], prices_aligned.index[-1]
         
-        print(f"   Consumption data: {len(consumption_aligned)} points from {cons_start} to {cons_end}")
+        consumption_type = "REAL" if real_consumption else "PROFILE"
+        print(f"   {consumption_type} consumption data: {len(consumption_aligned)} points from {cons_start} to {cons_end}")
         print(f"   Price data: {len(prices_aligned)} points from {price_start} to {price_end}")
         
         # Check data quality
@@ -551,7 +656,7 @@ def prepare_simulation_data(
         if cons_coverage < 90 or price_coverage < 90:
             warnings.warn("Low data coverage detected. Results may be affected.")
         
-        print("\nData preparation completed successfully!")
+        print(f"\nData preparation completed successfully using {consumption_type} consumption data!")
         print("="*50)
         
         return consumption_aligned, prices_aligned

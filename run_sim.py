@@ -334,7 +334,7 @@ def plot_results(results_df: pd.DataFrame, price_df: pd.DataFrame, config: dict)
 
 
 def main():
-    """Main simulation function."""
+    """Main simulation function with real consumption support."""
     print("="*60)
     print("ESS ENERGY ARBITRAGE SIMULATION")
     print("="*60)
@@ -355,19 +355,37 @@ def main():
     
     print(f"\nSimulation period: {start_date.date()} to {end_date.date()}")
     
+    # Check consumption data type
+    real_consumption = config['consumption'].get('real_consumption', False)
+    consumption_type = "REAL DATA" if real_consumption else "E-REDES PROFILE"
+    print(f"Consumption data type: {consumption_type}")
+    
+    if real_consumption:
+        real_file = config['consumption'].get('real_consumption_file')
+        print(f"Real consumption file: {real_file}")
+    
     # Print tariff summary
     print_tariff_summary(config, fixed_costs)
     
     # Load and prepare data
     print("\nPreparing simulation data...")
-    consumption_df, prices_df = prepare_simulation_data(
-        config['consumption']['profile_file'],
-        config['consumption']['annual_consumption_kwh'],
-        start_date,
-        end_date,
-        config['consumption']['profile_column'],
-        consumption_model=config['consumption'].get('consumption_model', False)
-    )
+    
+    # Prepare arguments for data loading
+    prepare_args = {
+        'consumption_profile_path': config['consumption']['profile_file'],
+        'annual_consumption_kwh': config['consumption']['annual_consumption_kwh'],
+        'start_date': start_date,
+        'end_date': end_date,
+        'profile_column': config['consumption']['profile_column'],
+        'consumption_model': config['consumption'].get('consumption_model', False),
+        'real_consumption': real_consumption
+    }
+    
+    # Add real consumption file if needed
+    if real_consumption:
+        prepare_args['real_consumption_file'] = config['consumption']['real_consumption_file']
+    
+    consumption_df, prices_df = prepare_simulation_data(**prepare_args)
 
     # Rename price column for clarity
     if 'price_eur_per_kwh' in prices_df.columns:
@@ -415,7 +433,7 @@ def main():
     # Create and run simulator
     simulator = EnergyArbitrageSimulator(battery, strategy)
 
-    print("\nRunning simulation...")
+    print(f"\nRunning simulation with {consumption_type}...")
     results_df = simulator.run(
         consumption_df,
         prices_df,
@@ -439,7 +457,12 @@ def main():
         save_results(results_df, config['output']['timeline_file'])
 
     if config['output']['save_summary']:
-        summary = {**metrics, 'fixed_costs_breakdown': fixed_costs}
+        summary = {
+            **metrics, 
+            'fixed_costs_breakdown': fixed_costs,
+            'consumption_data_type': consumption_type,
+            'real_consumption_used': real_consumption
+        }
         with open(config['output']['summary_file'], 'w') as f:
             json.dump(summary, f, indent=2, default=str)
         print(f"\nSummary saved to {config['output']['summary_file']}")
@@ -449,6 +472,7 @@ def main():
     print(f"Cost without battery:  €{invoice.total_without_battery:.2f}")
     print(f"Cost with battery:     €{invoice.total_with_battery:.2f}")
     print(f"Savings:               €{invoice.savings:.2f}")
+    print(f"Data source:           {consumption_type}")
 
     # Generate plots
     if config['output']['generate_plots']:
@@ -458,6 +482,7 @@ def main():
   
     print("\n" + "="*60)
     print("SIMULATION COMPLETED SUCCESSFULLY")
+    print(f"Using {consumption_type} consumption data")
     print("="*60)
     
     return results_df, metrics
