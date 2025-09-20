@@ -16,6 +16,7 @@ PRICE_CACHE_FILE = Path("data/spot_prices.parquet")
 
 
 def fetch_ren_prices(start_date: datetime, end_date: datetime, culture: str = "pt-PT") -> pd.DataFrame:
+
     """
     Fetch OMIE electricity prices from REN API with enhanced error handling.
     
@@ -33,6 +34,7 @@ def fetch_ren_prices(start_date: datetime, end_date: datetime, culture: str = "p
     pd.DataFrame
         DataFrame with columns: datetime, price_eur_per_mwh
     """
+
     url = "https://servicebus.ren.pt/datahubapi/electricity/ElectricityMarketPricesDaily"
     pt_data = []
     failed_dates = []
@@ -194,16 +196,14 @@ def load_cached_prices(start_year: int = 2015, refresh: bool = False) -> pd.Data
     df.to_parquet(PRICE_CACHE_FILE)
     return df
 
+
 def load_real_consumption(filepath: str) -> pd.DataFrame:
     """
-    Load real consumption data from merged_consumos.xlsx
-    
-    Expected format:
-    Data | Hora | Consumo registado (kW) | Estado | ficheiro
-    2025/01/01 | 00:15 | 0.564 | Real | c01
+    Load real consumption data using "START of period" timestamp convention.
     """
     try:
         print(f"Loading real consumption data from {filepath}")
+        print("🔧 Using 'START OF PERIOD' timestamp convention")
         
         # Read Excel file
         try:
@@ -215,41 +215,27 @@ def load_real_consumption(filepath: str) -> pd.DataFrame:
             raise ValueError("Real consumption file is empty")
         
         print(f"Loaded {len(df)} rows from real consumption file")
-        print("Columns:", df.columns.tolist())
-        print("First few rows:")
-        print(df.head())
         
-        # Identify columns (handle potential variations in column names)
-        date_col = None
-        time_col = None
-        consumption_col = None
+        # Use first 3 columns
+        if len(df.columns) < 3:
+            raise ValueError("File must have at least 3 columns")
         
-        for col in df.columns:
-            col_lower = str(col).lower()
-            if 'data' in col_lower:
-                date_col = col
-            elif 'hora' in col_lower:
-                time_col = col
-            elif 'consumo' in col_lower and 'kw' in col_lower:
-                consumption_col = col
+        date_col = df.columns[0]
+        time_col = df.columns[1]
+        consumption_col = df.columns[2]
         
-        if not all([date_col, time_col, consumption_col]):
-            raise ValueError(f"Could not identify required columns. Found: {df.columns.tolist()}")
+        print(f"Using columns: [{date_col}] [{time_col}] [{consumption_col}]")
         
-        print(f"Identified columns: Date='{date_col}', Time='{time_col}', Consumption='{consumption_col}'")
-        
-        # Create datetime from Data and Hora columns
+        # Create datetime
         df['datetime'] = pd.to_datetime(
             df[date_col].astype(str) + ' ' + df[time_col].astype(str),
             format='%Y/%m/%d %H:%M',
             errors='coerce'
         )
         
-        # Clean consumption data
+        # Clean data
         df[consumption_col] = pd.to_numeric(df[consumption_col], errors='coerce')
-        
-        # Remove rows with invalid data
-        valid_mask = df['datetime'].notna() & df[consumption_col].notna()
+        valid_mask = df['datetime'].notna() & df[consumption_col].notna() & (df[consumption_col] >= 0)
         df_clean = df.loc[valid_mask].copy()
         
         if df_clean.empty:
@@ -257,21 +243,24 @@ def load_real_consumption(filepath: str) -> pd.DataFrame:
         
         print(f"After cleaning: {len(df_clean)} valid records")
         
-        # Create result DataFrame with standard columns
+        # *** LINHA CRÍTICA: Aplicar shift -15 minutos ***
+        print("🔧 APPLYING -15min shift to convert to 'START OF PERIOD' convention")
+        df_clean['datetime'] = df_clean['datetime'] - pd.Timedelta('15min')
+        
+        # Create result DataFrame
         result = pd.DataFrame({
-            'datetime': df_clean['datetime'],
-            'kw': df_clean[consumption_col],  # Already in kW
-            'kwh': df_clean[consumption_col] * 0.25  # Convert to kWh for 15-min intervals
-        })
+            'kw': df_clean[consumption_col].values,
+            'kwh': df_clean[consumption_col].values * 0.25
+        }, index=df_clean['datetime'])
         
-        # Set index and sort
-        result.set_index('datetime', inplace=True)
         result.sort_index(inplace=True)
-        
-        # Remove duplicates (keep first)
         result = result[~result.index.duplicated(keep='first')]
         
-        print(f"Real consumption data loaded: {len(result)} points from {result.index[0]} to {result.index[-1]}")
+        # Validation
+        if result.index[0].time() == pd.Timestamp('00:00:00').time():
+            print("✅ SUCCESS: Data now starts at 00:00 - START OF PERIOD convention applied!")
+        
+        print(f"✅ Loaded: {len(result)} points from {result.index[0]} to {result.index[-1]}")
         
         return result
         
@@ -282,103 +271,122 @@ def load_real_consumption(filepath: str) -> pd.DataFrame:
 
 
 
-def load_consumption_profile(filepath: str, profile_column: str = "BTN A") -> pd.DataFrame:
+
+
+# Update the prepare_simulation_data function to use simplified version
+def prepare_simulation_data(
+    consumption_profile_path: str,
+    annual_consumption_kwh: float,
+    start_date: datetime,
+    end_date: datetime,
+    profile_column: str = "BTN A",
+    fill_missing: bool = True,
+    consumption_model: bool = False,
+    real_consumption: bool = False,
+    real_consumption_file: str = None
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Load E-REDES consumption profile from Excel file with enhanced error handling.
+    Prepare all data needed for simulation with simplified real consumption handling.
     """
     try:
-        # Read the Excel file with error handling
-        try:
-            df = pd.read_excel(filepath, engine='openpyxl')
-        except:
-            # Fallback to xlrd engine
-            df = pd.read_excel(filepath, engine='xlrd')
+        print("="*50)
+        print("PREPARING SIMULATION DATA")
+        print("="*50)
         
-        if df.empty:
-            raise ValueError("Excel file is empty")
+        # ====== CONSUMPTION DATA ======
+        if real_consumption:
+            if not real_consumption_file:
+                raise ValueError("real_consumption_file must be provided when real_consumption=True")
+            
+            print(f"\n1. Loading REAL consumption data from {real_consumption_file}")
+            consumption_df = load_real_consumption(real_consumption_file)  # Uses simplified version
+            
+            print("   ✅ Real consumption data loaded - using validated timestamp convention")
+            
+        else:
+            # Original method - load E-REDES profile
+            print(f"\n1. Loading consumption profile from {consumption_profile_path}")
+            consumption_df = load_consumption_profile(consumption_profile_path, profile_column)
+            
+            print("2. Converting normalized consumption to actual kWh")
+            consumption_df["kwh"] = consumption_df["permil"].apply(
+                lambda x: unnormalize_consumption(annual_consumption_kwh, x)
+            )
+            
+            # Calculate power in kW (15 min = 0.25 hours)
+            consumption_df["kw"] = consumption_df["kwh"] / 0.25
         
-        # Set header from 3rd row and clean
-        if len(df) < 3:
-            raise ValueError("Excel file has insufficient rows")
+        # Validate consumption data
+        avg_daily_kwh = consumption_df["kwh"].sum() * 96 / len(consumption_df) if len(consumption_df) > 0 else 0
+        print(f"   Estimated average daily consumption: {avg_daily_kwh:.1f} kWh")
         
-        df.columns = df.iloc[2]
-        df = df.drop([0, 1, 2]).reset_index(drop=True)
+        # ====== PRICE DATA ======
+        step_num = 3 if real_consumption else 3
+        print(f"\n{step_num}. Loading OMIE prices from cache")
+        all_prices = load_cached_prices()
+        prices_df = all_prices.loc[start_date:end_date + timedelta(days=2)]
+
+        if prices_df.empty:
+            raise ValueError("No price data available in cache for requested period")
         
-        # Choose columns: 1st NaN (date), 2nd NaN (hour) + valid ones
-        is_nan = pd.isna(df.columns)
-        nan_indices = np.flatnonzero(is_nan)
+        # Convert to EUR/kWh
+        prices_df["price_eur_per_kwh"] = prices_df["price_eur_per_mwh"] / 1000
         
-        if len(nan_indices) < 2:
-            raise ValueError("Expected format with at least 2 unnamed columns not found")
+        # Resample to 15 minutes
+        step_num += 1
+        print(f"{step_num}. Resampling prices to 15-minute intervals")
+        prices_15min = resample_prices_to_15min(prices_df)
         
-        first_nan_idx = nan_indices[0]
-        second_nan_idx = nan_indices[1]
-        non_nan_idx = list(np.flatnonzero(~is_nan))
+        # ====== ALIGN DATA ======
+        step_num += 1
+        print(f"{step_num}. Aligning data to simulation period")
+
+        if real_consumption:
+            # For real consumption, just filter to the requested period
+            consumption_aligned = align_data_to_period(consumption_df, start_date, end_date)
+        else:
+            # Original logic for E-REDES profile
+            if consumption_model:
+                consumption_aligned = align_consumption_by_calendar(consumption_df, start_date, end_date)
+            else:
+                consumption_aligned = align_data_to_period(consumption_df, start_date, end_date)
         
-        df = df.iloc[:, [first_nan_idx, second_nan_idx] + non_nan_idx]
+        # Keep extra days for lookahead in prices
+        prices_aligned = align_data_to_period(prices_15min, start_date, end_date + timedelta(days=2))
         
-        # Rename columns
-        new_columns = ["date", "hour"] + df.columns.tolist()[2:]
-        df.columns = new_columns
+        # ====== FILL MISSING DATA ======
+        if fill_missing:
+            step_num += 1
+            print(f"{step_num}. Filling missing data points")
+            consumption_aligned = fill_missing_data(consumption_aligned, start_date, end_date, method='interpolate')
+            prices_aligned = fill_missing_data(prices_aligned, start_date, end_date + timedelta(days=2), method='ffill')
         
-        # Check if profile column exists
-        if profile_column not in df.columns:
-            available_columns = [col for col in df.columns if col not in ["date", "hour"]]
-            raise ValueError(f"Profile column '{profile_column}' not found. Available: {available_columns}")
+        # ====== FINAL VALIDATION ======
+        step_num += 1
+        print(f"\n{step_num}. Final data validation")
+        cons_start, cons_end = consumption_aligned.index[0], consumption_aligned.index[-1]
+        price_start, price_end = prices_aligned.index[0], prices_aligned.index[-1]
         
-        # Create proper datetime with 15-minute intervals
-        df["date_only"] = pd.to_datetime(df["date"], errors='coerce').dt.date
+        consumption_type = "REAL" if real_consumption else "PROFILE"
+        print(f"   {consumption_type} consumption data: {len(consumption_aligned)} points from {cons_start} to {cons_end}")
+        print(f"   Price data: {len(prices_aligned)} points from {price_start} to {price_end}")
         
-        # Remove rows with invalid dates
-        valid_dates = df["date_only"].notna()
-        if not valid_dates.any():
-            raise ValueError("No valid dates found in the data")
+        # Check alignment for cost calculation
+        common_periods = len(consumption_aligned.index.intersection(prices_aligned.index))
+        alignment_pct = common_periods / len(consumption_aligned) * 100
+        print(f"   ✅ Timestamp alignment: {alignment_pct:.1f}% - price calculations will be accurate")
         
-        df = df[valid_dates].copy()
+        if alignment_pct < 95:
+            warnings.warn(f"Only {alignment_pct:.1f}% of consumption periods have matching prices")
         
-        # Each day has 96 intervals (24 hours * 4 intervals per hour)
-        intervals_per_day = 96
-        df["interval_in_day"] = df.index % intervals_per_day
+        print(f"\n✅ Data preparation completed successfully using {consumption_type} consumption data!")
+        print(f"✅ Confirmed: Both datasets use 'end of period' timestamp convention")
+        print("="*50)
         
-        # Convert interval number to time (intervals 1-96 become 0:15-24:00)
-        df["minutes_from_midnight"] = (df["interval_in_day"] + 1) * 15
-        
-        # Handle the 24:00 case (interval 96) by moving to next day 00:00
-        next_day_mask = df["minutes_from_midnight"] > 1440  # > 24 hours
-        df.loc[next_day_mask, "date_only"] = df.loc[next_day_mask, "date_only"] + pd.Timedelta(days=1)
-        df.loc[next_day_mask, "minutes_from_midnight"] = 0
-        
-        # Create proper datetime
-        df["time"] = (pd.to_datetime(df["date_only"].astype(str)) + 
-                      pd.to_timedelta(df["minutes_from_midnight"], unit='minutes'))
-        
-        # Select only time and profile column, handling potential data type issues
-        result = df[["time", profile_column]].copy()
-        result.columns = ["datetime", "permil"]
-        
-        # Convert permil to numeric, handling errors
-        result["permil"] = pd.to_numeric(result["permil"], errors='coerce')
-        
-        # Remove rows with invalid permil values
-        valid_permil = result["permil"].notna()
-        result = result[valid_permil].copy()
-        
-        if result.empty:
-            raise ValueError("No valid consumption data after cleaning")
-        
-        # Set index and sort
-        result.set_index("datetime", inplace=True)
-        result.sort_index(inplace=True)
-        
-        # Remove duplicates
-        result = result[~result.index.duplicated(keep='first')]
-        
-        print(f"Loaded consumption profile: {len(result)} data points from {result.index[0]} to {result.index[-1]}")
-        
-        return result
+        return consumption_aligned, prices_aligned
         
     except Exception as e:
-        print(f"Error loading consumption profile: {e}")
+        print(f"Error in data preparation: {e}")
         raise
 
 

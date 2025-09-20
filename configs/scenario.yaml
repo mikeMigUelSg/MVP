@@ -2,15 +2,15 @@
 
 # Simulation period - avoiding DST transition
 period:
-  start_date: "2025-01-01"  # Avoid March DST transition
-  num_days: 250  # Shorter period for testing
+  start_date: "2025-05-24"  # Avoid March DST transition
+  num_days: 60  # Shorter period for testing
   # end_date: "2024-01-31"
 
 # Household consumption
 consumption:
   profile_file: "data/e_redes_perfil_consumo.xlsx"
   profile_column: "BTN A"  # Residential profile
-  annual_consumption_kwh: 1900  # More typical residential consumption
+  annual_consumption_kwh: 1900  # More typicaßßßl residential consumption
   consumption_model: true  # Use 2024 profile for any simulation year
   
   # NEW: Real consumption data support

@@ -391,6 +391,9 @@ def main():
     
     consumption_df, prices_df = prepare_simulation_data(**prepare_args)
 
+    print(consumption_df)
+    print((prices_df))
+
     # Rename price column for clarity
     if 'price_eur_per_kwh' in prices_df.columns:
         prices_df = prices_df.rename(columns={'price_eur_per_kwh': 'price_omie_eur_kwh'})
