@@ -1,8 +1,16 @@
 {
-  "cost_without_battery_eur": 162.55754558270002,
-  "cost_with_battery_eur": 122.19364644862375,
-  "savings_eur": 40.36389913407626,
-  "savings_pct": 24.83052939153871,
+  "cost_without_battery_eur": 181.16997027249602,
+  "cost_with_battery_eur": 128.4956647590193,
+  "savings_eur": 52.674305513476725,
+  "savings_pct": 29.07452346227678,
+  "electricity_cost_without_eur": 154.885858862496,
+  "electricity_cost_with_eur": 102.16549404038487,
+  "electricity_savings_eur": 52.72036482211114,
+  "power_cost_eur": 19.09776,
+  "taxes_cost_eur": 7.18635141,
+  "electricity_pct_of_total": 85.49201538728171,
+  "power_pct_of_total": 10.541349634972752,
+  "taxes_pct_of_total": 3.966634977745527,
   "fixed_costs_breakdown": {
     "k3_daily": 0.094,
     "power_daily": 0.224296,
@@ -11,5 +19,31 @@
     "total_daily": 0.421866
   },
   "consumption_data_type": "REAL DATA",
-  "real_consumption_used": true
+  "real_consumption_used": true,
+  "modular_invoice": {
+    "electricity_term": {
+      "without_battery": {
+        "OMIE Market (adjusted)": 73.958236736,
+        "Network Access (K2)": 13.5943124,
+        "Time-of-Use Tariff": 47.42202,
+        "Energy VAT": 19.911289726496
+      },
+      "with_battery": {
+        "OMIE Market (adjusted)": 25.046924075520963,
+        "Network Access (K2)": 14.238393789034077,
+        "Time-of-Use Tariff": 49.668815543142124,
+        "Energy VAT": 13.211360632687716
+      }
+    },
+    "power_term": {
+      "K3 Daily Fee": 5.64,
+      "Contracted Power": 13.45776
+    },
+    "taxes": {
+      "IEC Tax": 0.7903669999999999,
+      "IEC VAT": 0.18178441,
+      "CAV (incl. VAT)": 6.042000000000001,
+      "DGEG (incl. VAT)": 0.17220000000000002
+    }
+  }
 }

@@ -125,6 +125,288 @@ def print_tariff_summary(config: dict, fixed_costs: dict):
     print("="*50)
 
 
+def run_billing(results_df, prices_df, config, fixed_costs):
+    """Run billing with refactored modular structure."""
+    # Create billing engine with fixed costs
+    billing = BillingEngine(
+        tariff_cfg=config['tariff'],
+        fixed_costs=fixed_costs  # Pass the fixed_costs dict directly
+    )
+    
+    # Generate ledger and invoice
+    ledger = billing.generate_ledger(results_df, prices_df)
+    invoice = billing.invoice_from_ledger(ledger)
+    metrics = billing.metrics_from_ledger(ledger)
+    
+    return ledger, invoice, metrics
+
+def print_modular_invoice(invoice):
+    """Print invoice with modular structure."""
+    print("\n" + "="*60)
+    print("MODULAR INVOICE BREAKDOWN")
+    print("="*60)
+    
+    # 1. ELECTRICITY TERM
+    print("\n1. ELECTRICITY TERM (Variable)")
+    print("-" * 40)
+    print("Without Battery:")
+    for component, value in invoice.electricity_term_without.items():
+        print(f"  {component:30s} €{value:8.2f}")
+    electricity_total_without = sum(invoice.electricity_term_without.values())
+    print(f"  {'SUBTOTAL':30s} €{electricity_total_without:8.2f}")
+    
+    print("\nWith Battery:")
+    for component, value in invoice.electricity_term_with.items():
+        print(f"  {component:30s} €{value:8.2f}")
+    electricity_total_with = sum(invoice.electricity_term_with.values())
+    print(f"  {'SUBTOTAL':30s} €{electricity_total_with:8.2f}")
+    
+    electricity_savings = electricity_total_without - electricity_total_with
+    print(f"\n  {'ELECTRICITY SAVINGS':30s} €{electricity_savings:8.2f}")
+    
+    # 2. POWER TERM
+    print("\n2. POWER TERM (Fixed)")
+    print("-" * 40)
+    for component, value in invoice.power_term.items():
+        print(f"  {component:30s} €{value:8.2f}")
+    power_total = sum(invoice.power_term.values())
+    print(f"  {'SUBTOTAL':30s} €{power_total:8.2f}")
+    
+    # 3. TAXES
+    print("\n3. TAXES")
+    print("-" * 40)
+    for component, value in invoice.taxes.items():
+        print(f"  {component:30s} €{value:8.2f}")
+    taxes_total = sum(invoice.taxes.values())
+    print(f"  {'SUBTOTAL':30s} €{taxes_total:8.2f}")
+    
+    # TOTAL SUMMARY
+    print("\n" + "="*60)
+    print("TOTAL INVOICE")
+    print("-" * 60)
+    print(f"Without Battery:               €{invoice.total_without_battery:8.2f}")
+    print(f"With Battery:                  €{invoice.total_with_battery:8.2f}")
+    print(f"{'TOTAL SAVINGS:':30s} €{invoice.savings:8.2f}")
+    print(f"Savings percentage:            {(invoice.savings/invoice.total_without_battery*100):.1f}%")
+    print("="*60)
+
+
+
+# ========== UPDATED SECTION 4: Updated plot function for modular invoice ==========
+def plot_modular_cost_breakdown(invoice, config, start_date, end_date, n_days):
+    """
+    Create visualization for modular invoice structure.
+    Shows the 3 main components separately.
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from matplotlib.patches import Rectangle
+    
+    plots_dir = config['output']['plots_dir']
+    
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    fig.suptitle(f'Modular Energy Cost Breakdown\n{start_date} to {end_date} ({n_days} days)', 
+                 fontsize=16, fontweight='bold')
+    
+    # Colors for components
+    electricity_colors = {
+        'OMIE Market (adjusted)': '#1f77b4',
+        'Network Access (K2)': '#ff7f0e',
+        'Time-of-Use Tariff': '#2ca02c',
+        'Energy VAT': '#d62728'
+    }
+    
+    power_colors = {
+        'K3 Daily Fee': '#9467bd',
+        'Contracted Power': '#8c564b'
+    }
+    
+    taxes_colors = {
+        'IEC Tax': '#e377c2',
+        'IEC VAT': '#7f7f7f',
+        'CAV (incl. VAT)': '#bcbd22',
+        'DGEG (incl. VAT)': '#17becf'
+    }
+    
+    # 1. ELECTRICITY TERM COMPARISON
+    ax1 = axes[0, 0]
+    categories = list(invoice.electricity_term_without.keys())
+    without_vals = [invoice.electricity_term_without[cat] for cat in categories]
+    with_vals = [invoice.electricity_term_with[cat] for cat in categories]
+    
+    x = np.arange(len(categories))
+    width = 0.35
+    
+    bars1 = ax1.bar(x - width/2, without_vals, width, label='Without Battery', 
+                    color='coral', alpha=0.8, edgecolor='black')
+    bars2 = ax1.bar(x + width/2, with_vals, width, label='With Battery',
+                    color='lightgreen', alpha=0.8, edgecolor='black')
+    
+    ax1.set_xlabel('Component')
+    ax1.set_ylabel('Cost (EUR)')
+    ax1.set_title('Electricity Term (Variable Costs)')
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(categories, rotation=45, ha='right')
+    ax1.legend()
+    ax1.grid(True, axis='y', alpha=0.3)
+    
+    # Add values on bars
+    for bars in [bars1, bars2]:
+        for bar in bars:
+            height = bar.get_height()
+            if height > 0.5:
+                ax1.text(bar.get_x() + bar.get_width()/2., height,
+                        f'€{height:.1f}', ha='center', va='bottom', fontsize=8)
+    
+    # 2. POWER TERM (Fixed)
+    ax2 = axes[0, 1]
+    power_components = list(invoice.power_term.keys())
+    power_values = [invoice.power_term[comp] for comp in power_components]
+    colors = [power_colors.get(comp, '#666666') for comp in power_components]
+    
+    bars = ax2.bar(power_components, power_values, color=colors, alpha=0.8, 
+                   edgecolor='black', linewidth=0.5)
+    
+    for bar, val in zip(bars, power_values):
+        ax2.text(bar.get_x() + bar.get_width()/2., bar.get_height(),
+                f'€{val:.2f}', ha='center', va='bottom', fontsize=9)
+    
+    ax2.set_ylabel('Cost (EUR)')
+    ax2.set_title('Power Term (Fixed Costs)')
+    ax2.grid(True, axis='y', alpha=0.3)
+    
+    # 3. TAXES
+    ax3 = axes[1, 0]
+    tax_components = list(invoice.taxes.keys())
+    tax_values = [invoice.taxes[comp] for comp in tax_components]
+    colors = [taxes_colors.get(comp, '#666666') for comp in tax_components]
+    
+    bars = ax3.bar(tax_components, tax_values, color=colors, alpha=0.8,
+                   edgecolor='black', linewidth=0.5)
+    
+    for bar, val in zip(bars, tax_values):
+        ax3.text(bar.get_x() + bar.get_width()/2., bar.get_height(),
+                f'€{val:.2f}', ha='center', va='bottom', fontsize=9)
+    
+    ax3.set_ylabel('Cost (EUR)')
+    ax3.set_title('Taxes')
+    ax3.set_xticklabels(tax_components, rotation=45, ha='right')
+    ax3.grid(True, axis='y', alpha=0.3)
+    
+    # 4. TOTAL COMPARISON (Pie chart or stacked bar)
+    ax4 = axes[1, 1]
+    
+    # Calculate totals for each category
+    electricity_without = sum(invoice.electricity_term_without.values())
+    electricity_with = sum(invoice.electricity_term_with.values())
+    power_total = sum(invoice.power_term.values())
+    taxes_total = sum(invoice.taxes.values())
+    
+    # Stacked bar comparison
+    categories = ['Without Battery', 'With Battery']
+    electricity_vals = [electricity_without, electricity_with]
+    power_vals = [power_total, power_total]  # Same for both
+    taxes_vals = [taxes_total, taxes_total]  # Approximately same
+    
+    x = np.arange(len(categories))
+    width = 0.5
+    
+    p1 = ax4.bar(x, electricity_vals, width, label='Electricity', color='#ff9999')
+    p2 = ax4.bar(x, power_vals, width, bottom=electricity_vals, label='Power', color='#66b3ff')
+    p3 = ax4.bar(x, taxes_vals, width, bottom=np.array(electricity_vals) + np.array(power_vals),
+                 label='Taxes', color='#99ff99')
+    
+    ax4.set_ylabel('Cost (EUR)')
+    ax4.set_title('Total Cost Breakdown')
+    ax4.set_xticks(x)
+    ax4.set_xticklabels(categories)
+    ax4.legend()
+    ax4.grid(True, axis='y', alpha=0.3)
+    
+    # Add total values
+    totals = [invoice.total_without_battery, invoice.total_with_battery]
+    for i, total in enumerate(totals):
+        ax4.text(i, total + 2, f'€{total:.2f}', ha='center', fontweight='bold')
+    
+    # Add savings annotation
+    savings = invoice.total_without_battery - invoice.total_with_battery
+    ax4.annotate(f'Savings: €{savings:.2f}', xy=(0.5, max(totals)/2),
+                xytext=(0.5, max(totals)*0.7), ha='center', fontsize=12,
+                fontweight='bold', color='darkgreen',
+                arrowprops=dict(arrowstyle='->', color='darkgreen', lw=2))
+    
+    plt.tight_layout()
+    plt.savefig(f"{plots_dir}/modular_cost_breakdown.png", dpi=150, bbox_inches='tight')
+    
+    return fig
+
+
+# ========== UPDATED MAIN FUNCTION SECTION ==========
+# In your main() function, replace the billing section with:
+
+    # ... (earlier code remains the same) ...
+    
+    # Run billing with refactored modular structure
+    print("\nRunning billing calculations...")
+    ledger, invoice, metrics = run_billing(results_df, prices_df, config, fixed_costs)
+    
+    # Print modular invoice
+    print_modular_invoice(invoice)
+    
+    # Save results
+    if config['output']['save_timeline']:
+        # Add ledger columns to results for complete view
+        results_with_ledger = results_df.join(ledger[[
+            'omie_adjusted_without_eur', 'k2_without_eur', 'tariff_without_eur',
+            'energy_vat_without_eur', 'iec_without_eur',
+            'omie_adjusted_with_eur', 'k2_with_eur', 'tariff_with_eur',
+            'energy_vat_with_eur', 'iec_with_eur'
+        ]], how='left')
+        save_results(results_with_ledger, config['output']['timeline_file'])
+    
+    if config['output']['save_summary']:
+        summary = {
+            **metrics,
+            'fixed_costs_breakdown': fixed_costs,
+            'consumption_data_type': consumption_type,
+            'real_consumption_used': real_consumption,
+            # Add modular breakdown to summary
+            'modular_invoice': {
+                'electricity_term': {
+                    'without_battery': invoice.electricity_term_without,
+                    'with_battery': invoice.electricity_term_with
+                },
+                'power_term': invoice.power_term,
+                'taxes': invoice.taxes
+            }
+        }
+        with open(config['output']['summary_file'], 'w') as f:
+            json.dump(summary, f, indent=2, default=str)
+        print(f"\nSummary saved to {config['output']['summary_file']}")
+    
+    # Generate plots
+    if config['output']['generate_plots']:
+        print("\nGenerating plots...")
+        
+        # Original plots
+        fig_results = plot_results(results_df, prices_df, config)
+        
+        # New modular breakdown plot
+        n_days = (end_date - start_date).days + 1
+        fig_modular = plot_modular_cost_breakdown(
+            invoice, config, start_date.strftime('%Y-%m-%d'), 
+            end_date.strftime('%Y-%m-%d'), n_days
+        )
+        
+        # Show all plots
+        plt.ion()
+        fig_results.show()
+        fig_modular.show()
+        
+        print("\nAll plots displayed!")
+        input("Press Enter to continue...")
+
+
 def plot_cost_breakdown_invoice(results_df: pd.DataFrame, prices_df: pd.DataFrame, config: dict, metrics: dict, fixed_costs: dict, ledger: pd.DataFrame):
     """
     Generate an invoice-style cost breakdown comparison plot using the **ledger**
@@ -450,67 +732,68 @@ def main():
 
     # Billing
     n_days = (end_date - start_date).days + 1
-    billing = BillingEngine(
-        tariff_cfg=config['tariff'],
-        daily_fixed_cost_eur=fixed_costs['total_daily']
-    )
 
-    ledger = billing.generate_ledger(results_df, prices_df)
-    invoice = billing.invoice_from_ledger(ledger)
-    metrics = billing.metrics_from_ledger(ledger)
 
-    # Save timeline and summary
+    print("\nRunning billing calculations...")
+    ledger, invoice, metrics = run_billing(results_df, prices_df, config, fixed_costs)
+    
+    # Print modular invoice
+    print_modular_invoice(invoice)
+    
+    # Save results
     if config['output']['save_timeline']:
-        save_results(results_df, config['output']['timeline_file'])
-
+        # Add ledger columns to results for complete view
+        results_with_ledger = results_df.join(ledger[[
+            'omie_adjusted_without_eur', 'k2_without_eur', 'tariff_without_eur',
+            'energy_vat_without_eur', 'iec_without_eur',
+            'omie_adjusted_with_eur', 'k2_with_eur', 'tariff_with_eur',
+            'energy_vat_with_eur', 'iec_with_eur'
+        ]], how='left')
+        save_results(results_with_ledger, config['output']['timeline_file'])
+    
     if config['output']['save_summary']:
         summary = {
-            **metrics, 
+            **metrics,
             'fixed_costs_breakdown': fixed_costs,
             'consumption_data_type': consumption_type,
-            'real_consumption_used': real_consumption
+            'real_consumption_used': real_consumption,
+            # Add modular breakdown to summary
+            'modular_invoice': {
+                'electricity_term': {
+                    'without_battery': invoice.electricity_term_without,
+                    'with_battery': invoice.electricity_term_with
+                },
+                'power_term': invoice.power_term,
+                'taxes': invoice.taxes
+            }
         }
         with open(config['output']['summary_file'], 'w') as f:
             json.dump(summary, f, indent=2, default=str)
         print(f"\nSummary saved to {config['output']['summary_file']}")
-
-    # Print billing summary
-    print("\n--- BILLING SUMMARY ---")
-    print(f"Cost without battery:  €{invoice.total_without_battery:.2f}")
-    print(f"Cost with battery:     €{invoice.total_with_battery:.2f}")
-    print(f"Savings:               €{invoice.savings:.2f}")
-    print(f"Data source:           {consumption_type}")
-
-    # Generate plots - FIXED: All plots created but not shown yet
+    
+    # Generate plots
     if config['output']['generate_plots']:
         print("\nGenerating plots...")
         
-        # Create all figures first
+        # Original plots
         fig_results = plot_results(results_df, prices_df, config)
-        fig_invoice, fig_detailed, cost_breakdown = plot_cost_breakdown_invoice(
-            results_df, prices_df, config, metrics, fixed_costs, ledger
+        
+        # New modular breakdown plot
+        n_days = (end_date - start_date).days + 1
+        fig_modular = plot_modular_cost_breakdown(
+            invoice, config, start_date.strftime('%Y-%m-%d'), 
+            end_date.strftime('%Y-%m-%d'), n_days
         )
         
-        # Show all plots simultaneously using non-blocking mode
-        plt.ion()  # Turn on interactive mode
-        
-        # Show all figures
+        # Show all plots
+        plt.ion()
         fig_results.show()
-        fig_invoice.show()
-        fig_detailed.show()
+        fig_modular.show()
         
-        # Keep plots open
-        print("\nAll plots are now displayed simultaneously!")
-        print("Close individual plot windows when done viewing.")
-        
-        # Optional: Wait for user input before continuing
-        input("Press Enter to continue (plots will remain open)...")
-  
-    print("\n" + "="*60)
-    print("SIMULATION COMPLETED SUCCESSFULLY")
-    print(f"Using {consumption_type} consumption data")
-    print("="*60)
-    
+        print("\nAll plots displayed!")
+        input("Press Enter to continue...")
+
+
     return results_df, metrics
 
 if __name__ == "__main__":

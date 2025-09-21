@@ -1,3 +1,7 @@
+"""
+ess/tariff.py - REFACTORED VERSION with modular invoice components
+"""
+
 import pandas as pd
 from datetime import datetime
 
@@ -79,8 +83,19 @@ def get_tariff_period(ts: datetime, option: str, cycle: str) -> str:
     return _period_weekly(ts, option, season)
 
 
-
 def apply_indexed_tariff(prices_df: pd.DataFrame, tariff_cfg: dict) -> pd.DataFrame:
+    """
+    REFACTORED: Apply indexed tariff and return electricity term components WITHOUT VAT.
+    
+    Returns prices_df with additional columns:
+    - tariff_period: Time-of-use period
+    - price_omie_adjusted_eur_kwh: OMIE price * (1 + losses) * k1
+    - k2_eur_kwh: K2 network access component  
+    - tariff_energy_eur_kwh: Time-of-use tariff component
+    - price_electricity_base_eur_kwh: Total electricity term (OMIE_adjusted + K2 + TAR)
+    
+    Note: VAT is NOT applied here - it's handled in the billing engine
+    """
     idx_cfg = tariff_cfg['indexed']
     option = idx_cfg['option']
     cycle = idx_cfg['cycle']
@@ -89,20 +104,25 @@ def apply_indexed_tariff(prices_df: pd.DataFrame, tariff_cfg: dict) -> pd.DataFr
     losses = idx_cfg['losses_pct']
     rates = idx_cfg['tariff_energy_eur_kwh']
 
-    vat_rate = tariff_cfg['vat_rate']
-    iec_tax = tariff_cfg.get('iec_tax_eur_kwh', 0.0)
-    iec_vat = tariff_cfg.get('iec_vat_rate', vat_rate)
-
     periods = []
+    omie_adjusted = []
+    k2_list = []
     tariffs = []
-    energy_pre_vat = []
-    iec_list = []
-    final_prices = []
-
+    electricity_base = []
 
     for ts, row in prices_df.iterrows():
+        # Get tariff period
         period = get_tariff_period(ts, option, cycle)
         periods.append(period)
+        
+        # OMIE adjusted for losses and k1
+        omie_adj = row['price_omie_eur_kwh'] * (1 + losses) * k1
+        omie_adjusted.append(omie_adj)
+        
+        # K2 network access
+        k2_list.append(k2)
+        
+        # Time-of-use tariff
         if option == 'simples':
             tar = rates['simples']
         elif option == 'bi':
@@ -112,18 +132,20 @@ def apply_indexed_tariff(prices_df: pd.DataFrame, tariff_cfg: dict) -> pd.DataFr
         else:
             tar = 0.0
         tariffs.append(tar)
+        
+        # Total electricity base (before VAT)
+        energy_base = omie_adj + k2 + tar
+        electricity_base.append(energy_base)
 
-        energy_base = row['price_omie_eur_kwh'] * (1 + losses) * k1 + k2 + tar
-        price_energy_with_vat = energy_base * (1 + vat_rate)
-        price_iec_with_vat = iec_tax * (1 + iec_vat)
-        final_prices.append(price_energy_with_vat + price_iec_with_vat)
-        energy_pre_vat.append(energy_base)
-        iec_list.append(iec_tax)
-
+    # Add columns to dataframe
     prices_df['tariff_period'] = periods
+    prices_df['price_omie_adjusted_eur_kwh'] = omie_adjusted
+    prices_df['k2_eur_kwh'] = k2_list
     prices_df['tariff_energy_eur_kwh'] = tariffs
-    prices_df['price_energy_pre_vat_eur_kwh'] = energy_pre_vat
-    prices_df['iec_tax_eur_kwh'] = iec_list
-
-    prices_df['price_final_eur_kwh'] = final_prices
+    prices_df['price_electricity_base_eur_kwh'] = electricity_base
+    
+    # Keep final price for backward compatibility (includes everything with VAT)
+    # This will be recalculated properly in billing engine
+    prices_df['price_final_eur_kwh'] = prices_df['price_electricity_base_eur_kwh']
+    
     return prices_df
