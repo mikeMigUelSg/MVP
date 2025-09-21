@@ -25,6 +25,7 @@ from ess.io import prepare_simulation_data, save_results
 from ess.strategies import ArbitrageStrategy, OptimalArbitrageStrategy
 from ess.simulator import EnergyArbitrageSimulator
 from ess.billing import BillingEngine
+from ess.tariff import create_tariff_processor
 
 
 def load_config(config_path: str = "configs/scenario.yaml") -> dict:
@@ -40,89 +41,99 @@ def create_output_dirs(config: dict):
         Path(config['output']['plots_dir']).mkdir(parents=True, exist_ok=True)
 
 
-def calculate_daily_fixed_costs(config: dict) -> dict:
-    """Calculate daily fixed costs with proper VAT application."""
+def calculate_daily_fixed_costs(
+    config: dict, tariff_processor=None
+) -> dict:
+    """Calculate daily fixed costs using the configured tariff processor."""
+
     tcfg = config['tariff']
-    idx_cfg = tcfg['indexed']
     contracted_power_kva = config['power_contract']['contracted_power_kva']
-    
-    # Fixed costs breakdown
-    costs = {}
-    
-    # K3 term (always standard VAT)
-    costs['k3_daily'] = idx_cfg['k3_eur_day']
-    
-    # Power term with conditional VAT
-    power_cost_base = idx_cfg['tariff_power_eur_kva_day'] * contracted_power_kva
-    
-    # Check if contracted power qualifies for reduced VAT on fixed power term
-    power_threshold = tcfg.get('fixed_power_reduced_vat_threshold_kva', 6.9)
-    if contracted_power_kva <= power_threshold:
-        power_vat_rate = tcfg.get('fixed_power_reduced_vat_rate', 0.06)
-        print(f"✓ Using reduced VAT ({power_vat_rate:.0%}) for power term (contracted power: {contracted_power_kva} kVA <= {power_threshold} kVA)")
-    else:
-        power_vat_rate = tcfg.get('fixed_power_vat_rate', 0.23)
-        print(f"✓ Using standard VAT ({power_vat_rate:.0%}) for power term (contracted power: {contracted_power_kva} kVA > {power_threshold} kVA)")
-    
-    costs['power_daily'] = power_cost_base * (1 + power_vat_rate)
-    
+    processor = tariff_processor or create_tariff_processor(tcfg)
+
+    fixed_terms, metadata = processor.compute_daily_fixed_costs(contracted_power_kva)
+
+    costs = {
+        'k3_daily': float(fixed_terms.get('k3_daily', 0.0)),
+        'power_daily': float(fixed_terms.get('power_daily', 0.0)),
+    }
+
+    metadata = metadata or {}
+
+    if 'power_vat_rate' in metadata:
+        vat_rate = metadata['power_vat_rate']
+        vat_type = metadata.get('vat_type', 'standard')
+        threshold = metadata.get('threshold_kva')
+        contracted = metadata.get('contracted_power_kva', contracted_power_kva)
+        if vat_type == 'reduced':
+            print(
+                f"✓ Using reduced VAT ({vat_rate:.0%}) for power term (contracted power: {contracted} kVA <= {threshold} kVA)"
+            )
+        else:
+            print(
+                f"✓ Using standard VAT ({vat_rate:.0%}) for power term (contracted power: {contracted} kVA > {threshold} kVA)"
+            )
+    elif metadata.get('power_term_source'):
+        source = metadata['power_term_source'].replace('_', ' ')
+        print(
+            f"✓ Using provided power term ({source}) -> €{costs['power_daily']:.4f}/day"
+        )
+
+    if metadata.get('k3_source') == 'configured' and costs['k3_daily']:
+        print(f"✓ Using provided K3 daily cost -> €{costs['k3_daily']:.4f}/day")
+
     # CAV fee (monthly converted to daily)
-    cav_daily = tcfg['cav_fee_eur_month'] / 30 * (1 + tcfg['cav_vat_rate'])
-    costs['cav_daily'] = cav_daily
-    
-    # DGEG fee (monthly converted to daily)  
-    dgeg_daily = tcfg['dgeg_fee_eur_month'] / 30 * (1 + tcfg['dgeg_vat_rate'])
-    costs['dgeg_daily'] = dgeg_daily
-    
-    # Total daily fixed cost
-    total_daily_fixed = (
-        costs['k3_daily'] + 
-        costs['power_daily'] + 
-        costs['cav_daily'] + 
-        costs['dgeg_daily']
+    costs['cav_daily'] = tcfg['cav_fee_eur_month'] / 30 * (1 + tcfg['cav_vat_rate'])
+
+    # DGEG fee (monthly converted to daily)
+    costs['dgeg_daily'] = tcfg['dgeg_fee_eur_month'] / 30 * (1 + tcfg['dgeg_vat_rate'])
+
+    costs['total_daily'] = (
+        costs['k3_daily']
+        + costs['power_daily']
+        + costs['cav_daily']
+        + costs['dgeg_daily']
     )
-    costs['total_daily'] = total_daily_fixed
-    
+
     return costs
 
 
-def print_tariff_summary(config: dict, fixed_costs: dict):
+def print_tariff_summary(config: dict, fixed_costs: dict, tariff_processor=None):
     """Print a summary of the tariff configuration."""
-    print("\n" + "="*50)
+
+    print("\n" + "=" * 50)
     print("TARIFF CONFIGURATION SUMMARY")
-    print("="*50)
-    
+    print("=" * 50)
+
     tcfg = config['tariff']
-    idx_cfg = tcfg['indexed']
     contracted_power = config['power_contract']['contracted_power_kva']
-    
+    processor = tariff_processor or create_tariff_processor(tcfg)
+
     print(f"Tariff type: {tcfg['type']}")
-    print(f"Option: {idx_cfg['option']}")
-    print(f"Cycle: {idx_cfg['cycle']}")
     print(f"Contracted power: {contracted_power} kVA")
-    
-    print(f"\nEnergy VAT rates:")
+
+    details = processor.summary_lines()
+    if details:
+        print("\nTariff details:")
+        for line in details:
+            print(f"  {line}")
+
+    print("\nEnergy VAT rates:")
     print(f"  Standard VAT: {tcfg['vat_rate']:.0%}")
     print(f"  Reduced VAT: {tcfg['reduced_vat_rate']:.0%}")
-    print(f"  Reduced VAT threshold: {tcfg.get('fixed_power_reduced_vat_threshold_kva', 6.9)} kVA")
-    print(f"  Reduced VAT allowance: {tcfg['reduced_vat_kwh_per_30_days']} kWh per {tcfg['vat_cycle_days']} days")
-    
-    print(f"\nFixed power term VAT rates:")
-    power_threshold = tcfg.get('fixed_power_reduced_vat_threshold_kva', 6.9)
-    if contracted_power <= power_threshold:
-        rate_used = tcfg.get('fixed_power_reduced_vat_rate', 0.06)
-        print(f"  Applied VAT: {rate_used:.0%} (reduced - power <= {power_threshold} kVA)")
-    else:
-        rate_used = tcfg.get('fixed_power_vat_rate', 0.23)
-        print(f"  Applied VAT: {rate_used:.0%} (standard - power > {power_threshold} kVA)")
-    
-    print(f"\nDaily fixed costs:")
+    print(
+        f"  Reduced VAT threshold: {tcfg.get('fixed_power_reduced_vat_threshold_kva', 6.9)} kVA"
+    )
+    print(
+        f"  Reduced VAT allowance: {tcfg['reduced_vat_kwh_per_30_days']} kWh per {tcfg['vat_cycle_days']} days"
+    )
+
+    print("\nDaily fixed costs:")
     print(f"  K3 term: €{fixed_costs['k3_daily']:.4f}")
-    print(f"  Power term (with VAT): €{fixed_costs['power_daily']:.4f}")
+    print(f"  Power term: €{fixed_costs['power_daily']:.4f}")
     print(f"  CAV fee: €{fixed_costs['cav_daily']:.4f}")
     print(f"  DGEG fee: €{fixed_costs['dgeg_daily']:.4f}")
     print(f"  Total daily fixed: €{fixed_costs['total_daily']:.4f}")
-    print("="*50)
+    print("=" * 50)
 
 
 def run_billing(results_df, prices_df, config, fixed_costs):
@@ -628,9 +639,10 @@ def main():
     # Load configuration
     config = load_config()
     create_output_dirs(config)
-    
-    # Calculate fixed costs with proper VAT
-    fixed_costs = calculate_daily_fixed_costs(config)
+
+    # Instantiate tariff processor and fixed costs
+    tariff_processor = create_tariff_processor(config['tariff'])
+    fixed_costs = calculate_daily_fixed_costs(config, tariff_processor)
     
     # Parse dates
     start_date = datetime.strptime(config['period']['start_date'], "%Y-%m-%d")
@@ -651,7 +663,7 @@ def main():
         print(f"Real consumption file: {real_file}")
     
     # Print tariff summary
-    print_tariff_summary(config, fixed_costs)
+    print_tariff_summary(config, fixed_costs, tariff_processor)
     
     # Load and prepare data
     print("\nPreparing simulation data...")
@@ -681,11 +693,7 @@ def main():
         prices_df = prices_df.rename(columns={'price_eur_per_kwh': 'price_omie_eur_kwh'})
 
     # Apply tariff to compute final prices
-    from ess.tariff import apply_indexed_tariff
-    if config['tariff']['type'] == 'indexed':
-        prices_df = apply_indexed_tariff(prices_df, config['tariff'])
-    else:
-        raise NotImplementedError("Only indexed tariff is implemented for now")
+    prices_df = tariff_processor.apply(prices_df)
 
     # Create battery
     battery = Battery(
