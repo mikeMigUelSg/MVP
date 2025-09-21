@@ -4,6 +4,22 @@ from datetime import datetime
 from typing import Dict, List, Tuple
 
 import pandas as pd
+import os
+
+# --- Tariff selection helpers ---
+
+def get_active_tariff_type(tariff_cfg: Dict) -> str:
+    """Resolve active tariff type. Priority: env var TARIFF_ACTIVE > cfg['active'].
+    Defaults to 'indexed' if not set.
+    """
+    env_choice = os.getenv("TARIFF_ACTIVE")
+    if env_choice:
+        return env_choice.strip().lower()
+    # New single-source-of-truth in YAML
+    if "active" in tariff_cfg and tariff_cfg["active"]:
+        return str(tariff_cfg["active"]).strip().lower()
+    # Final default
+    return "indexed"
 
 
 def _is_summer(date: datetime) -> bool:
@@ -162,10 +178,8 @@ class IndexedTariffProcessor(TariffProcessor):
         df["price_omie_adjusted_eur_kwh"] = pd.Series(omie_adjusted, index=df.index)
         df["k2_eur_kwh"] = pd.Series(k2_list, index=df.index)
         df["tariff_energy_eur_kwh"] = pd.Series(tariffs, index=df.index)
-        df["price_electricity_base_eur_kwh"] = pd.Series(
-            electricity_base, index=df.index
-        )
-        df["price_final_eur_kwh"] = df["price_electricity_base_eur_kwh"]
+        total_base_series = pd.Series(electricity_base, index=df.index)
+        df["price_final_eur_kwh"] = total_base_series
 
         return df
 
@@ -173,7 +187,21 @@ class IndexedTariffProcessor(TariffProcessor):
         self, contracted_power_kva: float
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
         k3_daily = float(self.idx_cfg.get("k3_eur_day", 0.0))
-        power_base = float(self.idx_cfg.get("tariff_power_eur_kva_day", 0.0)) * contracted_power_kva
+
+        # --- FIXED DAILY POWER TERM (no per‑kVA scaling) ---
+        if "power_term_daily_eur" in self.idx_cfg:
+            power_base = float(self.idx_cfg["power_term_daily_eur"])  # base excl. VAT
+            base_source = "daily_fixed"
+        elif "tariff_power_eur_day" in self.idx_cfg:
+            power_base = float(self.idx_cfg["tariff_power_eur_day"])  # alias; excl. VAT
+            base_source = "daily_fixed_alias"
+        elif "tariff_power_eur_kva_day" in self.idx_cfg:
+            # Legacy: keep backward compatibility by computing a fixed base at current contracted power
+            power_base = float(self.idx_cfg["tariff_power_eur_kva_day"]) * contracted_power_kva
+            base_source = "legacy_per_kva_scaled_once"
+        else:
+            power_base = 0.0
+            base_source = "absent"
 
         threshold = float(self.config.get("fixed_power_reduced_vat_threshold_kva", 6.9))
         reduced_rate = float(self.config.get("fixed_power_reduced_vat_rate", 0.06))
@@ -198,6 +226,7 @@ class IndexedTariffProcessor(TariffProcessor):
             "vat_type": vat_type,
             "threshold_kva": threshold,
             "contracted_power_kva": contracted_power_kva,
+            "power_term_source": base_source,
         }
 
         if "k3_eur_day" in self.idx_cfg:
@@ -246,11 +275,8 @@ class IndexedTariffProcessor(TariffProcessor):
                             f"  {period_key.capitalize()}: €{tri_rates[period_key]:.4f}/kWh"
                         )
 
-        power_term = float(
-            self.idx_cfg.get("tariff_power_eur_kva_day", 0.0)
-        )
         lines.append(
-            f"Power term base: €{power_term:.4f}/kVA/day (VAT applied later)"
+            f"Power term base (daily, excl. VAT): €{float(self.idx_cfg.get('power_term_daily_eur', self.idx_cfg.get('tariff_power_eur_day', self.idx_cfg.get('tariff_power_eur_kva_day', 0.0)))):.4f}"
         )
 
         return lines
@@ -294,39 +320,62 @@ class SimpleTariffProcessor(TariffProcessor):
     def apply(self, prices_df: pd.DataFrame) -> pd.DataFrame:
         df = prices_df.copy()
         base_price = self._get_energy_price()
-
         df["tariff_period"] = "simples"
-        df["price_omie_adjusted_eur_kwh"] = 0.0
-        df["k2_eur_kwh"] = 0.0
-        df["tariff_energy_eur_kwh"] = base_price
-        df["price_electricity_base_eur_kwh"] = base_price
+        # Provide only the minimal set needed by simulator/billing
         df["price_final_eur_kwh"] = base_price
+        # Simulator expects this column for warnings/range checks
         df["price_omie_eur_kwh"] = base_price
-
         return df
 
     def compute_daily_fixed_costs(
         self, contracted_power_kva: float
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
-        k3_daily = float(self.simple_cfg.get("k3_eur_day", 0.0))
-        power_daily = self._get_power_term_daily()
+        # K3 is not applicable for simple tariff in this model
+        k3_daily = 0.0
+
+        # --- FIXED DAILY POWER TERM (no per‑kVA scaling) ---
+        power_base = self._get_power_term_daily()  # base excl. VAT
+        base_source = "daily_fixed"
+
+        # VAT threshold logic (same as IndexedTariffProcessor)
+        threshold = float(self.config.get("fixed_power_reduced_vat_threshold_kva", 6.9))
+        reduced_rate = float(self.config.get("fixed_power_reduced_vat_rate", 0.06))
+        standard_rate = float(self.config.get("fixed_power_vat_rate", 0.23))
+
+        if contracted_power_kva <= threshold:
+            vat_rate = reduced_rate
+            vat_type = "reduced"
+        else:
+            vat_rate = standard_rate
+            vat_type = "standard"
+
+        power_daily = power_base * (1 + vat_rate)
+
         terms = {
             "k3_daily": k3_daily,
             "power_daily": power_daily,
         }
+
         metadata = {
-            "power_term_source": "provided_final",
-            "k3_source": "configured" if "k3_eur_day" in self.simple_cfg else "absent",
+            "power_vat_rate": vat_rate,
+            "vat_type": vat_type,
+            "threshold_kva": threshold,
+            "contracted_power_kva": contracted_power_kva,
+            "power_term_source": base_source,
+            "k3_source": "absent",
         }
+
         return terms, metadata
 
     def summary_lines(self) -> List[str]:
         lines = [
             f"Energy price (flat): €{self._get_energy_price():.4f}/kWh",
-            f"Power term (daily, provided): €{self._get_power_term_daily():.4f}",
         ]
-        if "k3_eur_day" in self.simple_cfg:
-            lines.append(f"K3 daily (provided): €{self.simple_cfg['k3_eur_day']:.4f}")
+        if "tariff_power_eur_kva_day" in self.simple_cfg or "power_term_daily_eur" in self.simple_cfg or "power_term_daily" in self.simple_cfg or "tariff_power_eur_day" in self.simple_cfg:
+            lines.append(
+                f"Power term base (daily, excl. VAT): €{self._get_power_term_daily():.4f} (VAT applied by threshold)"
+            )
+        lines.append("K3 daily: disabled (0.00)")
         return lines
 
 
@@ -394,27 +443,45 @@ class BiHourlyTariffProcessor(TariffProcessor):
 
         base_series = pd.Series(base_prices, index=df.index)
         df["tariff_period"] = periods
-        df["price_omie_adjusted_eur_kwh"] = 0.0
-        df["k2_eur_kwh"] = 0.0
-        df["tariff_energy_eur_kwh"] = base_series
-        df["price_electricity_base_eur_kwh"] = base_series
         df["price_final_eur_kwh"] = base_series
         df["price_omie_eur_kwh"] = base_series
-
         return df
 
     def compute_daily_fixed_costs(
         self, contracted_power_kva: float
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
-        k3_daily = float(self.bi_cfg.get("k3_eur_day", 0.0))
-        power_daily = self._get_power_term_daily()
+        # K3 is not applicable for bi-horária in this model
+        k3_daily = 0.0
+
+        # --- FIXED DAILY POWER TERM (no per‑kVA scaling) ---
+        power_base = self._get_power_term_daily()  # base excl. VAT
+        base_source = "daily_fixed"
+
+        # VAT threshold logic (same as IndexedTariffProcessor)
+        threshold = float(self.config.get("fixed_power_reduced_vat_threshold_kva", 6.9))
+        reduced_rate = float(self.config.get("fixed_power_reduced_vat_rate", 0.06))
+        standard_rate = float(self.config.get("fixed_power_vat_rate", 0.23))
+
+        if contracted_power_kva <= threshold:
+            vat_rate = reduced_rate
+            vat_type = "reduced"
+        else:
+            vat_rate = standard_rate
+            vat_type = "standard"
+
+        power_daily = power_base * (1 + vat_rate)
+
         terms = {
             "k3_daily": k3_daily,
             "power_daily": power_daily,
         }
         metadata = {
-            "power_term_source": "provided_final",
-            "k3_source": "configured" if "k3_eur_day" in self.bi_cfg else "absent",
+            "power_vat_rate": vat_rate,
+            "vat_type": vat_type,
+            "threshold_kva": threshold,
+            "contracted_power_kva": contracted_power_kva,
+            "power_term_source": base_source,
+            "k3_source": "absent",
         }
         return terms, metadata
 
@@ -431,24 +498,34 @@ class BiHourlyTariffProcessor(TariffProcessor):
         for extra in sorted(set(rates.keys()) - {"fora_vazio", "vazio"}):
             lines.append(f"  {extra}: €{rates[extra]:.4f}/kWh")
 
-        lines.append(
-            f"Power term (daily, provided): €{self._get_power_term_daily():.4f}"
-        )
-        if "k3_eur_day" in self.bi_cfg:
-            lines.append(f"K3 daily (provided): €{self.bi_cfg['k3_eur_day']:.4f}")
+        if "tariff_power_eur_kva_day" in self.bi_cfg or "power_term_daily_eur" in self.bi_cfg or "tariff_power_eur_day" in self.bi_cfg:
+            lines.append(
+                f"Power term base (daily, excl. VAT): €{self._get_power_term_daily():.4f} (VAT applied by threshold)"
+            )
+        lines.append("K3 daily: disabled (0.00)")
         return lines
 
 
 def create_tariff_processor(tariff_cfg: Dict) -> TariffProcessor:
-    """Factory returning the appropriate processor for the given tariff type."""
+    """Factory returning the appropriate processor for the active tariff type.
 
-    tariff_type = tariff_cfg.get("type", "indexed").lower()
+    Selection order:
+      1) Environment variable TARIFF_ACTIVE
+      2) tariff.active in YAML
+    """
+    tariff_type = get_active_tariff_type(tariff_cfg)
+
+    # Normalize a few aliases
+    if tariff_type in {"simple"}:
+        tariff_type = "simples"
+    if tariff_type in {"bi-horaria", "bi"}:
+        tariff_type = "bi_horaria"
 
     if tariff_type == "indexed":
         return IndexedTariffProcessor(tariff_cfg)
-    if tariff_type in {"simples", "simple"}:
+    if tariff_type == "simples":
         return SimpleTariffProcessor(tariff_cfg)
-    if tariff_type in {"bi_horaria", "bi-horaria", "bi"}:
+    if tariff_type == "bi_horaria":
         return BiHourlyTariffProcessor(tariff_cfg)
 
     raise ValueError(f"Unsupported tariff type: {tariff_type}")
@@ -461,8 +538,3 @@ def apply_tariff(prices_df: pd.DataFrame, tariff_cfg: Dict) -> pd.DataFrame:
     return processor.apply(prices_df)
 
 
-def apply_indexed_tariff(prices_df: pd.DataFrame, tariff_cfg: dict) -> pd.DataFrame:
-    """Backward compatible helper kept for existing imports."""
-
-    processor = IndexedTariffProcessor(tariff_cfg)
-    return processor.apply(prices_df)

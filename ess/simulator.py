@@ -383,6 +383,7 @@ class EnergyArbitrageSimulator:
         daily_avg_savings = total_savings / n_days if n_days > 0 else 0
         annual_projected_savings = daily_avg_savings * 365
         
+        
         # Battery utilization
         battery_active_periods = (results_df['battery_action'] != 'idle').sum()
         battery_utilization_pct = battery_active_periods / n_periods * 100 if n_periods > 0 else 0

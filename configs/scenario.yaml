@@ -2,8 +2,8 @@
 
 # Simulation period - avoiding DST transition
 period:
-  start_date: "2025-05-24"  # Avoid March DST transition
-  num_days: 60  # Shorter period for testing
+  start_date: "2025-03-24"  # Avoid March DST transition
+  num_days: 61 
   # end_date: "2024-01-31"
 
 # Household consumption
@@ -17,9 +17,10 @@ consumption:
   real_consumption: true  # Set to true to use real consumption data
   real_consumption_file: "data/merged_consumos.xlsx"  # Path to real consumption file
 
+#
 # Electricity tariff
 tariff:
-  type: "indexed"  # or "bi_horaria"
+  active: indexed  # selects the effective tariff; can be overridden by env var TARIFF_ACTIVE
   
   indexed:
     k1: 1.28
@@ -27,7 +28,6 @@ tariff:
     k3_eur_day: 0.094
 
     losses_pct: 0
-
     option: "simples"           # simples, bi or tri
     cycle: "daily"         # daily or weekly
     tariff_energy_eur_kwh:
@@ -40,7 +40,21 @@ tariff:
         cheias: 0.0388
         vazio: 0.0149
 
-    tariff_power_eur_kva_day: 0.0460  # 0.2116/ 4.6 
+    power_term_daily_eur: 0.2116  # = 0.0460 × 4.6 kVA (fixed daily base, excl. VAT)
+
+  simples:
+    # Flat energy price (€/kWh)
+    price_electricity_eur_kwh: 0.1800
+    # Power term base (without VAT) — fixed daily:
+    power_term_daily_eur: 0.3396  # fixed daily base, excl. VAT
+
+  bi_horaria:
+    price_electricity_eur_kwh:
+      fora_vazio: 0.2008
+      vazio: 0.1094
+    # Power term base (without VAT) — fixed daily:
+    power_term_daily_eur: 0.3396  # fixed daily base, excl. VAT
+    cycle: daily
 
   # VAT settings for energy consumption
   vat_rate: 0.23  # Standard VAT for energy beyond reduced tier
@@ -51,7 +65,7 @@ tariff:
   # VAT settings for fixed power term
   fixed_power_vat_rate: 0.23  # Standard VAT for power term
   fixed_power_reduced_vat_rate: 0.06  # Reduced VAT for power term when applicable
-  fixed_power_reduced_vat_threshold_kva: 6.9  # Apply reduced VAT if contracted power <= threshold
+  fixed_power_reduced_vat_threshold_kva: 4.6  # Apply reduced VAT if contracted power <= threshold
 
   # IEC tax settings
   iec_tax_eur_kwh: 0.001  # IEC consumption tax
@@ -66,7 +80,7 @@ tariff:
 
 # Contracted power
 power_contract:
-  contracted_power_kva: 4.6  # Typical residential
+  contracted_power_kva: 6.9  # Typical residential
 
 # Battery specifications - more realistic sizing
 battery:
@@ -115,3 +129,5 @@ simulation:
   validation_mode: true
   max_strategy_errors: 10  # Stop if too many errors
   fallback_to_simple: true  # Use simple strategy if optimization fails
+
+
