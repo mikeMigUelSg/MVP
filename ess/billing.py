@@ -161,12 +161,12 @@ class BillingEngine:
             total_energy = float(df[energy_col].sum())
             if total_energy <= 0.0:
                 continue
-             
 
-            
 
             # Reduced allowance capped by total energy for this scenario
             reduced_total = min(period_reduced_allowance_kwh, total_energy)
+
+            print(reduced_total)
 
             # Proportional weights by energy share
             weights = (df[energy_col] / total_energy).fillna(0.0)
@@ -219,6 +219,7 @@ class BillingEngine:
                 base_with_col = 'electricity_base_standard_with_eur'
                 vat_without_col = 'energy_vat_standard_without_eur'
                 vat_with_col = 'energy_vat_standard_with_eur'
+
             breakdown[block] = {
                 'kwh_without': float(ledger[kwh_without_col].sum()) if kwh_without_col in ledger.columns else 0.0,
                 'kwh_with': float(ledger[kwh_with_col].sum()) if kwh_with_col in ledger.columns else 0.0,
@@ -301,7 +302,7 @@ class BillingEngine:
             }
         # Non-indexed: provide a single line
         return {
-            'Energy (TOU/Flat)': ledger[base_col].sum(),
+            'Energy (Fixed)': ledger[base_col].sum(),
         }
     
     def _aggregate_power_term(self, n_days: int) -> Dict[str, float]:
@@ -340,7 +341,7 @@ class BillingEngine:
         power_term = self._aggregate_power_term(n_days)
         
         # ========== ELECTRICITY TERM (Variable) ==========
-        electricity_without = self._aggregate_electricity_term(ledger, 'without')
+        electricity_without = self._aggregate_electricity_term(ledger, 'without') 
         electricity_with = self._aggregate_electricity_term(ledger, 'with')
         
         # Add energy VAT to electricity term

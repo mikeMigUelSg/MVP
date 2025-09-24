@@ -2,8 +2,8 @@
 
 # Simulation period - avoiding DST transition
 period:
-  start_date: "2025-03-24"  # Avoid March DST transition
-  num_days: 61 
+  start_date: "2025-08-19"  # Avoid March DST transition
+  num_days: 28 
   # end_date: "2024-01-31"
 
 # Household consumption
@@ -15,17 +15,17 @@ consumption:
   
   # NEW: Real consumption data support
   real_consumption: true  # Set to true to use real consumption data
-  real_consumption_file: "data/merged_consumos.xlsx"  # Path to real consumption file
+  real_consumption_file: "data/merged_consumos_arthur.xlsx"  # Path to real consumption file
 
 #
 # Electricity tariff
 tariff:
-  active: indexed  # selects the effective tariff; can be overridden by env var TARIFF_ACTIVE
+  active:  simples  # selects the effective tariff; can be overridden by env var TARIFF_ACTIVE
   
   indexed:
-    k1: 1.28
-    k2_eur_kwh: 0.0172
-    k3_eur_day: 0.094
+    k1: 1.2528
+    k2_eur_kwh: 0.0185
+    k3_eur_day: 0.1171 
 
     losses_pct: 0
     option: "simples"           # simples, bi or tri
@@ -40,13 +40,14 @@ tariff:
         cheias: 0.0388
         vazio: 0.0149
 
-    power_term_daily_eur: 0.2116  # = 0.0460 × 4.6 kVA (fixed daily base, excl. VAT)
-
-  simples:
+    power_term_daily_eur: 0.1587  # = 0.0460 × 4.6 kVA (fixed daily base, excl. VAT)
+    
+    
+  simples:  
     # Flat energy price (€/kWh)
-    price_electricity_eur_kwh: 0.1800
-    # Power term base (without VAT) — fixed daily:
-    power_term_daily_eur: 0.3396  # fixed daily base, excl. VAT
+    price_electricity_eur_kwh: 0.1340
+    # Power term base (without VAT) — fixed dccaily:
+    power_term_daily_eur: 0.2758  # fixed daily base, excl. VAT
 
   bi_horaria:
     price_electricity_eur_kwh:

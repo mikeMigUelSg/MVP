@@ -214,7 +214,10 @@ class IndexedTariffProcessor(TariffProcessor):
             vat_rate = standard_rate
             vat_type = "standard"
 
+        vat_rate_k3 = 0.23
+
         power_daily = power_base * (1 + vat_rate)
+        k3_daily = k3_daily * (1 + vat_rate_k3)
 
         terms = {
             "k3_daily": k3_daily,
