@@ -64,9 +64,16 @@ def calculate_daily_fixed_costs(
         vat_type = metadata.get('vat_type', 'standard')
         threshold = metadata.get('threshold_kva')
         contracted = metadata.get('contracted_power_kva', contracted_power_kva)
+        standard_vat = tcfg.get('fixed_power_vat_rate', 0.23)
+
         if vat_type == 'reduced':
             print(
                 f"✓ Using reduced VAT ({vat_rate:.0%}) for power term (contracted power: {contracted} kVA <= {threshold} kVA)"
+            )
+        elif vat_type == 'tariff_only_reduced':
+            print(
+                "✓ Applying reduced VAT "
+                f"({vat_rate:.0%}) only to TAR potência component; remaining fixed term taxed at {standard_vat:.0%}"
             )
         else:
             print(

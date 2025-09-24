@@ -25,7 +25,7 @@ tariff:
   indexed:
     k1: 1.2528
     k2_eur_kwh: 0.0185
-    k3_eur_day: 0.1171 
+    k3_eur_day: 0.1171
 
     losses_pct: 0
     option: "simples"           # simples, bi or tri
@@ -39,11 +39,7 @@ tariff:
         ponta: 0.2469
         cheias: 0.0388
         vazio: 0.0149
-
-    power_term_daily_eur: 0.1587  # = 0.0460 × 4.6 kVA (fixed daily base, excl. VAT)
-    
-    
-  simples:  
+  simples:
     # Flat energy price (€/kWh)
     price_electricity_eur_kwh: 0.1340
     # Power term base (without VAT) — fixed dccaily:
@@ -78,6 +74,19 @@ tariff:
 
   dgeg_fee_eur_month: 0.07  # DGEG fixed monthly fee
   dgeg_vat_rate: 0.23
+
+  # Tarifa de Acesso às Redes — potência (€/dia) por escalão de potência contratada
+  tariff_access_power_daily_eur:
+    1.15: 0.0529
+    2.3: 0.1058
+    3.45: 0.1587
+    4.6: 0.2116
+    5.75: 0.2645
+    6.9: 0.3174
+    10.35: 0.4761
+    13.8: 0.6348
+    17.25: 0.7935
+    20.7: 0.9522
 
 # Contracted power
 power_contract:
