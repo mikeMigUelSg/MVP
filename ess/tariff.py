@@ -1,7 +1,7 @@
 """Tariff helpers and processors used across the project."""
 
 from datetime import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 import os
@@ -109,6 +109,66 @@ class TariffProcessor:
 
     def __init__(self, tariff_cfg: Dict):
         self.config = tariff_cfg
+        self._tariff_power_table_cache: Optional[Dict[float, float]] = None
+
+    # --- Shared helpers -------------------------------------------------
+
+    def _load_tariff_power_table(self) -> Dict[float, float]:
+        """Return TAR Potência daily values indexed by contracted power."""
+
+        if self._tariff_power_table_cache is None:
+            table_cfg = self.config.get("tariff_access_power_daily_eur")
+            if not table_cfg:
+                raise ValueError(
+                    "Tariff configuration missing 'tariff_access_power_daily_eur' mapping"
+                )
+
+            table: Dict[float, float] = {}
+            for raw_key, raw_value in table_cfg.items():
+                try:
+                    key = float(str(raw_key).replace(",", "."))
+                except (TypeError, ValueError) as exc:  # pragma: no cover - defensive
+                    raise ValueError(
+                        f"Invalid power key '{raw_key}' in tariff_access_power_daily_eur"
+                    ) from exc
+
+                try:
+                    value = float(raw_value)
+                except (TypeError, ValueError) as exc:  # pragma: no cover - defensive
+                    raise ValueError(
+                        f"Invalid TAR potência value '{raw_value}' for key {raw_key}"
+                    ) from exc
+
+                table[key] = value
+
+            self._tariff_power_table_cache = table
+
+        return self._tariff_power_table_cache
+
+    def _get_tariff_power_daily(self, contracted_power_kva: float) -> float:
+        """Fetch TAR Potência (€/day) for the contracted power."""
+
+        table = self._load_tariff_power_table()
+
+        # Direct match first
+        if contracted_power_kva in table:
+            return table[contracted_power_kva]
+
+        # Fallback: match by rounding to 2 decimals (typical precision in configs)
+        target = round(contracted_power_kva, 2)
+        for power_key, value in table.items():
+            if round(power_key, 2) == target:
+                return value
+
+        # Ultimate fallback: find closest entry within a tiny tolerance
+        closest_power = min(table.keys(), key=lambda pk: abs(pk - contracted_power_kva))
+        if abs(closest_power - contracted_power_kva) <= 1e-3:
+            return table[closest_power]
+
+        raise ValueError(
+            "No TAR potência value configured for contracted power "
+            f"{contracted_power_kva} kVA"
+        )
 
     def apply(self, prices_df: pd.DataFrame) -> pd.DataFrame:
         """Return a dataframe with all mandatory tariff columns populated."""
@@ -188,20 +248,9 @@ class IndexedTariffProcessor(TariffProcessor):
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
         k3_daily = float(self.idx_cfg.get("k3_eur_day", 0.0))
 
-        # --- FIXED DAILY POWER TERM (no per‑kVA scaling) ---
-        if "power_term_daily_eur" in self.idx_cfg:
-            power_base = float(self.idx_cfg["power_term_daily_eur"])  # base excl. VAT
-            base_source = "daily_fixed"
-        elif "tariff_power_eur_day" in self.idx_cfg:
-            power_base = float(self.idx_cfg["tariff_power_eur_day"])  # alias; excl. VAT
-            base_source = "daily_fixed_alias"
-        elif "tariff_power_eur_kva_day" in self.idx_cfg:
-            # Legacy: keep backward compatibility by computing a fixed base at current contracted power
-            power_base = float(self.idx_cfg["tariff_power_eur_kva_day"]) * contracted_power_kva
-            base_source = "legacy_per_kva_scaled_once"
-        else:
-            power_base = 0.0
-            base_source = "absent"
+        # --- FIXED DAILY POWER TERM (Tarifa de acesso potência) ---
+        power_base = self._get_tariff_power_daily(contracted_power_kva)
+        base_source = "tariff_power_table"
 
         threshold = float(self.config.get("fixed_power_reduced_vat_threshold_kva", 6.9))
         reduced_rate = float(self.config.get("fixed_power_reduced_vat_rate", 0.06))
@@ -230,6 +279,8 @@ class IndexedTariffProcessor(TariffProcessor):
             "threshold_kva": threshold,
             "contracted_power_kva": contracted_power_kva,
             "power_term_source": base_source,
+            "tariff_power_component_daily_eur": power_base,
+            "tariff_power_component_vat_rate": vat_rate,
         }
 
         if "k3_eur_day" in self.idx_cfg:
@@ -278,9 +329,14 @@ class IndexedTariffProcessor(TariffProcessor):
                             f"  {period_key.capitalize()}: €{tri_rates[period_key]:.4f}/kWh"
                         )
 
-        lines.append(
-            f"Power term base (daily, excl. VAT): €{float(self.idx_cfg.get('power_term_daily_eur', self.idx_cfg.get('tariff_power_eur_day', self.idx_cfg.get('tariff_power_eur_kva_day', 0.0)))):.4f}"
-        )
+        if self.config.get("tariff_access_power_daily_eur"):
+            available_powers = ", ".join(
+                f"{power:g} kVA" for power in sorted(self._load_tariff_power_table().keys())
+            )
+            lines.append(
+                "Power term base (daily, excl. VAT): TAR potência from table"
+            )
+            lines.append(f"  Available contracted powers: {available_powers}")
 
         return lines
 
@@ -339,20 +395,27 @@ class SimpleTariffProcessor(TariffProcessor):
         # --- FIXED DAILY POWER TERM (no per‑kVA scaling) ---
         power_base = self._get_power_term_daily()  # base excl. VAT
         base_source = "daily_fixed"
+        tar_power_base = self._get_tariff_power_daily(contracted_power_kva)
 
         # VAT threshold logic (same as IndexedTariffProcessor)
         threshold = float(self.config.get("fixed_power_reduced_vat_threshold_kva", 6.9))
         reduced_rate = float(self.config.get("fixed_power_reduced_vat_rate", 0.06))
         standard_rate = float(self.config.get("fixed_power_vat_rate", 0.23))
 
-        if contracted_power_kva <= threshold:
-            vat_rate = reduced_rate
-            vat_type = "reduced"
-        else:
-            vat_rate = standard_rate
-            vat_type = "standard"
+        # Start with all components taxed at the standard rate
+        power_daily = power_base * (1 + standard_rate)
+        vat_type = "standard"
+        applied_tariff_vat_rate = standard_rate
 
-        power_daily = power_base * (1 + vat_rate)
+        if contracted_power_kva <= threshold:
+            # Replace VAT on TAR Potência component with the reduced rate
+            power_daily = (
+                power_daily
+                - tar_power_base * (1 + standard_rate)
+                + tar_power_base * (1 + reduced_rate)
+            )
+            vat_type = "tariff_only_reduced"
+            applied_tariff_vat_rate = reduced_rate
 
         terms = {
             "k3_daily": k3_daily,
@@ -360,12 +423,14 @@ class SimpleTariffProcessor(TariffProcessor):
         }
 
         metadata = {
-            "power_vat_rate": vat_rate,
+            "power_vat_rate": applied_tariff_vat_rate,
             "vat_type": vat_type,
             "threshold_kva": threshold,
             "contracted_power_kva": contracted_power_kva,
             "power_term_source": base_source,
             "k3_source": "absent",
+            "tariff_power_component_daily_eur": tar_power_base,
+            "tariff_power_component_vat_rate": applied_tariff_vat_rate,
         }
 
         return terms, metadata
@@ -459,32 +524,39 @@ class BiHourlyTariffProcessor(TariffProcessor):
         # --- FIXED DAILY POWER TERM (no per‑kVA scaling) ---
         power_base = self._get_power_term_daily()  # base excl. VAT
         base_source = "daily_fixed"
+        tar_power_base = self._get_tariff_power_daily(contracted_power_kva)
 
         # VAT threshold logic (same as IndexedTariffProcessor)
         threshold = float(self.config.get("fixed_power_reduced_vat_threshold_kva", 6.9))
         reduced_rate = float(self.config.get("fixed_power_reduced_vat_rate", 0.06))
         standard_rate = float(self.config.get("fixed_power_vat_rate", 0.23))
 
-        if contracted_power_kva <= threshold:
-            vat_rate = reduced_rate
-            vat_type = "reduced"
-        else:
-            vat_rate = standard_rate
-            vat_type = "standard"
+        power_daily = power_base * (1 + standard_rate)
+        vat_type = "standard"
+        applied_tariff_vat_rate = standard_rate
 
-        power_daily = power_base * (1 + vat_rate)
+        if contracted_power_kva <= threshold:
+            power_daily = (
+                power_daily
+                - tar_power_base * (1 + standard_rate)
+                + tar_power_base * (1 + reduced_rate)
+            )
+            vat_type = "tariff_only_reduced"
+            applied_tariff_vat_rate = reduced_rate
 
         terms = {
             "k3_daily": k3_daily,
             "power_daily": power_daily,
         }
         metadata = {
-            "power_vat_rate": vat_rate,
+            "power_vat_rate": applied_tariff_vat_rate,
             "vat_type": vat_type,
             "threshold_kva": threshold,
             "contracted_power_kva": contracted_power_kva,
             "power_term_source": base_source,
             "k3_source": "absent",
+            "tariff_power_component_daily_eur": tar_power_base,
+            "tariff_power_component_vat_rate": applied_tariff_vat_rate,
         }
         return terms, metadata
 
