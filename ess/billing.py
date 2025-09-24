@@ -307,6 +307,11 @@ class BillingEngine:
     
     def _aggregate_power_term(self, n_days: int) -> Dict[str, float]:
         """Aggregate power term components (fixed costs)."""
+
+
+        print("->",self.fixed_costs['k3_daily'])
+        print(self.fixed_costs['power_daily'] )
+
         return {
             'K3 Daily Fee': self.fixed_costs['k3_daily'] * n_days,
             'Contracted Power': self.fixed_costs['power_daily'] * n_days,  # Includes VAT
