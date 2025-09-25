@@ -1,0 +1,1816 @@
+{
+  "Header": {
+    "Consumer": {
+      "Application": "distribuicao-edp-prd",
+      "IntermediateApplication": ""
+    },
+    "Producers": {
+      "Producer": {
+        "Application": "edm",
+        "IntermediateApplication": ""
+      }
+    },
+    "RequestInfo": {
+      "TransactionId": "bc11daed-611a-4d52-acfd-236b066e2131",
+      "StepCounter": 0,
+      "MessageInstanceId": "",
+      "ReferToMessageInstanceId": "",
+      "ReferToMessageTransactionId": ""
+    },
+    "Operation": "",
+    "SentOn": "2025-09-25 18:30:02",
+    "ActivateOn": "",
+    "Status": {
+      "ResponseCode": 0,
+      "ResponseStatuses": {
+        "ResponseStatus": []
+      }
+    },
+    "AccessControl": {
+      "Authentication": {
+        "Id": "",
+        "Token": ""
+      },
+      "Message": {
+        "Hash": ""
+      },
+      "RemoteUser": {
+        "Id": "",
+        "Name": "",
+        "Language": "PT"
+      }
+    },
+    "Mode": ""
+  },
+  "Body": {
+    "Success": true,
+    "Result": {
+      "utilitiesDevices": [
+        {
+          "meterReaderManufacturer": "282",
+          "meterReaderOwnership": "0",
+          "meterReaderSerialNumber": "000002200574477",
+          "meterLoadCurves": [
+            {
+              "register": "A+",
+              "loadCurves": [
+                {
+                  "loadCurveTimestamp": "2025-06-01T00:00:00Z",
+                  "meterLoadCurve": 0.099,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T00:15:00Z",
+                  "meterLoadCurve": 0.311,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T00:30:00Z",
+                  "meterLoadCurve": 0.406,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T00:45:00Z",
+                  "meterLoadCurve": 0.308,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T01:00:00Z",
+                  "meterLoadCurve": 0.35,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T01:15:00Z",
+                  "meterLoadCurve": 0.155,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T01:30:00Z",
+                  "meterLoadCurve": 0.145,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T01:45:00Z",
+                  "meterLoadCurve": 0.146,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T02:00:00Z",
+                  "meterLoadCurve": 0.159,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T02:15:00Z",
+                  "meterLoadCurve": 0.127,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T02:30:00Z",
+                  "meterLoadCurve": 0.094,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T02:45:00Z",
+                  "meterLoadCurve": 0.054,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T03:00:00Z",
+                  "meterLoadCurve": 0.056,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T03:15:00Z",
+                  "meterLoadCurve": 0.057,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T03:30:00Z",
+                  "meterLoadCurve": 0.052,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T03:45:00Z",
+                  "meterLoadCurve": 0.057,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T04:00:00Z",
+                  "meterLoadCurve": 0.064,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T04:15:00Z",
+                  "meterLoadCurve": 0.072,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T04:30:00Z",
+                  "meterLoadCurve": 0.073,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T04:45:00Z",
+                  "meterLoadCurve": 0.074,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T05:00:00Z",
+                  "meterLoadCurve": 0.079,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T05:15:00Z",
+                  "meterLoadCurve": 0.076,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T05:30:00Z",
+                  "meterLoadCurve": 0.068,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T05:45:00Z",
+                  "meterLoadCurve": 0.072,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T06:00:00Z",
+                  "meterLoadCurve": 0.144,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T06:15:00Z",
+                  "meterLoadCurve": 0.087,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T06:30:00Z",
+                  "meterLoadCurve": 0.074,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T06:45:00Z",
+                  "meterLoadCurve": 0.076,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T07:00:00Z",
+                  "meterLoadCurve": 0.1,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T07:15:00Z",
+                  "meterLoadCurve": 0.153,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T07:30:00Z",
+                  "meterLoadCurve": 0.075,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T07:45:00Z",
+                  "meterLoadCurve": 0.06,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T08:00:00Z",
+                  "meterLoadCurve": 0.061,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T08:15:00Z",
+                  "meterLoadCurve": 0.072,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T08:30:00Z",
+                  "meterLoadCurve": 0.074,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T08:45:00Z",
+                  "meterLoadCurve": 0.072,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T09:00:00Z",
+                  "meterLoadCurve": 0.061,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T09:15:00Z",
+                  "meterLoadCurve": 0.081,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T09:30:00Z",
+                  "meterLoadCurve": 0.069,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T09:45:00Z",
+                  "meterLoadCurve": 0.064,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T10:00:00Z",
+                  "meterLoadCurve": 0.061,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T10:15:00Z",
+                  "meterLoadCurve": 0.065,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T10:30:00Z",
+                  "meterLoadCurve": 0.073,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T10:45:00Z",
+                  "meterLoadCurve": 0.094,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T11:00:00Z",
+                  "meterLoadCurve": 0.07,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T11:15:00Z",
+                  "meterLoadCurve": 0.06,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T11:30:00Z",
+                  "meterLoadCurve": 0.11,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T11:45:00Z",
+                  "meterLoadCurve": 0.141,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T12:00:00Z",
+                  "meterLoadCurve": 0.13,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T12:15:00Z",
+                  "meterLoadCurve": 0.112,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T12:30:00Z",
+                  "meterLoadCurve": 0.117,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T12:45:00Z",
+                  "meterLoadCurve": 0.124,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T13:00:00Z",
+                  "meterLoadCurve": 0.204,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T13:15:00Z",
+                  "meterLoadCurve": 0.168,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T13:30:00Z",
+                  "meterLoadCurve": 0.144,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T13:45:00Z",
+                  "meterLoadCurve": 0.074,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T14:00:00Z",
+                  "meterLoadCurve": 0.09,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T14:15:00Z",
+                  "meterLoadCurve": 0.083,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T14:30:00Z",
+                  "meterLoadCurve": 0.099,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T14:45:00Z",
+                  "meterLoadCurve": 0.116,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T15:00:00Z",
+                  "meterLoadCurve": 0.129,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T15:15:00Z",
+                  "meterLoadCurve": 0.139,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T15:30:00Z",
+                  "meterLoadCurve": 0.147,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T15:45:00Z",
+                  "meterLoadCurve": 0.173,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T16:00:00Z",
+                  "meterLoadCurve": 0.224,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T16:15:00Z",
+                  "meterLoadCurve": 0.196,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T16:30:00Z",
+                  "meterLoadCurve": 0.15,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T16:45:00Z",
+                  "meterLoadCurve": 0.116,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T17:00:00Z",
+                  "meterLoadCurve": 0.148,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T17:15:00Z",
+                  "meterLoadCurve": 0.161,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T17:30:00Z",
+                  "meterLoadCurve": 0.15,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T17:45:00Z",
+                  "meterLoadCurve": 0.145,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T18:00:00Z",
+                  "meterLoadCurve": 0.26,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T18:15:00Z",
+                  "meterLoadCurve": 0.117,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T18:30:00Z",
+                  "meterLoadCurve": 0.301,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T18:45:00Z",
+                  "meterLoadCurve": 0.157,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T19:00:00Z",
+                  "meterLoadCurve": 0.159,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T19:15:00Z",
+                  "meterLoadCurve": 0.122,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T19:30:00Z",
+                  "meterLoadCurve": 0.122,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T19:45:00Z",
+                  "meterLoadCurve": 0.14,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T20:00:00Z",
+                  "meterLoadCurve": 0.165,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T20:15:00Z",
+                  "meterLoadCurve": 0.171,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T20:30:00Z",
+                  "meterLoadCurve": 0.206,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T20:45:00Z",
+                  "meterLoadCurve": 0.235,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T21:00:00Z",
+                  "meterLoadCurve": 0.247,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T21:15:00Z",
+                  "meterLoadCurve": 0.145,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T21:30:00Z",
+                  "meterLoadCurve": 0.149,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T21:45:00Z",
+                  "meterLoadCurve": 0.235,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T22:00:00Z",
+                  "meterLoadCurve": 0.279,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T22:15:00Z",
+                  "meterLoadCurve": 0.291,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T22:30:00Z",
+                  "meterLoadCurve": 0.221,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T22:45:00Z",
+                  "meterLoadCurve": 0.19,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T23:00:00Z",
+                  "meterLoadCurve": 0.5,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T23:15:00Z",
+                  "meterLoadCurve": 0.269,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T23:30:00Z",
+                  "meterLoadCurve": 0.197,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-01T23:45:00Z",
+                  "meterLoadCurve": 0.08,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T00:00:00Z",
+                  "meterLoadCurve": 0.072,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T00:15:00Z",
+                  "meterLoadCurve": 0.078,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T00:30:00Z",
+                  "meterLoadCurve": 0.092,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T00:45:00Z",
+                  "meterLoadCurve": 0.334,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T01:00:00Z",
+                  "meterLoadCurve": 0.138,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T01:15:00Z",
+                  "meterLoadCurve": 0.08,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T01:30:00Z",
+                  "meterLoadCurve": 0.065,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T01:45:00Z",
+                  "meterLoadCurve": 0.06,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T02:00:00Z",
+                  "meterLoadCurve": 0.051,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T02:15:00Z",
+                  "meterLoadCurve": 0.043,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T02:30:00Z",
+                  "meterLoadCurve": 0.055,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T02:45:00Z",
+                  "meterLoadCurve": 0.054,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T03:00:00Z",
+                  "meterLoadCurve": 0.053,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T03:15:00Z",
+                  "meterLoadCurve": 0.048,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T03:30:00Z",
+                  "meterLoadCurve": 0.05,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T03:45:00Z",
+                  "meterLoadCurve": 0.055,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T04:00:00Z",
+                  "meterLoadCurve": 0.053,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T04:15:00Z",
+                  "meterLoadCurve": 0.052,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T04:30:00Z",
+                  "meterLoadCurve": 0.049,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T04:45:00Z",
+                  "meterLoadCurve": 0.053,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T05:00:00Z",
+                  "meterLoadCurve": 0.052,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T05:15:00Z",
+                  "meterLoadCurve": 0.055,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T05:30:00Z",
+                  "meterLoadCurve": 0.089,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T05:45:00Z",
+                  "meterLoadCurve": 0.085,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T06:00:00Z",
+                  "meterLoadCurve": 0.061,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T06:15:00Z",
+                  "meterLoadCurve": 0.057,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T06:30:00Z",
+                  "meterLoadCurve": 0.056,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T06:45:00Z",
+                  "meterLoadCurve": 0.044,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T07:00:00Z",
+                  "meterLoadCurve": 0.059,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T07:15:00Z",
+                  "meterLoadCurve": 0.098,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T07:30:00Z",
+                  "meterLoadCurve": 0.066,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T07:45:00Z",
+                  "meterLoadCurve": 0.294,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T08:00:00Z",
+                  "meterLoadCurve": 0.087,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T08:15:00Z",
+                  "meterLoadCurve": 0.074,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T08:30:00Z",
+                  "meterLoadCurve": 0.082,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T08:45:00Z",
+                  "meterLoadCurve": 0.098,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T09:00:00Z",
+                  "meterLoadCurve": 0.08,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T09:15:00Z",
+                  "meterLoadCurve": 0.073,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T09:30:00Z",
+                  "meterLoadCurve": 0.062,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T09:45:00Z",
+                  "meterLoadCurve": 0.097,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T10:00:00Z",
+                  "meterLoadCurve": 0.102,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T10:15:00Z",
+                  "meterLoadCurve": 0.099,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T10:30:00Z",
+                  "meterLoadCurve": 0.114,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T10:45:00Z",
+                  "meterLoadCurve": 0.09,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T11:00:00Z",
+                  "meterLoadCurve": 0.118,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T11:15:00Z",
+                  "meterLoadCurve": 0.123,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T11:30:00Z",
+                  "meterLoadCurve": 0.122,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T11:45:00Z",
+                  "meterLoadCurve": 0.127,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T12:00:00Z",
+                  "meterLoadCurve": 0.158,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T12:15:00Z",
+                  "meterLoadCurve": 0.159,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T12:30:00Z",
+                  "meterLoadCurve": 0.178,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T12:45:00Z",
+                  "meterLoadCurve": 0.233,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T13:00:00Z",
+                  "meterLoadCurve": 0.246,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T13:15:00Z",
+                  "meterLoadCurve": 0.201,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T13:30:00Z",
+                  "meterLoadCurve": 0.167,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T13:45:00Z",
+                  "meterLoadCurve": 0.106,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T14:00:00Z",
+                  "meterLoadCurve": 0.106,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T14:15:00Z",
+                  "meterLoadCurve": 0.083,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T14:30:00Z",
+                  "meterLoadCurve": 0.096,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T14:45:00Z",
+                  "meterLoadCurve": 0.075,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T15:00:00Z",
+                  "meterLoadCurve": 0.059,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T15:15:00Z",
+                  "meterLoadCurve": 0.069,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T15:30:00Z",
+                  "meterLoadCurve": 0.116,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T15:45:00Z",
+                  "meterLoadCurve": 0.125,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T16:00:00Z",
+                  "meterLoadCurve": 0.165,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T16:15:00Z",
+                  "meterLoadCurve": 0.144,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T16:30:00Z",
+                  "meterLoadCurve": 0.125,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T16:45:00Z",
+                  "meterLoadCurve": 0.11,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T17:00:00Z",
+                  "meterLoadCurve": 0.086,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T17:15:00Z",
+                  "meterLoadCurve": 0.068,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T17:30:00Z",
+                  "meterLoadCurve": 0.082,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T17:45:00Z",
+                  "meterLoadCurve": 0.083,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T18:00:00Z",
+                  "meterLoadCurve": 0.088,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T18:15:00Z",
+                  "meterLoadCurve": 0.077,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T18:30:00Z",
+                  "meterLoadCurve": 0.05,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T18:45:00Z",
+                  "meterLoadCurve": 0.107,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T19:00:00Z",
+                  "meterLoadCurve": 0.13,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T19:15:00Z",
+                  "meterLoadCurve": 0.136,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T19:30:00Z",
+                  "meterLoadCurve": 0.161,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T19:45:00Z",
+                  "meterLoadCurve": 0.158,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T20:00:00Z",
+                  "meterLoadCurve": 0.169,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T20:15:00Z",
+                  "meterLoadCurve": 0.225,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T20:30:00Z",
+                  "meterLoadCurve": 0.358,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T20:45:00Z",
+                  "meterLoadCurve": 0.316,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T21:00:00Z",
+                  "meterLoadCurve": 0.199,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T21:15:00Z",
+                  "meterLoadCurve": 0.196,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T21:30:00Z",
+                  "meterLoadCurve": 0.213,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T21:45:00Z",
+                  "meterLoadCurve": 0.213,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T22:00:00Z",
+                  "meterLoadCurve": 0.218,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T22:15:00Z",
+                  "meterLoadCurve": 0.189,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T22:30:00Z",
+                  "meterLoadCurve": 0.181,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T22:45:00Z",
+                  "meterLoadCurve": 0.185,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T23:00:00Z",
+                  "meterLoadCurve": 0.191,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T23:15:00Z",
+                  "meterLoadCurve": 0.202,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T23:30:00Z",
+                  "meterLoadCurve": 0.173,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-02T23:45:00Z",
+                  "meterLoadCurve": 0.168,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T00:00:00Z",
+                  "meterLoadCurve": 0.197,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T00:15:00Z",
+                  "meterLoadCurve": 0.188,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T00:30:00Z",
+                  "meterLoadCurve": 0.184,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T00:45:00Z",
+                  "meterLoadCurve": 0.175,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T01:00:00Z",
+                  "meterLoadCurve": 0.141,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T01:15:00Z",
+                  "meterLoadCurve": 0.124,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T01:30:00Z",
+                  "meterLoadCurve": 0.121,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T01:45:00Z",
+                  "meterLoadCurve": 0.127,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T02:00:00Z",
+                  "meterLoadCurve": 0.294,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T02:15:00Z",
+                  "meterLoadCurve": 0.405,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T02:30:00Z",
+                  "meterLoadCurve": 0.256,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T02:45:00Z",
+                  "meterLoadCurve": 0.307,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T03:00:00Z",
+                  "meterLoadCurve": 0.071,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T03:15:00Z",
+                  "meterLoadCurve": 0.072,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T03:30:00Z",
+                  "meterLoadCurve": 0.063,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T03:45:00Z",
+                  "meterLoadCurve": 0.055,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T04:00:00Z",
+                  "meterLoadCurve": 0.052,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T04:15:00Z",
+                  "meterLoadCurve": 0.053,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T04:30:00Z",
+                  "meterLoadCurve": 0.052,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T04:45:00Z",
+                  "meterLoadCurve": 0.053,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T05:00:00Z",
+                  "meterLoadCurve": 0.055,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T05:15:00Z",
+                  "meterLoadCurve": 0.053,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T05:30:00Z",
+                  "meterLoadCurve": 0.051,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T05:45:00Z",
+                  "meterLoadCurve": 0.046,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T06:00:00Z",
+                  "meterLoadCurve": 0.053,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T06:15:00Z",
+                  "meterLoadCurve": 0.052,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T06:30:00Z",
+                  "meterLoadCurve": 0.051,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T06:45:00Z",
+                  "meterLoadCurve": 0.048,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T07:00:00Z",
+                  "meterLoadCurve": 0.046,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T07:15:00Z",
+                  "meterLoadCurve": 0.053,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T07:30:00Z",
+                  "meterLoadCurve": 0.221,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T07:45:00Z",
+                  "meterLoadCurve": 0.073,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T08:00:00Z",
+                  "meterLoadCurve": 0.176,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T08:15:00Z",
+                  "meterLoadCurve": 0.105,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T08:30:00Z",
+                  "meterLoadCurve": 0.099,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T08:45:00Z",
+                  "meterLoadCurve": 0.109,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T09:00:00Z",
+                  "meterLoadCurve": 0.133,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T09:15:00Z",
+                  "meterLoadCurve": 0.132,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T09:30:00Z",
+                  "meterLoadCurve": 0.164,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T09:45:00Z",
+                  "meterLoadCurve": 0.156,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T10:00:00Z",
+                  "meterLoadCurve": 0.154,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T10:15:00Z",
+                  "meterLoadCurve": 0.149,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T10:30:00Z",
+                  "meterLoadCurve": 0.152,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T10:45:00Z",
+                  "meterLoadCurve": 0.11,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T11:00:00Z",
+                  "meterLoadCurve": 0.109,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T11:15:00Z",
+                  "meterLoadCurve": 0.097,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T11:30:00Z",
+                  "meterLoadCurve": 0.124,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T11:45:00Z",
+                  "meterLoadCurve": 0.067,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T12:00:00Z",
+                  "meterLoadCurve": 0.053,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T12:15:00Z",
+                  "meterLoadCurve": 0.044,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T12:30:00Z",
+                  "meterLoadCurve": 0.046,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T12:45:00Z",
+                  "meterLoadCurve": 0.084,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T13:00:00Z",
+                  "meterLoadCurve": 0.197,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T13:15:00Z",
+                  "meterLoadCurve": 0.091,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T13:30:00Z",
+                  "meterLoadCurve": 0.12,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T13:45:00Z",
+                  "meterLoadCurve": 0.109,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T14:00:00Z",
+                  "meterLoadCurve": 0.106,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T14:15:00Z",
+                  "meterLoadCurve": 0.078,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T14:30:00Z",
+                  "meterLoadCurve": 0.083,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T14:45:00Z",
+                  "meterLoadCurve": 0.1,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T15:00:00Z",
+                  "meterLoadCurve": 0.116,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T15:15:00Z",
+                  "meterLoadCurve": 0.108,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T15:30:00Z",
+                  "meterLoadCurve": 0.093,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T15:45:00Z",
+                  "meterLoadCurve": 0.104,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T16:00:00Z",
+                  "meterLoadCurve": 0.095,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T16:15:00Z",
+                  "meterLoadCurve": 0.139,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T16:30:00Z",
+                  "meterLoadCurve": 0.165,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T16:45:00Z",
+                  "meterLoadCurve": 0.14,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T17:00:00Z",
+                  "meterLoadCurve": 0.144,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T17:15:00Z",
+                  "meterLoadCurve": 0.141,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T17:30:00Z",
+                  "meterLoadCurve": 0.14,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T17:45:00Z",
+                  "meterLoadCurve": 0.124,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T18:00:00Z",
+                  "meterLoadCurve": 0.074,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T18:15:00Z",
+                  "meterLoadCurve": 0.057,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T18:30:00Z",
+                  "meterLoadCurve": 0.054,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T18:45:00Z",
+                  "meterLoadCurve": 0.04,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T19:00:00Z",
+                  "meterLoadCurve": 0.061,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T19:15:00Z",
+                  "meterLoadCurve": 0.067,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T19:30:00Z",
+                  "meterLoadCurve": 0.064,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T19:45:00Z",
+                  "meterLoadCurve": 0.063,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T20:00:00Z",
+                  "meterLoadCurve": 0.08,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T20:15:00Z",
+                  "meterLoadCurve": 0.15,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T20:30:00Z",
+                  "meterLoadCurve": 0.097,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T20:45:00Z",
+                  "meterLoadCurve": 0.165,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T21:00:00Z",
+                  "meterLoadCurve": 0.223,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T21:15:00Z",
+                  "meterLoadCurve": 0.179,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T21:30:00Z",
+                  "meterLoadCurve": 0.224,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T21:45:00Z",
+                  "meterLoadCurve": 0.217,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T22:00:00Z",
+                  "meterLoadCurve": 0.246,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T22:15:00Z",
+                  "meterLoadCurve": 0.25,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T22:30:00Z",
+                  "meterLoadCurve": 0.237,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T22:45:00Z",
+                  "meterLoadCurve": 0.198,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T23:00:00Z",
+                  "meterLoadCurve": 0.164,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T23:15:00Z",
+                  "meterLoadCurve": 0.164,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T23:30:00Z",
+                  "meterLoadCurve": 0.176,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-03T23:45:00Z",
+                  "meterLoadCurve": 0.317,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-04T00:00:00Z",
+                  "meterLoadCurve": 0.264,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-04T00:15:00Z",
+                  "meterLoadCurve": 0.336,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-04T00:30:00Z",
+                  "meterLoadCurve": 0.191,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                },
+                {
+                  "loadCurveTimestamp": "2025-06-04T00:45:00Z",
+                  "meterLoadCurve": 0.165,
+                  "meterLoadCurveStatus": "0",
+                  "meterLoadCurveUnitMeasurement": "kwh"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

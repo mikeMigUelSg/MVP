@@ -4,19 +4,20 @@
     "description": "Bot para extrair dados de consumo do Balcão Digital E-REDES",
     "main": "eredes-bot.js",
     "scripts": {
-      "start": "node eredes-bot.js",
-      "setup": "npx playwright install chromium"
+        "start": "node eredes-bot.js",
+        "setup": "npx playwright install chromium"
     },
     "keywords": [
-      "eredes",
-      "playwright",
-      "automation",
-      "data-extraction",
-      "energia"
+        "eredes",
+        "playwright",
+        "automation",
+        "data-extraction",
+        "energia"
     ],
     "author": "",
     "license": "MIT",
     "dependencies": {
-      "playwright": "^1.40.0"
+        "playwright": "^1.40.0",
+        "xlsx": "^0.18.5"
     }
-  }
+}
