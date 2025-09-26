@@ -36,6 +36,7 @@ const api = {
   get: async (endpoint, options = {}) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'GET',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -49,6 +50,7 @@ const api = {
   post: async (endpoint, data = null, options = {}) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -63,6 +65,7 @@ const api = {
   put: async (endpoint, data = null, options = {}) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'PUT',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -77,6 +80,7 @@ const api = {
   delete: async (endpoint, options = {}) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'DELETE',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,

@@ -115,6 +115,14 @@ body {
   transition: background-color var(--transition-normal);
 }
 
+.auth-loading-state {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fb 0%, #e7ecf9 100%);
+}
+
 #root {
   min-height: 100vh;
   display: flex;

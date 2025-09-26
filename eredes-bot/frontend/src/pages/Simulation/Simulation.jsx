@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import LoginForm from './components/LoginForm';
 
 const Simulation = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
-    // E-REDES Login
-    nif: '',
-    password: '',
-    // Simulation Configuration
     startDate: '',
     endDate: '',
     tariffType: 'normal',
@@ -32,35 +30,6 @@ const Simulation = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: null }));
-    }
-  };
-
-  const handleLogin = async () => {
-    setLoading(true);
-    setErrors({});
-
-    try {
-      // Import authService dynamically to avoid issues
-      const { authService } = await import('../../services/authService');
-
-      // Open E-REDES login modal
-      const authResult = await authService.openERedesLogin();
-
-      if (authResult.success) {
-        setIsAuthenticated(true);
-        setCurrentStep(2);
-      } else {
-        setErrors({ auth: 'Falha na autenticação' });
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      if (error.message === 'Login cancelled by user') {
-        setErrors({ auth: 'Login cancelado pelo utilizador' });
-      } else {
-        setErrors({ auth: error.message || 'Erro na autenticação. Tente novamente.' });
-      }
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -88,123 +57,17 @@ const Simulation = () => {
     }, 3000);
   };
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      setCurrentStep((prev) => (prev < 2 ? 2 : prev));
+    }
+  }, [isAuthenticated]);
+
   const renderLoginForm = () => (
-    <div style={{
-      padding: '30px',
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-      maxWidth: '500px',
-      margin: '0 auto'
-    }}>
-      <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-        <div style={{ fontSize: '48px', marginBottom: '20px' }}>⚡</div>
-        <h2 style={{ color: '#2563eb', margin: '0 0 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-          🔐 Autenticação E-REDES
-        </h2>
-        <p style={{ color: '#6b7280', margin: '0 0 20px', lineHeight: '1.5' }}>
-          Aceda à sua conta E-REDES de forma segura através da página oficial
-        </p>
-      </div>
-
-      {/* Info Box */}
-      <div style={{
-        padding: '20px',
-        backgroundColor: '#f0f9ff',
-        borderRadius: '8px',
-        border: '1px solid #0ea5e9',
-        marginBottom: '25px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'start', gap: '12px' }}>
-          <span style={{ fontSize: '20px', flexShrink: 0 }}>💡</span>
-          <div>
-            <h4 style={{ margin: '0 0 8px', color: '#0c4a6e', fontSize: '14px' }}>Como funciona:</h4>
-            <p style={{ margin: '0', color: '#0c4a6e', fontSize: '13px', lineHeight: '1.4' }}>
-              Será aberta uma janela segura com a página oficial do E-REDES onde poderá fazer login com as suas credenciais normais.
-              Após o login, a janela fechará automaticamente e poderá continuar com a simulação.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Error Message */}
-      {errors.auth && (
-        <div style={{
-          padding: '15px',
-          backgroundColor: '#fef2f2',
-          borderRadius: '8px',
-          border: '1px solid #fca5a5',
-          marginBottom: '20px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ color: '#dc2626' }}>⚠️</span>
-            <p style={{ margin: 0, color: '#dc2626', fontSize: '14px' }}>
-              {errors.auth}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Login Button */}
-      <button
-        onClick={handleLogin}
-        disabled={loading}
-        style={{
-          width: '100%',
-          padding: '16px',
-          backgroundColor: loading ? '#9ca3af' : '#2563eb',
-          color: 'white',
-          border: 'none',
-          borderRadius: '8px',
-          fontSize: '16px',
-          fontWeight: '500',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '10px',
-          transition: 'background-color 0.2s',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}
-        onMouseOver={e => !loading && (e.target.style.backgroundColor = '#1d4ed8')}
-        onMouseOut={e => !loading && (e.target.style.backgroundColor = '#2563eb')}
-      >
-        {loading ? (
-          <>
-            <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>🔄</span>
-            A abrir E-REDES...
-          </>
-        ) : (
-          <>
-            <span>🌐</span>
-            Entrar com E-REDES
-          </>
-        )}
-      </button>
-
-      {/* Security Note */}
-      <div style={{
-        marginTop: '25px',
-        padding: '15px',
-        backgroundColor: '#f9fafb',
-        borderRadius: '8px',
-        textAlign: 'center'
-      }}>
-        <p style={{ margin: 0, color: '#6b7280', fontSize: '12px', lineHeight: '1.4' }}>
-          🔒 <strong>Seguro:</strong> As suas credenciais são introduzidas diretamente na página oficial do E-REDES.
-          Não guardamos nem temos acesso às suas palavras-passe.
-        </p>
-      </div>
-
-      <style>
-        {`
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-        `}
-      </style>
-    </div>
+    <LoginForm
+      onSuccess={() => setCurrentStep(2)}
+      onCancel={() => navigate('/')}
+    />
   );
 
   const renderConfigForm = () => (

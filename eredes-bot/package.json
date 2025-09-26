@@ -6,7 +6,8 @@
     "scripts": {
         "start": "node eredes-bot.js",
         "proxy": "node proxy-server.js",
-        "setup": "npx playwright install chromium"
+        "setup": "npx playwright install chromium",
+        "backend:start": "node backend/src/server.js"
     },
     "keywords": [
         "eredes",
@@ -22,6 +23,8 @@
         "xlsx": "^0.18.5",
         "express": "^4.18.0",
         "cors": "^2.8.5",
-        "http-proxy-middleware": "^2.0.0"
+        "http-proxy-middleware": "^2.0.0",
+        "express-session": "^1.17.3",
+        "zod": "^3.22.4"
     }
 }

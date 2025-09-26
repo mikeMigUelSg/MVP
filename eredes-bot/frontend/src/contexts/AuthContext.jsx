@@ -7,12 +7,17 @@ const initialState = {
   isAuthenticated: false,
   authToken: null,
   user: null,
-  status: 'idle', // idle, loading, success, error
+  status: 'idle',
   error: null,
+  isInitialized: false,
 };
 
 const authReducer = (state, action) => {
   switch (action.type) {
+    case 'SESSION_CHECK_START':
+      return { ...state, status: 'loading', error: null };
+    case 'SESSION_READY':
+      return { ...state, status: 'idle', error: null, isInitialized: true };
     case 'LOGIN_START':
       return { ...state, status: 'loading', error: null };
     case 'LOGIN_SUCCESS':
@@ -23,6 +28,7 @@ const authReducer = (state, action) => {
         user: action.payload.user,
         status: 'success',
         error: null,
+        isInitialized: true,
       };
     case 'LOGIN_ERROR':
       return {
@@ -32,9 +38,10 @@ const authReducer = (state, action) => {
         user: null,
         status: 'error',
         error: action.payload,
+        isInitialized: true,
       };
     case 'LOGOUT':
-      return { ...initialState };
+      return { ...initialState, isInitialized: true };
     case 'RESET_STATUS':
       return { ...state, status: 'idle', error: null };
     case 'TOKEN_REFRESHED':
@@ -55,36 +62,59 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Initialize auth state on app start
   useEffect(() => {
-    const token = authService.getToken();
-    const user = authService.getUser();
-    
-    if (token && user) {
-      dispatch({ 
-        type: 'LOGIN_SUCCESS', 
-        payload: { 
-          authToken: token, 
-          user 
-        } 
-      });
-    }
+    let isMounted = true;
+
+    const initialize = async () => {
+      dispatch({ type: 'SESSION_CHECK_START' });
+
+      try {
+        const session = await authService.getSession();
+        if (!isMounted) return;
+
+        if (session?.isAuthenticated) {
+          dispatch({
+            type: 'LOGIN_SUCCESS',
+            payload: {
+              authToken: session.authToken || null,
+              user: session.user || null,
+            },
+          });
+        } else {
+          dispatch({ type: 'LOGOUT' });
+        }
+      } catch (error) {
+        if (!isMounted) return;
+        dispatch({ type: 'LOGIN_ERROR', payload: error.message || 'Falha ao verificar sessão' });
+      } finally {
+        if (isMounted) {
+          dispatch({ type: 'SESSION_READY' });
+        }
+      }
+    };
+
+    initialize();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const login = useCallback(async (credentials) => {
     dispatch({ type: 'LOGIN_START' });
-    
+
     try {
       const result = await authService.login(credentials);
-      
-      dispatch({ 
-        type: 'LOGIN_SUCCESS', 
+
+      dispatch({
+        type: 'LOGIN_SUCCESS',
         payload: {
           authToken: result.authToken,
           user: result.user,
-        }
+        },
       });
-      
+
+      dispatch({ type: 'RESET_STATUS' });
       return result;
     } catch (error) {
       dispatch({ type: 'LOGIN_ERROR', payload: error.message });
