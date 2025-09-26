@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Fatura E-REDES</title>
+    <style>
+        :root {
+            /* Color Variables */
+            --primary-color: #1890ff;
+            --primary-dark: #096dd9;
+            --primary-light: #40a9ff;
+            --secondary-color: #52c41a;
+            --danger-color: #ff4d4f;
+            --warning-color: #faad14;
+            --text-primary: #262626;
+            --text-secondary: #595959;
+            --text-light: #8c8c8c;
+            --background: #f0f2f5;
+            --surface: #ffffff;
+            --border-color: #d9d9d9;
+            --border-light: #f0f0f0;
+            
+            /* Spacing Variables */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px;
+            
+            /* Border Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            
+            /* Typography */
+            --font-size-xs: 12px;
+            --font-size-sm: 14px;
+            --font-size-md: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 20px;
+            --font-size-xxl: 24px;
+            --font-size-xxxl: 32px;
+            
+            /* Transitions */
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--surface);
+            padding: var(--spacing-lg) 0;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: var(--font-size-lg);
+        }
+
+        .logo-text h1 {
+            font-size: var(--font-size-xxl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .logo-text p {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: var(--spacing-xl) auto;
+            padding: 0 var(--spacing-lg);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+            align-items: start;
+        }
+
+        /* Configuration Panel */
+        .config-panel {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .panel-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .panel-title::before {
+            content: "⚙️";
+            font-size: var(--font-size-lg);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-md);
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+
+        .date-range-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+        }
+
+        .cpe-input-container {
+            position: relative;
+        }
+
+        .cpe-help {
+            position: absolute;
+            right: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: help;
+            color: var(--text-light);
+            font-size: var(--font-size-lg);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 280px;
+            background-color: var(--text-primary);
+            color: white;
+            text-align: left;
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-sm);
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            right: 0;
+            font-size: var(--font-size-xs);
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: var(--spacing-md) var(--spacing-xl);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            text-decoration: none;
+        }
+
+        .button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button.secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .button.secondary:hover {
+            background: var(--border-light);
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Login Panel */
+        .login-panel {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: var(--spacing-lg);
+            text-align: center;
+        }
+
+        .login-header h2 {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .login-header p {
+            opacity: 0.9;
+            font-size: var(--font-size-sm);
+        }
+
+        .login-status {
+            padding: var(--spacing-lg);
+            text-align: center;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .status-waiting {
+            background: rgba(250, 173, 20, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-loading {
+            background: rgba(24, 144, 255, 0.1);
+            color: var(--primary-color);
+        }
+
+        .status-success {
+            background: rgba(82, 196, 26, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .status-error {
+            background: rgba(255, 77, 79, 0.1);
+            color: var(--danger-color);
+        }
+
+        .login-container {
+            padding: var(--spacing-lg);
+            min-height: 500px;
+        }
+
+        .login-iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: var(--radius-sm);
+        }
+
+        .instructions {
+            background: rgba(24, 144, 255, 0.05);
+            border: 1px solid rgba(24, 144, 255, 0.2);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .instruction-step {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            font-size: var(--font-size-sm);
+        }
+
+        .instruction-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* Loading Animation */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: currentColor;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Results Panel */
+        .results-panel {
+            grid-column: 1 / -1;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            margin-top: var(--spacing-xl);
+            display: none;
+        }
+
+        .results-panel.show {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-lg);
+                padding: 0 var(--spacing-md);
+            }
+
+            .header-content {
+                padding: 0 var(--spacing-md);
+                flex-direction: column;
+                gap: var(--spacing-md);
+                text-align: center;
+            }
+
+            .date-range-container {
+                grid-template-columns: 1fr;
+            }
+
+            .logo-text h1 {
+                font-size: var(--font-size-xl);
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-muted { color: var(--text-secondary); }
+        .mb-0 { margin-bottom: 0; }
+        .mt-lg { margin-top: var(--spacing-lg); }
+        .hidden { display: none; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .gap-sm { gap: var(--spacing-sm); }
+        .justify-between { justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <div class="logo-text">
+                    <h1>Simulador E-REDES</h1>
+                    <p>Simule a sua fatura de eletricidade</p>
+                </div>
+            </div>
+            <div class="text-muted">
+                <small>Powered by E-REDES API</small>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Configuration Panel -->
+        <div class="config-panel">
+            <h2 class="panel-title">Configuração da Simulação</h2>
+            
+            <form id="simulationForm">
+                <div class="form-group">
+                    <label for="cpe" class="form-label">CPE (Código do Ponto de Entrega)</label>
+                    <div class="cpe-input-container">
+                        <input 
+                            type="text" 
+                            id="cpe" 
+                            name="cpe" 
+                            class="form-input" 
+                            placeholder="Ex: PT0002000000000000000000AM"
+                            required
+                        >
+                        <div class="tooltip">
+                            <span class="cpe-help">❓</span>
+                            <span class="tooltip-text">
+                                O CPE encontra-se na sua fatura de eletricidade. 
+                                É um código que identifica unicamente o seu ponto de entrega de energia.
+                                Formato típico: PT seguido de números e letras.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Período de Simulação</label>
+                    <div class="date-range-container">
+                        <div>
+                            <label for="startDate" class="form-label">Data Início</label>
+                            <input 
+                                type="datetime-local" 
+                                id="startDate" 
+                                name="startDate" 
+                                class="form-input" 
+                                required
+                            >
+                        </div>
+                        <div>
+                            <label for="endDate" class="form-label">Data Fim</label>
+                            <input 
+                                type="datetime-local" 
+                                id="endDate" 
+                                name="endDate" 
+                                class="form-input" 
+                                required
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="timezone" class="form-label">Fuso Horário</label>
+                    <select id="timezone" name="timezone" class="form-input">
+                        <option value="utc">UTC (Coordenado Universal)</option>
+                        <option value="local" selected>Local (Portugal)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="outputFormat" class="form-label">Formato de Saída</label>
+                    <select id="outputFormat" name="outputFormat" class="form-input">
+                        <option value="xlsx">Excel (.xlsx)</option>
+                        <option value="csv">CSV (.csv)</option>
+                        <option value="json">JSON (.json)</option>
+                    </select>
+                </div>
+
+                <button type="button" id="initLoginBtn" class="button" style="width: 100%;">
+                    🔐 Iniciar Login no Balcão Digital
+                </button>
+            </form>
+        </div>
+
+        <!-- Login Panel -->
+        <div class="login-panel">
+            <div class="login-header">
+                <h2>🔐 Autenticação E-REDES</h2>
+                <p>Faça login no Balcão Digital para aceder aos seus dados</p>
+            </div>
+
+            <div class="login-status">
+                <div id="loginStatus" class="status-indicator status-waiting">
+                    <span>⏳</span>
+                    <span>Aguardando início do login</span>
+                </div>
+            </div>
+
+            <div id="loginContainer" class="login-container hidden">
+                <div class="instructions">
+                    <div class="instruction-step">
+                        <span class="step-number">1</span>
+                        <span>Clique em "<strong>Particular</strong>" no formulário abaixo</span>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-number">2</span>
+                        <span>Insira o seu <strong>NIF</strong> e <strong>password</strong></span>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-number">3</span>
+                        <span>Complete qualquer <strong>CAPTCHA</strong> se aparecer</span>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-number">4</span>
+                        <span>Aguarde a captura automática dos tokens</span>
+                    </div>
+                </div>
+
+                <div id="loginContent">
+                    <!-- Login form will be loaded here -->
+                </div>
+            </div>
+
+            <div class="login-status mt-lg">
+                <button id="simulateBtn" class="button" disabled style="width: 100%;">
+                    <span class="spinner hidden" id="simulateSpinner"></span>
+                    📊 Executar Simulação
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="results-panel" id="resultsPanel">
+        <h2 class="panel-title">📈 Resultados da Simulação</h2>
+        <div id="resultsContent">
+            <!-- Results will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        class ERedesSimulator {
+            constructor() {
+                this.authToken = null;
+                this.cookies = null;
+                this.isLoggedIn = false;
+                
+                this.initElements();
+                this.bindEvents();
+                this.setDefaultDates();
+            }
+
+            initElements() {
+                this.elements = {
+                    initLoginBtn: document.getElementById('initLoginBtn'),
+                    loginContainer: document.getElementById('loginContainer'),
+                    loginContent: document.getElementById('loginContent'),
+                    loginStatus: document.getElementById('loginStatus'),
+                    simulateBtn: document.getElementById('simulateBtn'),
+                    simulateSpinner: document.getElementById('simulateSpinner'),
+                    resultsPanel: document.getElementById('resultsPanel'),
+                    resultsContent: document.getElementById('resultsContent'),
+                    form: document.getElementById('simulationForm')
+                };
+            }
+
+            bindEvents() {
+                this.elements.initLoginBtn.addEventListener('click', () => this.initLogin());
+                this.elements.simulateBtn.addEventListener('click', () => this.runSimulation());
+                
+                // Form validation
+                this.elements.form.addEventListener('input', () => this.validateForm());
+            }
+
+            setDefaultDates() {
+                const now = new Date();
+                const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59);
+
+                document.getElementById('startDate').value = this.formatDateForInput(lastMonth);
+                document.getElementById('endDate').value = this.formatDateForInput(endOfLastMonth);
+            }
+
+            formatDateForInput(date) {
+                return date.toISOString().slice(0, 16);
+            }
+
+            updateStatus(message, type = 'waiting', showSpinner = false) {
+                const statusEl = this.elements.loginStatus;
+                const icons = {
+                    waiting: '⏳',
+                    loading: showSpinner ? '<span class="spinner"></span>' : '🔄',
+                    success: '✅',
+                    error: '❌'
+                };
+
+                statusEl.className = `status-indicator status-${type}`;
+                statusEl.innerHTML = `
+                    ${icons[type]}
+                    <span>${message}</span>
+                `;
+            }
+
+            async initLogin() {
+                try {
+                    this.updateStatus('Carregando formulário de login...', 'loading', true);
+                    
+                    // Show login container
+                    this.elements.loginContainer.classList.remove('hidden');
+                    
+                    // Load the E-REDES login form
+                    await this.loadLoginForm();
+                    
+                    this.updateStatus('Formulário carregado. Faça login conforme as instruções.', 'loading');
+                    
+                } catch (error) {
+                    console.error('Erro ao inicializar login:', error);
+                    this.updateStatus('Erro ao carregar formulário de login', 'error');
+                }
+            }
+
+            async loadLoginForm() {
+                // In a real implementation, this would fetch the login form from E-REDES
+                // For demonstration, we'll create a mock form similar to the original
+                const mockLoginForm = `
+                    <div style="padding: 20px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fafafa;">
+                        <h6 style="margin-bottom: 20px;">Cliente <strong>particular</strong></h6>
+                        <form id="eredesLoginForm">
+                            <div style="margin-bottom: 20px;">
+                                <div style="position: relative;">
+                                    <input 
+                                        type="text" 
+                                        name="username" 
+                                        id="username" 
+                                        placeholder=" " 
+                                        style="width: 100%; padding: 12px; border: 1px solid #d9d9d9; border-radius: 4px;"
+                                        required
+                                    >
+                                    <label for="username" style="position: absolute; left: 12px; top: 12px; color: #999; transition: all 0.2s;">NIF</label>
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: right; margin-bottom: 20px;">
+                                <a href="#" style="color: #1890ff; font-size: 14px;">Esqueceu-se da password?</a>
+                            </div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <div style="position: relative;">
+                                    <input 
+                                        type="password" 
+                                        name="password" 
+                                        id="password" 
+                                        placeholder=" " 
+                                        style="width: 100%; padding: 12px; border: 1px solid #d9d9d9; border-radius: 4px;"
+                                        required
+                                    >
+                                    <label for="password" style="position: absolute; left: 12px; top: 12px; color: #999; transition: all 0.2s;">Password</label>
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center;">
+                                <button 
+                                    type="submit" 
+                                    style="background: #1890ff; color: white; border: none; padding: 12px 32px; border-radius: 20px; cursor: pointer; font-weight: 500;"
+                                >
+                                    Entrar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+
+                this.elements.loginContent.innerHTML = mockLoginForm;
+                
+                // Bind form submission
+                const loginForm = document.getElementById('eredesLoginForm');
+                loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+                
+                // Add input focus effects
+                this.addInputEffects();
+            }
+
+            addInputEffects() {
+                const inputs = this.elements.loginContent.querySelectorAll('input');
+                inputs.forEach(input => {
+                    const label = input.nextElementSibling;
+                    
+                    input.addEventListener('focus', () => {
+                        if (label) {
+                            label.style.transform = 'translateY(-20px) scale(0.8)';
+                            label.style.color = '#1890ff';
+                        }
+                    });
+                    
+                    input.addEventListener('blur', () => {
+                        if (label && !input.value) {
+                            label.style.transform = 'translateY(0) scale(1)';
+                            label.style.color = '#999';
+                        }
+                    });
+                    
+                    // Check if input has value on load
+                    if (input.value && label) {
+                        label.style.transform = 'translateY(-20px) scale(0.8)';
+                        label.style.color = '#1890ff';
+                    }
+                });
+            }
+
+            async handleLogin(event) {
+                event.preventDefault();
+                
+                const formData = new FormData(event.target);
+                const credentials = {
+                    username: formData.get('username'),
+                    password: formData.get('password')
+                };
+
+                if (!credentials.username || !credentials.password) {
+                    alert('Por favor, preencha todos os campos.');
+                    return;
+                }
+
+                this.updateStatus('Processando login...', 'loading', true);
+
+                try {
+                    // Simulate login process
+                    await this.simulateLoginProcess(credentials);
+                    
+                } catch (error) {
+                    console.error('Erro no login:', error);
+                    this.updateStatus('Erro no processo de login', 'error');
+                }
+            }
+
+            async simulateLoginProcess(credentials) {
+                // Simulate API calls
+                await this.delay(2000);
+                
+                // Mock successful authentication
+                this.authToken = 'mock-auth-token-' + Date.now();
+                this.cookies = 'PHPSESSID=mock-session; AAT=mock-aat-token';
+                this.isLoggedIn = true;
+
+                this.updateStatus('Login realizado com sucesso!', 'success');
+                this.elements.simulateBtn.disabled = false;
+                
+                // Auto-scroll to simulation button
+                this.elements.simulateBtn.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            async runSimulation() {
+                if (!this.isLoggedIn) {
+                    alert('Por favor, faça login primeiro.');
+                    return;
+                }
+
+                if (!this.validateForm()) {
+                    alert('Por favor, preencha todos os campos obrigatórios.');
+                    return;
+                }
+
+                const formData = new FormData(this.elements.form);
+                const config = Object.fromEntries(formData.entries());
+
+                this.elements.simulateBtn.disabled = true;
+                this.elements.simulateSpinner.classList.remove('hidden');
+                this.updateStatus('Executando simulação...', 'loading', true);
+
+                try {
+                    const results = await this.fetchConsumptionData(config);
+                    this.displayResults(results);
+                    
+                } catch (error) {
+                    console.error('Erro na simulação:', error);
+                    this.updateStatus('Erro ao executar simulação', 'error');
+                    alert('Erro ao executar a simulação. Tente novamente.');
+                    
+                } finally {
+                    this.elements.simulateBtn.disabled = false;
+                    this.elements.simulateSpinner.classList.add('hidden');
+                }
+            }
+
+            async fetchConsumptionData(config) {
+                // Simulate API call to backend
+                await this.delay(3000);
+                
+                // Mock response data
+                return {
+                    cpe: config.cpe,
+                    period: {
+                        start: config.startDate,
+                        end: config.endDate
+                    },
+                    totalConsumption: 234.5,
+                    estimatedCost: 45.67,
+                    peakHours: 156.2,
+                    offPeakHours: 78.3,
+                    dataPoints: 672,
+                    averagePower: 1.2,
+                    maxPower: 3.4,
+                    minPower: 0.1
+                };
+            }
+
+            displayResults(results) {
+                const resultsHTML = `
+                    <div class="flex justify-between items-center" style="margin-bottom: var(--spacing-lg);">
+                        <h3>Resumo do Consumo</h3>
+                        <div class="flex gap-sm">
+                            <button class="button secondary" onclick="simulator.downloadResults('xlsx')">
+                                📊 Excel
+                            </button>
+                            <button class="button secondary" onclick="simulator.downloadResults('csv')">
+                                📄 CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+                        <div class="metric-card">
+                            <div class="metric-icon">⚡</div>
+                            <div class="metric-value">${results.totalConsumption} kWh</div>
+                            <div class="metric-label">Consumo Total</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">💰</div>
+                            <div class="metric-value">€${results.estimatedCost}</div>
+                            <div class="metric-label">Custo Estimado</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">📊</div>
+                            <div class="metric-value">${results.averagePower} kW</div>
+                            <div class="metric-label">Potência Média</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">🔥</div>
+                            <div class="metric-value">${results.maxPower} kW</div>
+                            <div class="metric-label">Pico Máximo</div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+                        <div class="detail-card">
+                            <h4>⏰ Distribuição por Período</h4>
+                            <div class="detail-row">
+                                <span>Horas de Ponta:</span>
+                                <span><strong>${results.peakHours} kWh</strong></span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Horas de Vazio:</span>
+                                <span><strong>${results.offPeakHours} kWh</strong></span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Total de Registos:</span>
+                                <span><strong>${results.dataPoints}</strong></span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <h4>📋 Detalhes Técnicos</h4>
+                            <div class="detail-row">
+                                <span>CPE:</span>
+                                <span><strong>${results.cpe}</strong></span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Período:</span>
+                                <span><strong>${new Date(results.period.start).toLocaleDateString()}</strong> - <strong>${new Date(results.period.end).toLocaleDateString()}</strong></span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Potência Mínima:</span>
+                                <span><strong>${results.minPower} kW</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <h4>📈 Gráfico de Consumo (Simulado)</h4>
+                        <div class="chart-placeholder">
+                            <canvas id="consumptionChart" width="800" height="300"></canvas>
+                        </div>
+                    </div>
+                `;
+
+                this.elements.resultsContent.innerHTML = resultsHTML;
+                this.elements.resultsPanel.classList.add('show');
+                this.updateStatus('Simulação concluída com sucesso!', 'success');
+                
+                // Scroll to results
+                this.elements.resultsPanel.scrollIntoView({ behavior: 'smooth' });
+                
+                // Draw chart
+                this.drawConsumptionChart();
+            }
+
+            drawConsumptionChart() {
+                const canvas = document.getElementById('consumptionChart');
+                const ctx = canvas.getContext('2d');
+                
+                // Generate mock data points for the chart
+                const dataPoints = [];
+                const hours = 24;
+                for (let i = 0; i < hours; i++) {
+                    dataPoints.push({
+                        hour: i,
+                        consumption: 0.5 + Math.random() * 2.5 + Math.sin(i / 4) * 0.8
+                    });
+                }
+
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Chart settings
+                const padding = 60;
+                const chartWidth = canvas.width - 2 * padding;
+                const chartHeight = canvas.height - 2 * padding;
+                const maxConsumption = Math.max(...dataPoints.map(d => d.consumption));
+                
+                // Draw grid
+                ctx.strokeStyle = '#f0f0f0';
+                ctx.lineWidth = 1;
+                
+                // Vertical grid lines
+                for (let i = 0; i <= 6; i++) {
+                    const x = padding + (chartWidth / 6) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(x, padding);
+                    ctx.lineTo(x, padding + chartHeight);
+                    ctx.stroke();
+                }
+                
+                // Horizontal grid lines
+                for (let i = 0; i <= 5; i++) {
+                    const y = padding + (chartHeight / 5) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(padding, y);
+                    ctx.lineTo(padding + chartWidth, y);
+                    ctx.stroke();
+                }
+                
+                // Draw axes
+                ctx.strokeStyle = '#d9d9d9';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(padding, padding);
+                ctx.lineTo(padding, padding + chartHeight);
+                ctx.lineTo(padding + chartWidth, padding + chartHeight);
+                ctx.stroke();
+                
+                // Draw consumption line
+                ctx.strokeStyle = '#1890ff';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                
+                dataPoints.forEach((point, index) => {
+                    const x = padding + (chartWidth / (hours - 1)) * index;
+                    const y = padding + chartHeight - (point.consumption / maxConsumption) * chartHeight;
+                    
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                
+                ctx.stroke();
+                
+                // Draw data points
+                ctx.fillStyle = '#1890ff';
+                dataPoints.forEach((point, index) => {
+                    const x = padding + (chartWidth / (hours - 1)) * index;
+                    const y = padding + chartHeight - (point.consumption / maxConsumption) * chartHeight;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+                
+                // Draw labels
+                ctx.fillStyle = '#595959';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                
+                // X-axis labels (hours)
+                for (let i = 0; i <= 6; i++) {
+                    const x = padding + (chartWidth / 6) * i;
+                    const hour = Math.round((24 / 6) * i);
+                    ctx.fillText(`${hour}:00`, x, padding + chartHeight + 20);
+                }
+                
+                // Y-axis labels (consumption)
+                ctx.textAlign = 'right';
+                for (let i = 0; i <= 5; i++) {
+                    const y = padding + chartHeight - (chartHeight / 5) * i;
+                    const value = (maxConsumption / 5) * i;
+                    ctx.fillText(`${value.toFixed(1)} kW`, padding - 10, y + 4);
+                }
+                
+                // Chart title
+                ctx.textAlign = 'center';
+                ctx.font = 'bold 14px Arial';
+                ctx.fillStyle = '#262626';
+                ctx.fillText('Consumo por Hora (Últimas 24h)', canvas.width / 2, 30);
+            }
+
+            downloadResults(format) {
+                // Mock download functionality
+                const filename = `e-redes-consumption-${Date.now()}.${format}`;
+                
+                // In a real implementation, this would call the backend API
+                alert(`Download iniciado: ${filename}\n\nEm uma implementação real, o ficheiro seria gerado pelo backend e transferido automaticamente.`);
+            }
+
+            validateForm() {
+                const requiredFields = ['cpe', 'startDate', 'endDate'];
+                const isValid = requiredFields.every(field => {
+                    const element = document.getElementById(field);
+                    return element && element.value.trim() !== '';
+                });
+
+                // Additional validation for date range
+                if (isValid) {
+                    const startDate = new Date(document.getElementById('startDate').value);
+                    const endDate = new Date(document.getElementById('endDate').value);
+                    
+                    if (startDate >= endDate) {
+                        return false;
+                    }
+                }
+
+                return isValid;
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // Additional CSS for results display
+        const additionalStyles = `
+            .metric-card {
+                background: var(--surface);
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius-lg);
+                padding: var(--spacing-lg);
+                text-align: center;
+                box-shadow: var(--shadow-sm);
+                transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+            }
+
+            .metric-card:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .metric-icon {
+                font-size: var(--font-size-xxxl);
+                margin-bottom: var(--spacing-sm);
+            }
+
+            .metric-value {
+                font-size: var(--font-size-xxl);
+                font-weight: 700;
+                color: var(--primary-color);
+                margin-bottom: var(--spacing-xs);
+            }
+
+            .metric-label {
+                font-size: var(--font-size-sm);
+                color: var(--text-secondary);
+                font-weight: 500;
+            }
+
+            .detail-card {
+                background: var(--surface);
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius-lg);
+                padding: var(--spacing-lg);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .detail-card h4 {
+                font-size: var(--font-size-lg);
+                font-weight: 600;
+                margin-bottom: var(--spacing-md);
+                color: var(--text-primary);
+            }
+
+            .detail-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: var(--spacing-sm) 0;
+                border-bottom: 1px solid var(--border-light);
+                font-size: var(--font-size-sm);
+            }
+
+            .detail-row:last-child {
+                border-bottom: none;
+            }
+
+            .chart-container {
+                background: var(--surface);
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius-lg);
+                padding: var(--spacing-lg);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .chart-container h4 {
+                font-size: var(--font-size-lg);
+                font-weight: 600;
+                margin-bottom: var(--spacing-lg);
+                color: var(--text-primary);
+            }
+
+            .chart-placeholder {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: #fafafa;
+                border-radius: var(--radius-sm);
+                padding: var(--spacing-md);
+            }
+
+            #consumptionChart {
+                max-width: 100%;
+                height: auto;
+            }
+
+            @media (max-width: 768px) {
+                .chart-container {
+                    padding: var(--spacing-md);
+                }
+                
+                #consumptionChart {
+                    width: 100%;
+                    height: 250px;
+                }
+                
+                .detail-card h4 {
+                    font-size: var(--font-size-md);
+                }
+            }
+        `;
+
+        // Inject additional styles
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = additionalStyles;
+        document.head.appendChild(styleSheet);
+
+        // Initialize the application
+        let simulator;
+        document.addEventListener('DOMContentLoaded', () => {
+            simulator = new ERedesSimulator();
+            console.log('E-REDES Simulator initialized successfully!');
+        });
+    </script>
+</body>
+</html>

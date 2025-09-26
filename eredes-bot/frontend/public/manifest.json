@@ -1,0 +1,71 @@
+{
+  "short_name": "E-REDES Bot",
+  "name": "E-REDES Bot - Simulação de Faturas",
+  "description": "Simulação inteligente de faturas de eletricidade com dados reais do E-REDES",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#2196f3",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "pt-PT",
+  "categories": ["utilities", "productivity", "finance"],
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "type": "image/png",
+      "sizes": "1280x720",
+      "form_factor": "wide"
+    },
+    {
+      "src": "screenshot2.png",
+      "type": "image/png",
+      "sizes": "750x1334",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nova Simulação",
+      "short_name": "Simular",
+      "description": "Criar nova simulação de consumo",
+      "url": "/simulation",
+      "icons": [
+        {
+          "src": "favicon.ico",
+          "sizes": "32x32"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Ver estatísticas e histórico",
+      "url": "/",
+      "icons": [
+        {
+          "src": "favicon.ico",
+          "sizes": "32x32"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
+}

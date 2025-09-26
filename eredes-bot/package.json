@@ -5,6 +5,7 @@
     "main": "eredes-bot.js",
     "scripts": {
         "start": "node eredes-bot.js",
+        "proxy": "node proxy-server.js",
         "setup": "npx playwright install chromium"
     },
     "keywords": [
@@ -18,6 +19,9 @@
     "license": "MIT",
     "dependencies": {
         "playwright": "^1.40.0",
-        "xlsx": "^0.18.5"
+        "xlsx": "^0.18.5",
+        "express": "^4.18.0",
+        "cors": "^2.8.5",
+        "http-proxy-middleware": "^2.0.0"
     }
 }

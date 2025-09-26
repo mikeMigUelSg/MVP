@@ -1,0 +1,140 @@
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  
+  .input-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+  
+  .input-required {
+    color: var(--error-500);
+  }
+  
+  .input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .input-field {
+    width: 100%;
+    font-family: inherit;
+    font-size: var(--text-base);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-lg);
+    color: white;
+    transition: all var(--duration-200) var(--ease-out);
+    outline: none;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .input-field::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .input-field:focus {
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+  }
+  
+  .input-icon {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.6);
+    pointer-events: none;
+  }
+  
+  .input-icon--left {
+    left: var(--space-3);
+  }
+  
+  .input-icon--right {
+    right: var(--space-3);
+  }
+  
+  /* Size variants */
+  .input--sm .input-field {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    min-height: 36px;
+  }
+  
+  .input--sm .input-icon--left {
+    left: var(--space-2);
+  }
+  
+  .input--sm .input-icon--right {
+    right: var(--space-2);
+  }
+  
+  .input--sm .input-field {
+    padding-left: var(--space-8);
+  }
+  
+  .input--md .input-field {
+    padding: var(--space-3) var(--space-4);
+    min-height: 44px;
+  }
+  
+  .input--md .input-field:has(~ .input-icon--left) {
+    padding-left: var(--space-10);
+  }
+  
+  .input--md .input-field:has(~ .input-icon--right) {
+    padding-right: var(--space-10);
+  }
+  
+  .input--lg .input-field {
+    padding: var(--space-4) var(--space-5);
+    font-size: var(--text-lg);
+    min-height: 52px;
+  }
+  
+  /* State variants */
+  .input--error .input-field {
+    border-color: var(--error-500);
+  }
+  
+  .input--error .input-field:focus {
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.2);
+  }
+  
+  .input--success .input-field {
+    border-color: var(--success-500);
+  }
+  
+  .input--success .input-field:focus {
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+  }
+  
+  .input--disabled .input-field {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .input-message {
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+  
+  .input-message--error {
+    color: var(--error-500);
+  }
+  
+  .input-message--success {
+    color: var(--success-500);
+  }
+  

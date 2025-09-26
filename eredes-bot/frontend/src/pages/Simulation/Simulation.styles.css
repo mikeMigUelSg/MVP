@@ -1,0 +1,199 @@
+.simulation-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--space-6);
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .header-content h1 {
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    margin-bottom: var(--space-2);
+    line-height: 1.1;
+  }
+  
+  .page-subtitle {
+    font-size: var(--text-lg);
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 400;
+  }
+  
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(10px);
+  }
+  
+  .step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: var(--text-sm);
+  }
+  
+  .step-text {
+    color: white;
+    font-weight: 600;
+    font-size: var(--text-base);
+  }
+  
+  .simulation-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-8);
+    align-items: start;
+  }
+  
+  .auth-status-card {
+    position: sticky;
+    top: var(--space-6);
+  }
+  
+  .auth-status {
+    text-align: center;
+  }
+  
+  .auth-details {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .auth-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+    font-size: var(--text-sm);
+  }
+  
+  .auth-label {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .auth-value {
+    color: white;
+    font-weight: 600;
+  }
+  
+  .login-button {
+    width: 100%;
+    margin-top: var(--space-4);
+  }
+  
+  .simulation-running,
+  .simulation-complete {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+  }
+  
+  .running-card,
+  .complete-card {
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .running-content h2,
+  .complete-content h2 {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    margin: var(--space-6) 0 var(--space-3);
+    color: white;
+  }
+  
+  .running-content p,
+  .complete-content p {
+    font-size: var(--text-lg);
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: var(--space-8);
+  }
+  
+  .progress-steps {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+  }
+  
+  .step {
+    flex: 1;
+    text-align: center;
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.05);
+    transition: all var(--duration-300) var(--ease-out);
+  }
+  
+  .step.completed {
+    background: rgba(76, 175, 80, 0.2);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+  }
+  
+  .step.active {
+    background: rgba(33, 150, 243, 0.2);
+    border: 1px solid rgba(33, 150, 243, 0.3);
+    animation: pulse 2s infinite;
+  }
+  
+  .step-icon {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-2);
+  }
+  
+  .step-label {
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+  }
+  
+  .success-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-4);
+  }
+  
+  @media (max-width: 1024px) {
+    .simulation-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+    
+    .auth-status-card {
+      position: static;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .page-header {
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    
+    .header-content h1 {
+      font-size: var(--text-3xl);
+    }
+    
+    .progress-steps {
+      flex-direction: column;
+    }
+  }

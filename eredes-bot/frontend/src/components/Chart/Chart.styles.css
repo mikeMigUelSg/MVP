@@ -1,0 +1,49 @@
+.chart-container {
+    position: relative;
+  }
+  
+  .chart-header {
+    margin-bottom: var(--space-4);
+    text-align: center;
+  }
+  
+  .chart-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: white;
+    margin: 0;
+  }
+  
+  .chart-wrapper {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  
+  .chart-canvas {
+    display: block;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-lg);
+  }
+  
+  .chart-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .y-label {
+    transform: rotate(-90deg);
+    transform-origin: left;
+    position: absolute;
+    left: -20px;
+    top: 50%;
+  }
+  
+  .x-label {
+    text-align: center;
+    flex: 1;
+  }

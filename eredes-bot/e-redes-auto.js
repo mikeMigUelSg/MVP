@@ -23,6 +23,8 @@
  *  node e-redes-auto.js --auto-auth true --cpe <CPE> --start "..." --end "..."
  *  node e-redes-auto.js --auto-auth true --print-auth true   # abre browser, faz login e imprime token+cookies
  */
+
+
 const readline = require('readline');
 const fs = require('fs');
 const path = require('path');
