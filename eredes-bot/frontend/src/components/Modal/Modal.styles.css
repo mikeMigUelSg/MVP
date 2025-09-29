@@ -1,0 +1,123 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: var(--space-4);
+  }
+  
+  .modal-content {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-backdrop);
+    -webkit-backdrop-filter: var(--glass-backdrop);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-2xl);
+    max-height: 90vh;
+    overflow: hidden;
+    animation: modalSlideUp var(--duration-300) var(--ease-out);
+    position: relative;
+  }
+  
+  @keyframes modalSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-6) var(--space-6) var(--space-4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .modal-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: white;
+    margin: 0;
+  }
+  
+  .modal-close {
+    font-size: var(--text-lg);
+    color: rgba(255, 255, 255, 0.7);
+    padding: var(--space-2);
+  }
+  
+  .modal-close:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .modal-body {
+    padding: var(--space-6);
+    overflow-y: auto;
+    max-height: calc(90vh - 120px);
+  }
+  
+  .modal-footer {
+    padding: var(--space-4) var(--space-6) var(--space-6);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+  }
+  
+  /* Size variants */
+  .modal--sm {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .modal--md {
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .modal--lg {
+    width: 100%;
+    max-width: 800px;
+  }
+  
+  .modal--xl {
+    width: 100%;
+    max-width: 1200px;
+  }
+  
+  .modal--full {
+    width: 95vw;
+    height: 95vh;
+    max-width: none;
+    max-height: none;
+  }
+  
+  @media (max-width: 768px) {
+    .modal-content {
+      margin: var(--space-4);
+      max-width: calc(100vw - var(--space-8));
+    }
+    
+    .modal--full {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      border-radius: 0;
+    }
+  }
+  
+
