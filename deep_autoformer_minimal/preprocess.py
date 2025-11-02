@@ -11,8 +11,8 @@ TIME_COLUMN = 'Hora'
 TARGET_COLUMN = 'Consumo registado (kW)'
 
 # Período para filtrar
-DATE_BEGIN = '2025-01-01'
-DATE_END = '2025-06-30'  # 6 meses para ter mais dados de treino
+DATE_BEGIN = '2025-04-01'
+DATE_END = '2025-07-01' 
 
 # Caminho de saída
 OUTPUT_CSV = 'data/data.csv'
