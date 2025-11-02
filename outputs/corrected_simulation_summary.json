@@ -1,16 +1,16 @@
 {
-  "cost_without_battery_eur": 609.8824468179743,
-  "cost_with_battery_eur": 442.5293866233201,
-  "savings_eur": 167.35306019465418,
-  "savings_pct": 27.44021590846054,
-  "electricity_cost_without_eur": 532.3994752179742,
-  "electricity_cost_with_eur": 364.87940730065714,
-  "electricity_savings_eur": 167.52006791731708,
-  "power_cost_eur": 58.60935,
-  "taxes_cost_eur": 18.8736216,
-  "electricity_pct_of_total": 87.29542520788016,
-  "power_pct_of_total": 9.609942097168206,
-  "taxes_pct_of_total": 3.094632694951627,
+  "cost_without_battery_eur": 161.65049164626006,
+  "cost_with_battery_eur": 120.2703008457996,
+  "savings_eur": 41.38019080046047,
+  "savings_pct": 25.598555487856345,
+  "electricity_cost_without_eur": 130.14987854626006,
+  "electricity_cost_with_eur": 88.74232320659456,
+  "electricity_savings_eur": 41.40755533966549,
+  "power_cost_eur": 24.225198,
+  "taxes_cost_eur": 7.275415100000002,
+  "electricity_pct_of_total": 80.51313498697372,
+  "power_pct_of_total": 14.986157946869735,
+  "taxes_pct_of_total": 4.500707066156533,
   "fixed_costs_breakdown": {
     "k3_daily": 0.0,
     "power_daily": 0.390729,
@@ -23,23 +23,23 @@
   "modular_invoice": {
     "electricity_term": {
       "without_battery": {
-        "Energy (Fixed)": 456.0713779999999,
-        "Energy VAT": 76.3280972179743
+        "Energy (Fixed)": 115.29879920000002,
+        "Energy VAT": 14.851079346260043
       },
       "with_battery": {
-        "Energy (Fixed)": 311.7709236451866,
-        "Energy VAT": 53.10848365547052
+        "Energy (Fixed)": 78.39796466737566,
+        "Energy VAT": 10.344358539218895
       }
     },
     "power_term": {
       "K3 Daily Fee": 0.0,
-      "Contracted Power": 58.60935
+      "Contracted Power": 24.225198
     },
     "taxes": {
-      "IEC Tax": 2.7139200000000003,
-      "IEC VAT": 0.6242016,
-      "CAV (incl. VAT)": 15.105000000000002,
-      "DGEG (incl. VAT)": 0.43050000000000005
+      "IEC Tax": 0.6943699999999999,
+      "IEC VAT": 0.1597051,
+      "CAV (incl. VAT)": 6.243400000000001,
+      "DGEG (incl. VAT)": 0.17794000000000001
     }
   }
 }
