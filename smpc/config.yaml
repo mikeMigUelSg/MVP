@@ -34,7 +34,7 @@ house:
 
 # Tariff configuration
 tariff:
-  type: "bihoraria"  # Options: "simple" or "bihoraria"
+  type: "simple"  # Options: "simple" or "bihoraria"
 
   # Simple tariff (flat rate)
   simple:

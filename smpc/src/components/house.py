@@ -45,21 +45,31 @@ class House:
             # Get consumption column
             consumption_col = 'Consumo registado (kW)'
             if consumption_col not in df.columns:
-                # Try alternative column names
                 consumption_col = [col for col in df.columns if 'consumo' in col.lower()][0]
 
-            # Create lookup key: (month, day, hour, minute)
-            # This allows matching regardless of year
+            # Lookup key
             df['month'] = df['timestamp'].dt.month
             df['day'] = df['timestamp'].dt.day
             df['hour'] = df['timestamp'].dt.hour
             df['minute'] = df['timestamp'].dt.minute
 
-            # Handle leap year (Feb 29 -> Feb 28)
+            # Feb 29 -> Feb 28
             df.loc[(df['month'] == 2) & (df['day'] == 29), 'day'] = 28
 
             self.consumption_data = df[['month', 'day', 'hour', 'minute', consumption_col]].copy()
             self.consumption_data.rename(columns={consumption_col: 'consumption'}, inplace=True)
+
+            # === NOVO: índices O(1) ===
+            self._cons_lookup = {
+                (int(r.month), int(r.day), int(r.hour), int(r.minute)): float(r.consumption)
+                for r in self.consumption_data.itertuples(index=False)
+            }
+            # média por (mês, dia) como fallback
+            from collections import defaultdict
+            _day_buckets = defaultdict(list)
+            for (m, d, h, mi), v in self._cons_lookup.items():
+                _day_buckets[(m, d)].append(v)
+            self._cons_day_mean = {k: (sum(vs)/len(vs)) for k, vs in _day_buckets.items()}
 
             print(f"Loaded consumption data: {len(self.consumption_data)} time steps")
             print(f"Original date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
@@ -69,72 +79,35 @@ class House:
         except Exception as e:
             print(f"Error loading consumption data: {e}")
             self.consumption_data = None
+            self._cons_lookup = {}
+            self._cons_day_mean = {}
+
 
     def get_consumption(self, timestamp: datetime) -> float:
         """
-        Get consumption at given timestamp
-
-        Args:
-            timestamp: Datetime to query (year is ignored)
-
-        Returns:
-            Consumption in kW
+        O(1) lookup via dicionário com fallback média do dia.
         """
-        if self.consumption_data is None:
-            # Simple model: average consumption with daily pattern
+        if self.consumption_data is None or not hasattr(self, "_cons_lookup"):
             hour = timestamp.hour
-            # Higher consumption during day, lower at night
             if 7 <= hour < 23:
-                base_load = 0.5
-                variable_load = 1.0
+                return 0
             else:
-                base_load = 0.3
-                variable_load = 0.2
+                return 0
 
-            return base_load + np.random.uniform(0, variable_load)
+        month = timestamp.month
+        day = 28 if (timestamp.month == 2 and timestamp.day == 29) else timestamp.day
+        key = (month, day, timestamp.hour, timestamp.minute)
 
-        try:
-            # Extract lookup key from timestamp (ignoring year)
-            month = timestamp.month
-            day = timestamp.day if not (timestamp.month == 2 and timestamp.day == 29) else 28
-            hour = timestamp.hour
-            minute = timestamp.minute
+        v = self._cons_lookup.get(key)
+        if v is not None:
+            return max(0.0, v)
 
-            # Find matching row
-            mask = (
-                (self.consumption_data['month'] == month) &
-                (self.consumption_data['day'] == day) &
-                (self.consumption_data['hour'] == hour) &
-                (self.consumption_data['minute'] == minute)
-            )
+        v = self._cons_day_mean.get((month, day))
+        if v is not None:
+            return max(0.0, v)
 
-            matches = self.consumption_data[mask]
+        return float(self.consumption_data["consumption"].mean())
 
-            if len(matches) > 0:
-                consumption = matches.iloc[0]['consumption']
-            else:
-                # If no exact match, find closest by hour
-                mask_day = (
-                    (self.consumption_data['month'] == month) &
-                    (self.consumption_data['day'] == day)
-                )
-                day_data = self.consumption_data[mask_day].copy()
-                if len(day_data) > 0:
-                    # Find closest time
-                    time_minutes = hour * 60 + minute
-                    day_data['time_minutes'] = day_data['hour'] * 60 + day_data['minute']
-                    day_data['time_diff'] = abs(day_data['time_minutes'] - time_minutes)
-                    min_idx = day_data['time_diff'].idxmin()
-                    consumption = day_data.loc[min_idx, 'consumption']
-                else:
-                    # Fallback to average
-                    consumption = self.consumption_data['consumption'].mean()
-
-            return max(0.0, consumption)
-
-        except Exception as e:
-            print(f"Error getting consumption at {timestamp}: {e}")
-            return 0.0
 
     def get_consumption_forecast(self,
                                  start_time: datetime,
