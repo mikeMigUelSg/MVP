@@ -16,6 +16,11 @@ from datetime import datetime, timedelta
 from typing import Tuple, Optional, Dict, List
 from scipy.interpolate import interp1d, RectBivariateSpline
 from dataclasses import dataclass
+import time
+import logging
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -431,6 +436,8 @@ class SDPController:
             R_bar: Previsão base R̄ para cada passo k (tamanho N+1)
             verbose: Imprimir progresso
         """
+        solve_start_time = time.time()
+
         N = self.params.N
         n_x = len(self.X_grid)
 
@@ -439,14 +446,22 @@ class SDPController:
         self.policy = [None] * N
 
         # Condição terminal (k=N)
+        terminal_start = time.time()
         n_R_N = len(self.R_grids[N])
         self.value_function[N] = np.zeros((n_x, n_R_N))
         for i in range(n_x):
             terminal_val = self.terminal_cost(self.X_grid[i])
             self.value_function[N][i, :] = terminal_val
+        terminal_time = time.time() - terminal_start
+        logger.info(f"  [SDP] Terminal cost initialization: {terminal_time:.4f}s")
 
         # Backward DP
+        backward_start = time.time()
+        step_times = []
+
         for k in range(N - 1, -1, -1):
+            step_start = time.time()
+
             if verbose and k % 10 == 0:
                 print(f"  Solving step {k}/{N}...")
 
@@ -491,8 +506,23 @@ class SDPController:
             self.value_function[k] = J_k
             self.policy[k] = mu_k
 
+            step_time = time.time() - step_start
+            step_times.append(step_time)
+
+        backward_time = time.time() - backward_start
+        total_solve_time = time.time() - solve_start_time
+
+        # Statistics
+        avg_step_time = np.mean(step_times)
+        max_step_time = np.max(step_times)
+        min_step_time = np.min(step_times)
+
+        logger.info(f"  [SDP] Backward DP completed: {backward_time:.4f}s")
+        logger.info(f"  [SDP] Step times - Avg: {avg_step_time:.4f}s, Min: {min_step_time:.4f}s, Max: {max_step_time:.4f}s")
+        logger.info(f"  [SDP] Total solve_sdp time: {total_solve_time:.4f}s")
+
         if verbose:
-            print("  SDP solved!")
+            print(f"  SDP solved in {total_solve_time:.2f}s!")
 
     def _expected_future_cost(self,
                              x_next: float,
@@ -685,6 +715,8 @@ class SDPController:
         Returns:
             Ação ótima (kW), positivo=carga, negativo=descarga
         """
+        action_start = time.time()
+
         # Verificar se precisa recalcular política
         need_update = False
         if self.policy is None or self.last_policy_update is None:
@@ -709,7 +741,12 @@ class SDPController:
         k = 0
 
         # Obter ação ótima
+        interpolation_start = time.time()
         u_star = self.get_action(x_current, R_current, k)
+        interpolation_time = time.time() - interpolation_start
+
+        total_action_time = time.time() - action_start
+        logger.debug(f"  [SDP] compute_action: {total_action_time:.6f}s (interpolation: {interpolation_time:.6f}s)")
 
         # Retornar (note: convenção de sinal pode ser diferente da Battery)
         # Battery: positivo=carga, negativo=descarga
@@ -729,24 +766,39 @@ class SDPController:
             pv_forecaster: Forecaster de PV
             load_forecaster: Forecaster de carga
         """
+        policy_update_start = time.time()
         print(f"\n[SDP] Updating policy at {timestamp}...")
+        logger.info(f"[SDP] Starting policy update at {timestamp}")
 
         # Obter previsões base R̄
+        forecast_start = time.time()
         R_bar = self._get_base_forecast(
             timestamp, pv_forecaster, load_forecaster
         )
+        forecast_time = time.time() - forecast_start
+        logger.info(f"  [SDP] Forecast generation: {forecast_time:.4f}s")
 
         # Salvar previsão base
         self.R_bar_forecast = R_bar
 
         # Criar grelhas
+        grid_start = time.time()
         self.create_grids(R_bar)
+        grid_time = time.time() - grid_start
+        logger.info(f"  [SDP] Grid creation: {grid_time:.4f}s")
 
         # Resolver SDP
+        solve_start = time.time()
         self.solve_sdp(R_bar, verbose=True)
+        solve_time = time.time() - solve_start
+        logger.info(f"  [SDP] SDP solve: {solve_time:.4f}s")
 
         # Atualizar timestamp
         self.last_policy_update = timestamp
+
+        total_update_time = time.time() - policy_update_start
+        logger.info(f"[SDP] Policy update completed in {total_update_time:.4f}s")
+        print(f"[SDP] Policy update completed in {total_update_time:.2f}s")
 
     def _get_base_forecast(self,
                           start_time: datetime,

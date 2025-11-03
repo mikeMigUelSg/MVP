@@ -1,0 +1,68 @@
+2025-11-03 17:09:05,531 - root - INFO - Loading configuration from: config.yaml
+2025-11-03 17:09:08,201 - root - INFO - [Main] Setup completed in 2.67s
+2025-11-03 17:09:08,201 - src.system - INFO - [System] Starting simulation: 2025-05-01 00:00:00 to 2025-05-02 00:00:00 with controller SDP
+2025-11-03 17:09:08,202 - src.controllers.sdp_controller - INFO - [SDP] Starting policy update at 2025-05-01 00:00:00
+2025-11-03 17:09:08,204 - src.controllers.sdp_controller - INFO -   [SDP] Forecast generation: 0.0024s
+2025-11-03 17:09:08,205 - src.controllers.sdp_controller - INFO -   [SDP] Grid creation: 0.0002s
+2025-11-03 17:09:08,205 - src.controllers.sdp_controller - INFO -   [SDP] Terminal cost initialization: 0.0001s
+2025-11-03 17:09:34,454 - src.controllers.sdp_controller - INFO -   [SDP] Backward DP completed: 26.2494s
+2025-11-03 17:09:34,455 - src.controllers.sdp_controller - INFO -   [SDP] Step times - Avg: 0.7291s, Min: 0.7114s, Max: 0.8249s
+2025-11-03 17:09:34,455 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 26.2496s
+2025-11-03 17:09:34,455 - src.controllers.sdp_controller - INFO -   [SDP] SDP solve: 26.2499s
+2025-11-03 17:09:34,455 - src.controllers.sdp_controller - INFO - [SDP] Policy update completed in 26.2527s
+2025-11-03 17:09:34,480 - src.controllers.sdp_controller - INFO - [SDP] Starting policy update at 2025-05-01 09:00:00
+2025-11-03 17:09:34,482 - src.controllers.sdp_controller - INFO -   [SDP] Forecast generation: 0.0020s
+2025-11-03 17:09:34,483 - src.controllers.sdp_controller - INFO -   [SDP] Grid creation: 0.0002s
+2025-11-03 17:09:34,483 - src.controllers.sdp_controller - INFO -   [SDP] Terminal cost initialization: 0.0000s
+2025-11-03 17:10:00,391 - src.controllers.sdp_controller - INFO -   [SDP] Backward DP completed: 25.9081s
+2025-11-03 17:10:00,392 - src.controllers.sdp_controller - INFO -   [SDP] Step times - Avg: 0.7197s, Min: 0.7078s, Max: 0.7624s
+2025-11-03 17:10:00,392 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 25.9082s
+2025-11-03 17:10:00,392 - src.controllers.sdp_controller - INFO -   [SDP] SDP solve: 25.9094s
+2025-11-03 17:10:00,392 - src.controllers.sdp_controller - INFO - [SDP] Policy update completed in 25.9118s
+2025-11-03 17:10:00,418 - src.controllers.sdp_controller - INFO - [SDP] Starting policy update at 2025-05-01 18:00:00
+2025-11-03 17:10:00,420 - src.controllers.sdp_controller - INFO -   [SDP] Forecast generation: 0.0023s
+2025-11-03 17:10:00,421 - src.controllers.sdp_controller - INFO -   [SDP] Grid creation: 0.0002s
+2025-11-03 17:10:00,421 - src.controllers.sdp_controller - INFO -   [SDP] Terminal cost initialization: 0.0000s
+2025-11-03 17:10:26,183 - src.controllers.sdp_controller - INFO -   [SDP] Backward DP completed: 25.7625s
+2025-11-03 17:10:26,183 - src.controllers.sdp_controller - INFO -   [SDP] Step times - Avg: 0.7156s, Min: 0.7068s, Max: 0.7333s
+2025-11-03 17:10:26,183 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 25.7625s
+2025-11-03 17:10:26,183 - src.controllers.sdp_controller - INFO -   [SDP] SDP solve: 25.7627s
+2025-11-03 17:10:26,183 - src.controllers.sdp_controller - INFO - [SDP] Policy update completed in 25.7655s
+2025-11-03 17:10:26,202 - src.system - INFO - [System] Simulation complete: 96 steps in 78.00s
+2025-11-03 17:10:26,202 - src.system - INFO - [System] Step time stats - Avg: 812.49ms, Min: 0.41ms, Max: 26253.23ms, P95: 1.20ms
+2025-11-03 17:10:26,203 - root - INFO - [Main] Simulation completed in 78.00s
+2025-11-03 17:10:28,340 - root - INFO - [Main] Total execution time: 82.81s
+2025-11-03 17:16:16,053 - root - INFO - Loading configuration from: config.yaml
+2025-11-03 17:16:18,667 - root - INFO - [Main] Setup completed in 2.61s
+2025-11-03 17:16:18,667 - src.system - INFO - [System] Starting simulation: 2025-05-01 00:00:00 to 2025-05-30 00:00:00 with controller SDP
+2025-11-03 17:16:18,667 - src.controllers.sdp_controller - INFO - [SDP] Starting policy update at 2025-05-01 00:00:00
+2025-11-03 17:16:18,669 - src.controllers.sdp_controller - INFO -   [SDP] Forecast generation: 0.0021s
+2025-11-03 17:16:18,670 - src.controllers.sdp_controller - INFO -   [SDP] Grid creation: 0.0002s
+2025-11-03 17:16:18,670 - src.controllers.sdp_controller - INFO -   [SDP] Terminal cost initialization: 0.0000s
+2025-11-03 17:16:45,031 - src.controllers.sdp_controller - INFO -   [SDP] Backward DP completed: 26.3612s
+2025-11-03 17:16:45,031 - src.controllers.sdp_controller - INFO -   [SDP] Step times - Avg: 0.7323s, Min: 0.7217s, Max: 0.7765s
+2025-11-03 17:16:45,032 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 26.3613s
+2025-11-03 17:16:45,032 - src.controllers.sdp_controller - INFO -   [SDP] SDP solve: 26.3620s
+2025-11-03 17:16:45,032 - src.controllers.sdp_controller - INFO - [SDP] Policy update completed in 26.3644s
+2025-11-03 17:16:45,058 - src.controllers.sdp_controller - INFO - [SDP] Starting policy update at 2025-05-01 09:00:00
+2025-11-03 17:16:45,060 - src.controllers.sdp_controller - INFO -   [SDP] Forecast generation: 0.0021s
+2025-11-03 17:16:45,061 - src.controllers.sdp_controller - INFO -   [SDP] Grid creation: 0.0002s
+2025-11-03 17:16:45,061 - src.controllers.sdp_controller - INFO -   [SDP] Terminal cost initialization: 0.0000s
+2025-11-03 17:17:11,343 - src.controllers.sdp_controller - INFO -   [SDP] Backward DP completed: 26.2825s
+2025-11-03 17:17:11,343 - src.controllers.sdp_controller - INFO -   [SDP] Step times - Avg: 0.7301s, Min: 0.7180s, Max: 0.7956s
+2025-11-03 17:17:11,343 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 26.2825s
+2025-11-03 17:17:11,344 - src.controllers.sdp_controller - INFO -   [SDP] SDP solve: 26.2828s
+2025-11-03 17:17:11,344 - src.controllers.sdp_controller - INFO - [SDP] Policy update completed in 26.2852s
+2025-11-03 17:17:11,370 - src.controllers.sdp_controller - INFO - [SDP] Starting policy update at 2025-05-01 18:00:00
+2025-11-03 17:17:11,372 - src.controllers.sdp_controller - INFO -   [SDP] Forecast generation: 0.0020s
+2025-11-03 17:17:11,372 - src.controllers.sdp_controller - INFO -   [SDP] Grid creation: 0.0002s
+2025-11-03 17:17:11,372 - src.controllers.sdp_controller - INFO -   [SDP] Terminal cost initialization: 0.0000s
+2025-11-03 17:17:37,747 - src.controllers.sdp_controller - INFO -   [SDP] Backward DP completed: 26.3745s
+2025-11-03 17:17:37,747 - src.controllers.sdp_controller - INFO -   [SDP] Step times - Avg: 0.7326s, Min: 0.7189s, Max: 0.7594s
+2025-11-03 17:17:37,747 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 26.3746s
+2025-11-03 17:17:37,747 - src.controllers.sdp_controller - INFO -   [SDP] SDP solve: 26.3748s
+2025-11-03 17:17:37,747 - src.controllers.sdp_controller - INFO - [SDP] Policy update completed in 26.3772s
+2025-11-03 17:17:37,773 - src.controllers.sdp_controller - INFO - [SDP] Starting policy update at 2025-05-02 03:00:00
+2025-11-03 17:17:37,775 - src.controllers.sdp_controller - INFO -   [SDP] Forecast generation: 0.0020s
+2025-11-03 17:17:37,776 - src.controllers.sdp_controller - INFO -   [SDP] Grid creation: 0.0002s
+2025-11-03 17:17:37,776 - src.controllers.sdp_controller - INFO -   [SDP] Terminal cost initialization: 0.0000s

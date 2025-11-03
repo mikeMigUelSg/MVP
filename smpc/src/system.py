@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
 from typing import Optional, Union
+import time
+import logging
 
 from .components.battery import Battery
 from .components.solar import SolarPanel
@@ -13,6 +15,9 @@ from .components.tariff import Tariff
 from .controllers.rule_based import RuleBasedController
 from .controllers.mpc_controller import MPCController
 from .controllers.sdp_controller import SDPController
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 class EnergyManagementSystem:
@@ -86,9 +91,12 @@ class EnergyManagementSystem:
         Returns:
             Dictionary with step results
         """
+        step_start_time = time.time()
+
         dt_hours = dt_minutes / 60.0
 
         # Get solar production and house load
+        component_start = time.time()
         solar_result = self.solar.step(timestamp, dt_hours)
         house_result = self.house.step(timestamp, dt_hours)
 
@@ -97,8 +105,10 @@ class EnergyManagementSystem:
 
         # Get electricity price
         price = self.tariff.get_price(timestamp)
+        component_time = time.time() - component_start
 
         # Compute controller action
+        controller_start = time.time()
         if isinstance(self.controller, MPCController):
             battery_power_cmd = self.controller.compute_action(
                 timestamp, solar_power, load_power,
@@ -118,10 +128,13 @@ class EnergyManagementSystem:
                 timestamp, solar_power, load_power,
                 self.battery, self.tariff, dt_hours
             )
+        controller_time = time.time() - controller_start
 
         # Execute battery action
+        battery_start = time.time()
         battery_result = self.battery.step(battery_power_cmd, dt_hours)
         battery_power = battery_result['power_kw']
+        battery_time = time.time() - battery_start
 
         # Power balance: grid_power = load - solar + battery_power
         # When battery_power > 0 (charging), it's a load
@@ -179,6 +192,9 @@ class EnergyManagementSystem:
             solar_power + grid_import - load_power - grid_export - battery_power
         )
 
+        total_step_time = time.time() - step_start_time
+        logger.debug(f"[System] Step time: {total_step_time:.6f}s (controller: {controller_time:.6f}s, components: {component_time:.6f}s, battery: {battery_time:.6f}s)")
+
         return {
             'timestamp': timestamp,
             'solar_power': solar_power,
@@ -208,24 +224,53 @@ class EnergyManagementSystem:
         Returns:
             DataFrame with simulation results
         """
+        simulation_start_time = time.time()
+
         self.reset()
 
         current_time = start_time
         step_count = 0
+        step_times = []
 
         print(f"Starting simulation: {start_time} to {end_time}")
         print(f"Controller: {self.controller.name}")
         print(f"Time step: {dt_minutes} minutes")
+        logger.info(f"[System] Starting simulation: {start_time} to {end_time} with controller {self.controller.name}")
+
+        last_progress_time = time.time()
 
         while current_time < end_time:
+            step_start = time.time()
             self.step(current_time, dt_minutes)
+            step_time = time.time() - step_start
+            step_times.append(step_time)
+
             current_time += timedelta(minutes=dt_minutes)
             step_count += 1
 
             if step_count % 1000 == 0:
-                print(f"Progress: {step_count} steps, {current_time}")
+                progress_time = time.time() - last_progress_time
+                avg_step_time = progress_time / 1000
+                print(f"Progress: {step_count} steps, {current_time} (avg step time: {avg_step_time*1000:.2f}ms)")
+                logger.info(f"[System] Progress: {step_count} steps (last 1000 steps in {progress_time:.2f}s, avg {avg_step_time*1000:.2f}ms/step)")
+                last_progress_time = time.time()
+
+        total_simulation_time = time.time() - simulation_start_time
+
+        # Calculate statistics
+        avg_step_time = np.mean(step_times)
+        max_step_time = np.max(step_times)
+        min_step_time = np.min(step_times)
+        p95_step_time = np.percentile(step_times, 95)
 
         print(f"\nSimulation complete: {step_count} steps")
+        print(f"Total simulation time: {total_simulation_time:.2f}s")
+        print(f"Average step time: {avg_step_time*1000:.2f}ms")
+        print(f"Min/Max step time: {min_step_time*1000:.2f}ms / {max_step_time*1000:.2f}ms")
+        print(f"95th percentile step time: {p95_step_time*1000:.2f}ms")
+
+        logger.info(f"[System] Simulation complete: {step_count} steps in {total_simulation_time:.2f}s")
+        logger.info(f"[System] Step time stats - Avg: {avg_step_time*1000:.2f}ms, Min: {min_step_time*1000:.2f}ms, Max: {max_step_time*1000:.2f}ms, P95: {p95_step_time*1000:.2f}ms")
 
         # Convert history to DataFrame
         df = pd.DataFrame(self.history)

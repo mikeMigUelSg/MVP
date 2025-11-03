@@ -14,93 +14,93 @@ baseline_no_pv_cost: !!python/object/apply:numpy.core.multiarray.scalar
   - -1
   - 0
 - !!binary |
-  4lJcVfZdFUA=
+  NIlBYOVQ/T8=
 baseline_no_pv_import_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  Ld0kBoFVREA=
+  sEfhehRuKEA=
 baseline_pv_cost: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  xpRIopch7T8=
+  ZWZmZmam2z8=
 baseline_pv_export_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  abx0kxiNQkA=
+  JTEIrBwmKUA=
 baseline_pv_import_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  rRxaZDupNkA=
+  xCCwcmhJHEA=
 battery_cycles: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  om88lEQS9z8=
+  IOhmEkgv2z8=
 battery_degradation_cost: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  5PLJqQN10j8=
+  f4aF22y/tT8=
 controller: SDP
 energy_balance:
-  battery_roundtrip_efficiency_pct: 101.67091695242385
-  solar_to_load_ratio_pct: 135.51010622602539
-  solar_utilization_pct: 57.14309151495706
-  total_battery_charged_kwh: 14.275275029029013
-  total_battery_discharged_kwh: 14.513803019494187
-  total_load_consumed_kwh: 40.668
-  total_solar_produced_kwh: 55.10925
+  battery_roundtrip_efficiency_pct: 134.5967401828057
+  solar_to_load_ratio_pct: 145.04911993450676
+  solar_utilization_pct: 46.01643959885368
+  total_battery_charged_kwh: 3.5893141569281317
+  total_battery_discharged_kwh: 4.83109985014522
+  total_load_consumed_kwh: 12.215
+  total_solar_produced_kwh: 17.717750000000002
 savings_pct_vs_no_pv: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  PA1FxaKRWEA=
+  NpkXUR+YWEA=
 savings_pct_vs_pv: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  TGu+jmd4VkA=
+  ZZsCGHRHV0A=
 savings_vs_no_pv: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  8DNw0aL/FEA=
+  6vNfuxXX/D8=
 savings_vs_pv: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  NZ3ngvsu6j8=
+  PRHg0ie/2T8=
 self_consumption_rate: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  RbSPfClJ4j8=
+  oHrjXVVz3T8=
 self_sufficiency_rate: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  8D8N7X736D8=
+  /rAbTKyc6D8=
 system_cost: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  h7wH++CUtz8=
+  gFJlOOlznj8=
 system_export_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  5b3VKj2eN0A=
+  dsNiuRwhI0A=
 system_import_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  cE5QeW7gIUA=
+  O3pixKOPBkA=
 total_consumption_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  Ld0kBoFVREA=
+  sEfhehRuKEA=
 total_cost: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  h7wH++CUtz8=
+  gFJlOOlznj8=
 total_grid_export_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  5b3VKj2eN0A=
+  dsNiuRwhI0A=
 total_grid_import_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  cE5QeW7gIUA=
+  O3pixKOPBkA=
 total_solar_production_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  QIts5/uNS0A=
+  O7TIdr63MUA=

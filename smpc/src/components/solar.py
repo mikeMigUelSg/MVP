@@ -27,27 +27,31 @@ class SolarPanel:
 
     def load_production_data(self, file_path: str):
         """
-        Load historical production data from CSV (timestamp;pv_1;pv_2;...)
-        Year is ignored for matching.
+        Load historical production data from CSV
+
+        Expected format: timestamp;production_values
+        Note: Year is ignored - only month/day/hour/minute are used for matching
         """
         try:
+            # Read CSV with semicolon separator
             df = pd.read_csv(file_path, sep=';', header=None)
             df.columns = ['timestamp'] + [f'pv_{i}' for i in range(len(df.columns) - 1)]
+
+            # Convert timestamp to datetime
             df['timestamp'] = pd.to_datetime(df['timestamp'], dayfirst=True)
 
+            # Create lookup key: (month, day, hour, minute)
+            # This allows matching regardless of year
             df['month'] = df['timestamp'].dt.month
             df['day'] = df['timestamp'].dt.day
             df['hour'] = df['timestamp'].dt.hour
             df['minute'] = df['timestamp'].dt.minute
+
+            # Handle leap year (Feb 29 -> Feb 28)
             df.loc[(df['month'] == 2) & (df['day'] == 29), 'day'] = 28
 
+            # Use first PV system as default
             self.production_data = df[['month', 'day', 'hour', 'minute', 'pv_1']].copy()
-
-            # === NOVO: índice O(1) (em kW já convertido) ===
-            self._pv_lookup = {
-                (int(r.month), int(r.day), int(r.hour), int(r.minute)): float(r.pv_1) / 1000.0
-                for r in self.production_data.itertuples(index=False)
-            }
 
             print(f"Loaded solar data: {len(self.production_data)} time steps")
             print(f"Original date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
@@ -56,27 +60,71 @@ class SolarPanel:
         except Exception as e:
             print(f"Error loading solar data: {e}")
             self.production_data = None
-            self._pv_lookup = {}
-
 
     def get_production(self, timestamp: datetime) -> float:
         """
-        O(1) lookup via dicionário, limitado pela capacidade instalada.
+        Get solar production at given timestamp
+
+        Args:
+            timestamp: Datetime to query (year is ignored)
+
+        Returns:
+            Production in kW (scaled by capacity)
         """
-        if self.production_data is None or not hasattr(self, "_pv_lookup"):
+        if self.production_data is None:
+            # Simple model: no production at night, peak at noon
             hour = timestamp.hour
             if hour < 7 or hour > 19:
                 return 0.0
-            hour_angle = (hour - 7) / 12 * np.pi
-            return max(0.0, min(self.capacity_kw * np.sin(hour_angle), self.capacity_kw))
+            else:
+                # Simple sine wave model
+                hour_angle = (hour - 7) / 12 * np.pi
+                return self.capacity_kw * np.sin(hour_angle)
 
-        month = timestamp.month
-        day = 28 if (timestamp.month == 2 and timestamp.day == 29) else timestamp.day
-        key = (month, day, timestamp.hour, timestamp.minute)
+        try:
+            # Extract lookup key from timestamp (ignoring year)
+            month = timestamp.month
+            day = timestamp.day if not (timestamp.month == 2 and timestamp.day == 29) else 28
+            hour = timestamp.hour
+            minute = timestamp.minute
 
-        v = self._pv_lookup.get(key, 0.0)
-        return max(0.0, min(v, self.capacity_kw))
+            # Find matching row
+            mask = (
+                (self.production_data['month'] == month) &
+                (self.production_data['day'] == day) &
+                (self.production_data['hour'] == hour) &
+                (self.production_data['minute'] == minute)
+            )
 
+            matches = self.production_data[mask]
+
+            if len(matches) > 0:
+                production = matches.iloc[0]['pv_1']
+            else:
+                # If no exact match, find closest by hour
+                mask_day = (
+                    (self.production_data['month'] == month) &
+                    (self.production_data['day'] == day)
+                )
+                day_data = self.production_data[mask_day].copy()
+                if len(day_data) > 0:
+                    # Find closest hour
+                    time_minutes = hour * 60 + minute
+                    day_data['time_minutes'] = day_data['hour'] * 60 + day_data['minute']
+                    day_data['time_diff'] = abs(day_data['time_minutes'] - time_minutes)
+                    min_idx = day_data['time_diff'].idxmin()
+                    production = day_data.loc[min_idx, 'pv_1']
+                else:
+                    return 0.0
+
+            # Scale by capacity (assuming data is in W, converting to kW)
+            scaled_production = production / 1000.0  # W to kW
+
+            return max(0.0, min(scaled_production, self.capacity_kw))
+
+        except Exception as e:
+            print(f"Error getting production at {timestamp}: {e}")
+            return 0.0
 
     def get_production_forecast(self,
                                 start_time: datetime,

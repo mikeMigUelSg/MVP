@@ -13,6 +13,8 @@ import pandas as pd
 from datetime import datetime, timedelta
 from pathlib import Path
 import sys
+import time
+import logging
 
 # Import components
 from src.components.battery import Battery
@@ -300,6 +302,7 @@ def create_controller(config: dict, battery: Battery,
 
 def run_simulation(config: dict):
     """Run the complete simulation."""
+    overall_start_time = time.time()
 
     print("\n" + "="*70)
     print("ENERGY MANAGEMENT SYSTEM SIMULATION")
@@ -319,6 +322,8 @@ def run_simulation(config: dict):
     print("Creating system components...")
     print("-"*70)
 
+    setup_start = time.time()
+
     battery = create_battery(config)
     print(f"✓ Battery: {battery.capacity_kwh} kWh, {battery.max_power_kw} kW")
 
@@ -332,8 +337,10 @@ def run_simulation(config: dict):
     print(f"✓ Tariff: {tariff.name}")
 
     # Create controller
+    controller_start = time.time()
     controller = create_controller(config, battery, solar, house, tariff)
-    print(f"✓ Controller: {controller.name}")
+    controller_creation_time = time.time() - controller_start
+    print(f"✓ Controller: {controller.name} (created in {controller_creation_time:.2f}s)")
 
     # Create system
     print("\n" + "-"*70)
@@ -348,16 +355,22 @@ def run_simulation(config: dict):
         controller=controller
     )
 
+    setup_time = time.time() - setup_start
+    logging.info(f"[Main] Setup completed in {setup_time:.2f}s")
+
     # Run simulation
     print("\n" + "-"*70)
     print("Running simulation...")
     print("-"*70 + "\n")
 
+    simulation_start = time.time()
     results_df = system.simulate(
         start_time=start_date,
         end_time=end_date,
         dt_minutes=timestep
     )
+    simulation_time = time.time() - simulation_start
+    logging.info(f"[Main] Simulation completed in {simulation_time:.2f}s")
 
     # Get summary
     print("\n" + "-"*70)
@@ -461,8 +474,12 @@ def run_simulation(config: dict):
         plot_daily_analysis(results_df, controller.name, str(daily_file))
         print(f"✓ Daily analysis plot saved to: {daily_file}")
 
+    overall_time = time.time() - overall_start_time
+    logging.info(f"[Main] Total execution time: {overall_time:.2f}s")
+
     print("\n" + "="*70)
     print("SIMULATION COMPLETE")
+    print(f"Total execution time: {overall_time:.2f}s")
     print("="*70 + "\n")
 
     return results_df, summary, savings
@@ -470,12 +487,23 @@ def run_simulation(config: dict):
 
 def main():
     """Main entry point."""
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(),  # Output to console
+            logging.FileHandler('simulation.log')  # Save to file
+        ]
+    )
+
     # Load configuration
     config_file = "config.yaml"
     if len(sys.argv) > 1:
         config_file = sys.argv[1]
 
     print(f"Loading configuration from: {config_file}")
+    logging.info(f"Loading configuration from: {config_file}")
     config = load_config(config_file)
 
     # Run simulation

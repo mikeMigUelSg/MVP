@@ -5,6 +5,8 @@ import numpy as np
 from datetime import datetime, timedelta
 from scipy.optimize import linprog
 from typing import TYPE_CHECKING, Optional
+import time
+import logging
 
 if TYPE_CHECKING:
     from ..components.battery import Battery
@@ -13,6 +15,9 @@ if TYPE_CHECKING:
     from ..components.tariff import Tariff
 
 from ..forecasters import LoadForecaster, SolarForecaster
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 class MPCController:
@@ -84,7 +89,10 @@ class MPCController:
         Returns:
             Battery power in kW (positive = charge, negative = discharge)
         """
+        action_start_time = time.time()
+
         # Get forecasts
+        forecast_start = time.time()
         if self.use_perfect_forecast:
             # PERFECT FORECAST MODE: Use actual future data (for testing only!)
             solar_forecast = np.zeros(self.horizon_steps)
@@ -144,13 +152,22 @@ class MPCController:
             # Fallback: constant price
             price_forecast = np.array([tariff.get_price(timestamp)] * self.horizon_steps)
 
+        forecast_time = time.time() - forecast_start
+        logger.debug(f"  [MPC] Forecast generation: {forecast_time:.6f}s")
+
         # Solve optimization problem
+        optimization_start = time.time()
         solution = self._solve_optimization(
             solar_forecast,
             load_forecast,
             price_forecast,
             battery
         )
+        optimization_time = time.time() - optimization_start
+        logger.debug(f"  [MPC] Optimization solve: {optimization_time:.6f}s")
+
+        total_action_time = time.time() - action_start_time
+        logger.debug(f"  [MPC] compute_action total: {total_action_time:.6f}s")
 
         if solution is not None:
             # Return first action (receding horizon)
@@ -176,6 +193,8 @@ class MPCController:
 
         We'll use a simplified formulation with split charge/discharge variables.
         """
+        setup_start = time.time()
+
         N = self.horizon_steps
         dt = self.dt_hours
 
@@ -379,7 +398,11 @@ class MPCController:
         A_eq = np.array(A_eq) if A_eq else None
         b_eq = np.array(b_eq) if b_eq else None
 
+        setup_time = time.time() - setup_start
+        logger.debug(f"    [MPC] LP problem setup: {setup_time:.6f}s")
+
         # Solve linear program
+        solver_start = time.time()
         try:
             result = linprog(
                 c,
@@ -390,6 +413,8 @@ class MPCController:
                 bounds=bounds,
                 method='highs'
             )
+            solver_time = time.time() - solver_start
+            logger.debug(f"    [MPC] LP solver time: {solver_time:.6f}s")
 
             if result.success:
                 # Extract battery power schedule (charge - discharge)
