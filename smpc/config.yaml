@@ -1,0 +1,114 @@
+# Energy Management System Configuration
+
+# Simulation settings
+simulation:
+  start_date: "2025-03-01 00:00:00"
+  end_date: "2025-03-03 00:00:00"  # 7 days simulation
+  timestep_minutes: 15
+
+# Battery configuration
+battery:
+  capacity_kwh: 10.0  # Battery capacity in kWh
+  max_power_kw: 5.0   # Maximum charge/discharge power in kW
+  max_charge_current_kw: 5.0   # Maximum charging power in kW
+  max_discharge_current_kw: 5.0  # Maximum discharging power in kW
+  efficiency_charge: 0.95  # Charging efficiency
+  efficiency_discharge: 0.95  # Discharging efficiency
+  initial_soc: 0.0  # Initial state of charge (0-1)
+  min_soc: 0.1  # Minimum state of charge (0-1)
+  max_soc: 0.9  # Maximum state of charge (0-1)
+  degradation_cost_per_kwh: 0.01  # Degradation cost in €/kWh throughput
+
+# Grid configuration
+grid:
+  contracted_power_kw: 6.9  # Maximum contracted power from grid in kW
+
+# Solar panel configuration
+solar:
+  capacity_kw: 5.0  # Installed solar capacity in kW
+  data_file: "data/solar/pvdata.csv"  # Path to historical production data
+
+# House configuration
+house:
+  data_file: "data/load/merged_consumos.xlsx"  # Path to consumption data
+
+# Tariff configuration
+tariff:
+  type: "bihoraria"  # Options: "simple" or "bihoraria"
+
+  # Simple tariff (flat rate)
+  simple:
+    price: 0.15  # €/kWh
+
+  # Bi-horária tariff
+  bihoraria:
+    peak_price: 0.18  # €/kWh during peak hours
+    off_peak_price: 0.10  # €/kWh during off-peak hours
+    # Peak hours for weekdays (Monday-Friday)
+    peak_hours_weekday: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    # Peak hours for weekends (Saturday-Sunday)
+    peak_hours_weekend: [9, 10, 11, 12, 13, 20, 21]
+
+# Controller configuration
+controller:
+  type: "sdp"  # Options: "rule_based", "mpc", or "sdp"
+
+  # Rule-based controller settings
+  rule_based:
+    high_price_threshold: 0.15  # €/kWh - threshold to consider high price
+    low_soc_threshold: 0.3  # Minimum SOC to allow discharge
+    high_soc_threshold: 0.8  # Maximum SOC to allow charge
+
+  # MPC controller settings
+  mpc:
+    horizon_steps: 96  # Prediction horizon (96 steps = 24h with 15min timestep)
+    export_price: 0.05  # Fixed export price in €/kWh
+
+  # SDP controller settings
+  sdp:
+    # Horizon and time step
+    horizon_steps: 36  # Planning horizon (36 steps = 9h with 15min timestep)
+
+    # Discretization
+    n_soc_points: 60  # Number of SOC grid points (higher = more accurate, slower) 150 
+    n_residual_points: 21  # Number of residual grid points 50 
+
+    # Residual model (forecast error model)
+    half_life_minutes: 67  # Half-life of residual persistence (minutes)
+    sigma_residual_kw: 1.077  # Noise standard deviation (kW)
+
+    # Policy update
+    policy_update_hours: 9  # Recalculate policy every N hours
+
+    # Terminal cost
+    soc_target: 0.5  # Target SOC at end of horizon (0-1)
+    terminal_cost_weight: 1.0  # Weight for terminal cost penalty
+
+    # Forecaster settings
+    forecaster:
+      type: "profile_persistence"  # Type of forecaster
+      n_weeks: 3  # Number of weeks for profile averaging
+
+    # Calibration settings (auto-calibrate half_life and sigma if enabled)
+    calibration:
+      enabled: false  # Set to true to auto-calibrate parameters
+      calibration_days: 7  # Number of days for calibration
+
+    # Tariff settings
+    buy_price: 0.20  # Electricity buy price (€/kWh) - can be overridden by tariff
+    sell_price: 0.05  # Electricity sell/export price (€/kWh)
+
+    # Grid limit
+    injection_limit_kw: 10.0  # Maximum injection to grid (kW)
+
+# Output configuration
+output:
+  save_plots: true
+  plots_directory: "results/plots"
+  save_results: true
+  results_directory: "results/data"
+
+# Comparison mode (optional)
+comparison:
+  enabled: false  # Set to true to compare multiple controllers
+  controllers: ["rule_based", "mpc"]  # Controllers to compare
