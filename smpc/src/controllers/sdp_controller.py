@@ -1,5 +1,5 @@
 """
-Stochastic Dynamic Programming (SDP) Controller for PV+Battery System
+Stochastic Dynamic Programming (SDP) Controller for PV+Battery System (Numba JIT Optimized)
 
 Implementa controle ótimo de bateria com PV considerando:
 - Limite de injeção na rede
@@ -8,20 +8,331 @@ Implementa controle ótimo de bateria com PV considerando:
 - Programação dinâmica estocástica com quadratura Gaussiana
 
 Baseado no paper de SDP para sistemas PV+Bateria.
+
+Esta versão usa Numba JIT para acelerar o loop principal do SDP.
 """
 
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-from typing import Tuple, Optional, Dict, List
+from typing import Tuple, Optional, Dict, List as PythonList
 from scipy.interpolate import interp1d, RectBivariateSpline
 from dataclasses import dataclass
 import time
 import logging
 
+# --- Importações Numba ---
+from numba import jit, prange
+from numba.typed import List
+import numba.types as types
+
 # Configure logging
 logger = logging.getLogger(__name__)
 
+
+# ############################################################################
+# Funções JIT (Lógica de Computação Principal)
+# Estas funções são definidas fora das classes para compilação nopython
+# ############################################################################
+
+# --- Funções JIT do Modelo da Planta ---
+
+@jit(nopython=True, cache=True)
+def p_eff_jit(u: float, eta_c: float, eta_d: float) -> float:
+    """Potência efetiva (JIT)."""
+    if u < 0:  # Carregando
+        return u * eta_c
+    elif u > 0:  # Descarregando
+        return u / eta_d
+    else:
+        return 0.0
+
+@jit(nopython=True, cache=True)
+def next_soc_jit(x: float, u: float, C_bat: float, dt_hours: float,
+                 eta_c: float, eta_d: float,
+                 soc_min: float, soc_max: float) -> float:
+    """Próximo SOC (JIT)."""
+    p_eff = p_eff_jit(u, eta_c, eta_d)
+    x_next = x - (p_eff * dt_hours) / C_bat
+    # Clip manual para Numba
+    if x_next < soc_min:
+        x_next = soc_min
+    elif x_next > soc_max:
+        x_next = soc_max
+    return x_next
+
+@jit(nopython=True, cache=True)
+def curtailment_jit(u: float, R: float, P_lim: float) -> float:
+    """Curtailment (JIT)."""
+    return max(0.0, u + R - P_lim)
+
+@jit(nopython=True, cache=True)
+def grid_power_jit(u: float, R: float, P_lim: float) -> float:
+    """Potência da rede (JIT)."""
+    phi = curtailment_jit(u, R, P_lim)
+    return -u - R + phi
+
+
+# --- Funções JIT do Controlador SDP ---
+
+@jit(nopython=True, cache=True)
+def stage_cost_jit(u: float, R: float, P_lim: float, c_s: float, c_f: float, dt_hours: float) -> float:
+    """Custo por etapa (JIT)."""
+    P_g = grid_power_jit(u, R, P_lim)
+    P_g_plus = max(0.0, P_g)
+    P_g_minus = max(0.0, -P_g)
+    cost = (P_g_plus * c_s - P_g_minus * c_f) * dt_hours
+    return cost
+
+
+
+
+@jit(nopython=True, cache=True)
+def terminal_cost_jit(x: float, soc_target: float, weight: float, C_bat: float, c_s: float, c_f: float) -> float:
+    # versão do paper: ignora soc_target/weight; usa média (c_s + c_f)/2
+    return - x * C_bat * 0.5 * (c_s + c_f)
+
+
+@jit(nopython=True, cache=True)
+def transition_mean_jit(R_current: float, R_bar_next: float, R_bar_current: float, kappa: float) -> float:
+    """Média da transição do resíduo (JIT)."""
+    return R_bar_next + kappa * (R_current - R_bar_current)
+
+@jit(nopython=True, cache=True)
+def gaussian_quadrature_5pt_jit(rho: float, sigma: float,
+                                R_grid: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """Quadratura Gaussiana 5 pontos (JIT)."""
+    m_values = np.array([-2.0, -1.0, 0.0, 1.0, 2.0])
+    points = rho + m_values * sigma
+    weights_unnorm = np.exp(-0.5 * m_values**2)
+
+    R_min = R_grid[0]
+    R_max = R_grid[-1]
+
+    # Filtro Numba-friendly
+    valid_mask = (points >= R_min) & (points <= R_max)
+    valid_points = points[valid_mask]
+    valid_weights = weights_unnorm[valid_mask]
+
+    if len(valid_weights) > 0:
+        norm_sum = valid_weights.sum()
+        if norm_sum > 1e-9:  # Evitar divisão por zero
+            valid_weights = valid_weights / norm_sum
+        else:
+            # Caso raro: pesos muito pequenos
+            valid_weights = np.zeros_like(valid_weights)
+    else:
+        # --- CORREÇÃO APLICADA AQUI ---
+        # Todos os pontos fora - clipa a média para o ponto mais próximo
+        # np.clip(float, float, float) não é suportado pelo Numba
+        
+        if rho < R_min:
+            clipped_rho = R_min
+        elif rho > R_max:
+            clipped_rho = R_max
+        else:
+            clipped_rho = rho
+        # --- FIM DA CORREÇÃO ---
+            
+        valid_points = np.array([clipped_rho], dtype=np.float64)
+        valid_weights = np.array([1.0], dtype=np.float64)
+
+    return valid_points, valid_weights
+
+@jit(nopython=True, cache=True)
+def _interpolate_value_function_jit(x: float, R: float,
+                                    X_grid: np.ndarray,
+                                    R_grid_k: np.ndarray,
+                                    value_function_k: np.ndarray) -> float:
+    """Interpolação bilinear (JIT)."""
+    
+    # --- CORREÇÃO 1 ---
+    len_X_minus_1 = len(X_grid) - 1
+    i_x = np.searchsorted(X_grid, x)
+    if i_x < 1:
+        i_x = 1
+    elif i_x > len_X_minus_1:
+        i_x = len_X_minus_1
+    # --- FIM DA CORREÇÃO 1 ---
+        
+    i_x_low = i_x - 1
+    i_x_high = i_x
+    x_low = X_grid[i_x_low]
+    x_high = X_grid[i_x_high]
+
+    # --- CORREÇÃO 2 ---
+    len_R_minus_1 = len(R_grid_k) - 1
+    i_R = np.searchsorted(R_grid_k, R)
+    if i_R < 1:
+        i_R = 1
+    elif i_R > len_R_minus_1:
+        i_R = len_R_minus_1
+    # --- FIM DA CORREÇÃO 2 ---
+        
+    i_R_low = i_R - 1
+    i_R_high = i_R
+    R_low = R_grid_k[i_R_low]
+    R_high = R_grid_k[i_R_high]
+
+    # Valores
+    J_ll = value_function_k[i_x_low, i_R_low]
+    J_lh = value_function_k[i_x_low, i_R_high]
+    J_hl = value_function_k[i_x_high, i_R_low]
+    J_hh = value_function_k[i_x_high, i_R_high]
+
+    # Pesos
+    if x_high == x_low:
+        w_x = 0.5
+    else:
+        w_x = (x - x_low) / (x_high - x_low)
+
+    if R_high == R_low:
+        w_R = 0.5
+    else:
+        w_R = (R - R_low) / (R_high - R_low)
+
+    # Interpolação
+    J_interp = (1 - w_x) * (1 - w_R) * J_ll + \
+               (1 - w_x) * w_R * J_lh + \
+               w_x * (1 - w_R) * J_hl + \
+               w_x * w_R * J_hh
+
+    return J_interp
+
+@jit(nopython=True, cache=True)
+def _expected_future_cost_jit(x_next: float, R_k: float, k: int,
+                              R_bar: np.ndarray, kappa: float, sigma: float,
+                              X_grid: np.ndarray,
+                              R_grids_list: List[np.ndarray],
+                              value_function_list: List[np.ndarray]
+                              ) -> float:
+    """Custo futuro esperado (JIT)."""
+    rho = transition_mean_jit(R_k, R_bar[k+1], R_bar[k], kappa)
+
+    R_grid_k_plus_1 = R_grids_list[k+1]
+    points, weights = gaussian_quadrature_5pt_jit(rho, sigma, R_grid_k_plus_1)
+
+    E_J = 0.0
+    value_function_k_plus_1 = value_function_list[k+1]
+
+    for i in range(len(points)):
+        R_next = points[i]
+        w = weights[i]
+        J_val = _interpolate_value_function_jit(
+            x_next, R_next,
+            X_grid,
+            R_grid_k_plus_1,
+            value_function_k_plus_1
+        )
+        E_J += w * J_val
+
+    return E_J
+
+
+@jit(nopython=True, parallel=True)
+def _solve_sdp_jit(N: int, X_grid: np.ndarray,
+                   R_grids_list: List[np.ndarray],
+                   _feasible_actions_cache: List[np.ndarray],
+                   R_bar: np.ndarray,
+                   # Plant params
+                   C_bat: float, dt_hours: float, eta_c: float, eta_d: float,
+                   soc_min: float, soc_max: float, P_nom: float, P_lim: float,
+                   # Residual params
+                   kappa: float, sigma: float,
+                   # Cost params
+                   c_s: float, c_f: float,
+                   soc_target: float, terminal_cost_weight: float
+                   ) -> Tuple[List[np.ndarray], List[np.ndarray]]:
+    """Loop principal do SDP otimizado com Numba JIT e parallel=True."""
+    
+    n_x = len(X_grid)
+
+    # Listas tipadas Numba para armazenar resultados
+    value_function_list = List.empty_list(types.float64[:, :])
+    policy_list = List.empty_list(types.float64[:, :])
+    
+    # Pré-alocar espaço (necessário para Numba)
+    for _ in range(N):
+        policy_list.append(np.empty((0, 0), dtype=np.float64))
+    for _ in range(N + 1):
+        value_function_list.append(np.empty((0, 0), dtype=np.float64))
+
+    # --- Condição Terminal (k=N) ---
+    n_R_N = len(R_grids_list[N])
+    J_N = np.zeros((n_x, n_R_N), dtype=np.float64)
+    # Paraleliza o loop sobre SOC
+    for i in prange(n_x):
+        terminal_val = terminal_cost_jit(
+            X_grid[i], soc_target, terminal_cost_weight, C_bat, c_s,c_f
+        )
+        J_N[i, :] = terminal_val
+    value_function_list[N] = J_N
+
+    # --- Backward DP ---
+    for k in range(N - 1, -1, -1):
+        n_R_k = len(R_grids_list[k])
+        J_k = np.zeros((n_x, n_R_k), dtype=np.float64)
+        mu_k = np.zeros((n_x, n_R_k), dtype=np.float64)
+
+        # Paraleliza o loop externo (sobre SOC)
+        for i in prange(n_x):
+            x_i = X_grid[i]
+            
+            # Obter ações do cache
+            U_i = _feasible_actions_cache[i]
+
+            if len(U_i) == 0:
+                # Se não houver ações, custo é infinito
+                J_k[i, :] = np.inf
+                mu_k[i, :] = 0.0 # Ação padrão
+                continue
+
+            for j in range(n_R_k):
+                R_kj = R_grids_list[k][j]
+
+                min_cost = np.inf
+                best_u = 0.0
+
+                # Loop sobre ações (não pode ser paralelizado, é uma minimização)
+                for u_idx in range(len(U_i)):
+                    u = U_i[u_idx]
+
+                    # Custo imediato
+                    g = stage_cost_jit(
+                        u, R_kj, P_lim, c_s, c_f, dt_hours
+                    )
+
+                    # Próximo estado
+                    x_next = next_soc_jit(
+                        x_i, u, C_bat, dt_hours, eta_c, eta_d, soc_min, soc_max
+                    )
+
+                    # Custo futuro esperado
+                    E_J = _expected_future_cost_jit(
+                        x_next, R_kj, k, R_bar, kappa, sigma,
+                        X_grid,
+                        R_grids_list,
+                        value_function_list
+                    )
+                    
+                    total_cost = g + E_J
+
+                    if total_cost < min_cost:
+                        min_cost = total_cost
+                        best_u = u
+
+                J_k[i, j] = min_cost
+                mu_k[i, j] = best_u
+
+        value_function_list[k] = J_k
+        policy_list[k] = mu_k
+        
+    return policy_list, value_function_list
+
+
+# ############################################################################
+# Classes Originais (Quase Inalteradas)
+# ############################################################################
 
 @dataclass
 class SDPParams:
@@ -118,7 +429,8 @@ class ResidualModel:
         Returns:
             Média da distribuição de transição
         """
-        return R_bar_next + self.kappa * (R_current - R_bar_current)
+        # Chama a versão JIT
+        return transition_mean_jit(R_current, R_bar_next, R_bar_current, self.kappa)
 
 
 class PlantModel:
@@ -163,76 +475,31 @@ class PlantModel:
     def p_eff(self, u: float) -> float:
         """
         Potência efetiva considerando perdas da bateria.
-
-        Args:
-            u: Ação (kW AC), <0 carrega, >0 descarrega
-
-        Returns:
-            Potência efetiva (kW)
+        (Wrapper para JIT)
         """
-        if u < 0:  # Carregando
-            return u * self.eta_c
-        elif u > 0:  # Descarregando
-            return u / self.eta_d
-        else:
-            return 0.0
+        return p_eff_jit(u, self.eta_c, self.eta_d)
 
     def next_soc(self, x: float, u: float) -> float:
         """
         Próximo SOC após aplicar ação u.
-
-        x_{k+1} = x_k - (p_eff(u) * Δt) / C_bat
-
-        Args:
-            x: SOC atual (0-1)
-            u: Ação (kW AC)
-
-        Returns:
-            Próximo SOC (0-1)
+        (Wrapper para JIT)
         """
-        p_eff = self.p_eff(u)
-        x_next = x - (p_eff * self.dt_hours) / self.C_bat
-        return np.clip(x_next, self.soc_min, self.soc_max)
+        return next_soc_jit(x, u, self.C_bat, self.dt_hours, self.eta_c,
+                            self.eta_d, self.soc_min, self.soc_max)
 
     def curtailment(self, u: float, R: float) -> float:
         """
         Curtailment devido ao limite de injeção.
-
-        φ(u,R) = max(0, u + R - P_lim)
-
-        Args:
-            u: Ação da bateria (kW AC)
-            R: Resíduo P_pv - P_load (kW)
-
-        Returns:
-            Curtailment (kW)
+        (Wrapper para JIT)
         """
-        return max(0.0, u + R - self.P_lim)
+        return curtailment_jit(u, R, self.P_lim)
 
     def grid_power(self, u: float, R: float) -> float:
         """
         Potência da rede.
-
-        P_g = -u - R + φ(u,R)
-
-        onde:
-        - u > 0: descarrega bateria (fornece à rede/carga)
-        - u < 0: carrega bateria (consome da rede/solar)
-        - R > 0: excesso solar
-        - R < 0: déficit (carga > solar)
-
-        P_g > 0: importação da rede
-        P_g < 0: exportação para rede
-
-        Args:
-            u: Ação da bateria (kW AC)
-            R: Resíduo P_pv - P_load (kW)
-
-        Returns:
-            Potência da rede (kW)
+        (Wrapper para JIT)
         """
-        phi = self.curtailment(u, R)
-        return -u - R + phi
+        return grid_power_jit(u, R, self.P_lim)
 
     def feasible_actions(self,
                         x: float,
@@ -250,6 +517,8 @@ class PlantModel:
         Returns:
             Array de ações viáveis (kW AC)
         """
+        # Esta função é chamada poucas vezes (em create_grids),
+        # não precisa ser JIT, mas seu resultado será usado pelo JIT.
         actions = []
 
         # Para cada possível SOC futuro na grelha
@@ -272,7 +541,7 @@ class PlantModel:
             if abs(u) <= self.P_nom:
                 actions.append(u)
 
-        return np.array(actions)
+        return np.array(actions, dtype=np.float64)
 
 
 class SDPController:
@@ -307,62 +576,46 @@ class SDPController:
 
         # Grelhas de discretização
         self.X_grid = None  # Grelha de SOC
-        self.R_grids = None  # Grelhas de resíduo (uma por passo k)
+        self.R_grids: PythonList[np.ndarray] = None  # Grelhas de resíduo
+        
+        # --- Listas tipadas Numba para JIT ---
+        self.R_grids_list: List[np.ndarray] = None
+        self._feasible_actions_cache: List[np.ndarray] = None
 
-        # Política ótima
-        self.policy = None  # policy[k][i, j] = u*(x_i, R_{k,j})
-        self.value_function = None  # J[k][i, j]
+        # Política ótima (listas Python padrão)
+        self.policy: PythonList[np.ndarray] = None
+        self.value_function: PythonList[np.ndarray] = None
 
         # Cache para evitar recálculo
         self.last_policy_update = None
         self.R_bar_forecast = None  # Previsão base R̄
 
         # Nome do controlador
-        self.name = "SDP"
+        self.name = "SDP (Numba JIT)"
 
     def stage_cost(self, u: float, R: float) -> float:
         """
         Custo por etapa.
-
-        g(u, R) = (P_g^+ * c_s - P_g^- * c_f) * Δt
-
-        Args:
-            u: Ação da bateria (kW)
-            R: Resíduo (kW)
-
-        Returns:
-            Custo (€)
+        (Wrapper para JIT)
         """
-        P_g = self.plant.grid_power(u, R)
-
-        # P_g > 0: compra da rede
-        P_g_plus = max(0.0, P_g)
-
-        # P_g < 0: venda para rede
-        P_g_minus = max(0.0, -P_g)
-
-        cost = (P_g_plus * self.c_s - P_g_minus * self.c_f) * self.plant.dt_hours
-        return cost
+        return stage_cost_jit(u, R, self.plant.P_lim, self.c_s,
+                              self.c_f, self.plant.dt_hours)
 
     def terminal_cost(self, x: float) -> float:
         """
         Custo terminal.
-
-        Penaliza desvio do SOC alvo.
-
-        Args:
-            x: SOC final
-
-        Returns:
-            Custo terminal (€)
+        (Wrapper para JIT)
         """
-        x_target = self.params.soc_target
-        weight = self.params.terminal_cost_weight
-        return weight * abs(x - x_target) * self.plant.C_bat * self.c_s
+        return terminal_cost_jit(x, self.params.soc_target,
+                                 self.params.terminal_cost_weight,
+                                 self.plant.C_bat, self.c_s)
 
     def create_grids(self, R_bar: np.ndarray):
         """
         Criar grelhas de discretização.
+
+        *** MODIFICADO ***
+        Cria listas tipadas Numba para JIT.
 
         Args:
             R_bar: Previsão base R̄ para cada passo k (tamanho N+1)
@@ -372,20 +625,31 @@ class SDPController:
         n_R = self.params.n_R
 
         # Grelha de SOC (uniforme em [soc_min, soc_max])
-        self.X_grid = np.linspace(self.plant.soc_min, self.plant.soc_max, n_x)
+        self.X_grid = np.linspace(self.plant.soc_min, self.plant.soc_max, n_x, dtype=np.float64)
+
+        # Pre-compute feasible actions
+        # *** Usa Numba typed List ***
+        self._feasible_actions_cache = List.empty_list(types.float64[:])
+        for x_i in self.X_grid:
+            actions = self.plant.feasible_actions(x_i, self.X_grid)
+            self._feasible_actions_cache.append(actions)
 
         # Grelhas de resíduo (uma por passo k, incluindo k=N)
-        # Cada grelha centrada em R̄_k com cobertura de ±3σ
-        # Precisamos de N+1 grelhas (k=0 a k=N) para calcular transições
         self.R_grids = []
+        # *** Usa Numba typed List ***
+        self.R_grids_list = List.empty_list(types.float64[:])
+        
         sigma = self.residual_model.sigma
 
         for k in range(N + 1):
             R_center = R_bar[k]
             R_min = R_center - 3 * sigma
             R_max = R_center + 3 * sigma
-            R_grid_k = np.linspace(R_min, R_max, n_R)
+            R_grid_k = np.linspace(R_min, R_max, n_R, dtype=np.float64)
+            
+            # Armazena em ambos os formatos
             self.R_grids.append(R_grid_k)
+            self.R_grids_list.append(R_grid_k)
 
     def gaussian_quadrature_5pt(self,
                                  rho: float,
@@ -393,134 +657,58 @@ class SDPController:
                                  R_grid: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
         Quadratura Gaussiana de 5 pontos.
-
-        Avalia em pontos ρ + m*σ com m ∈ {-2, -1, 0, 1, 2}
-        com pesos proporcionais a exp(-m²/2).
-
-        Args:
-            rho: Média da distribuição
-            sigma: Desvio padrão
-            R_grid: Grelha de resíduo para verificar limites
-
-        Returns:
-            (pontos, pesos) para integração
+        (Wrapper para JIT)
         """
-        m_values = np.array([-2, -1, 0, 1, 2])
-        points = rho + m_values * sigma
-
-        # Pesos sem normalizar
-        weights_unnorm = np.exp(-0.5 * m_values**2)
-
-        # Filtrar pontos fora do intervalo
-        R_min, R_max = R_grid.min(), R_grid.max()
-        valid_mask = (points >= R_min) & (points <= R_max)
-
-        valid_points = points[valid_mask]
-        valid_weights = weights_unnorm[valid_mask]
-
-        # Normalizar pesos
-        if len(valid_weights) > 0:
-            valid_weights = valid_weights / valid_weights.sum()
-        else:
-            # Todos os pontos fora do intervalo - usar apenas o centro
-            valid_points = np.array([np.clip(rho, R_min, R_max)])
-            valid_weights = np.array([1.0])
-
-        return valid_points, valid_weights
+        # Nota: Esta função não é mais chamada pelo solve_sdp,
+        # mas mantida para compatibilidade. O JIT usa a versão _jit.
+        return gaussian_quadrature_5pt_jit(rho, sigma, R_grid)
 
     def solve_sdp(self, R_bar: np.ndarray, verbose: bool = False):
         """
         Resolver SDP usando backward DP com quadratura.
+
+        *** MODIFICADO ***
+        Este método agora é um "wrapper" que chama a função _solve_sdp_jit.
 
         Args:
             R_bar: Previsão base R̄ para cada passo k (tamanho N+1)
             verbose: Imprimir progresso
         """
         solve_start_time = time.time()
+        
+        if verbose:
+            print(f"  [SDP] Chamando _solve_sdp_jit (pode compilar na 1ª execução)...")
 
-        N = self.params.N
-        n_x = len(self.X_grid)
+        # Chama a função JIT principal com todos os parâmetros
+        jit_start = time.time()
+        policy_list_jit, value_function_list_jit = _solve_sdp_jit(
+            self.params.N,
+            self.X_grid,
+            self.R_grids_list, # Passa a lista tipada
+            self._feasible_actions_cache, # Passa a lista tipada
+            R_bar,
+            # Plant params
+            self.plant.C_bat, self.plant.dt_hours, self.plant.eta_c, self.plant.eta_d,
+            self.plant.soc_min, self.plant.soc_max, self.plant.P_nom, self.plant.P_lim,
+            # Residual params
+            self.residual_model.kappa, self.residual_model.sigma,
+            # Cost params
+            self.c_s, self.c_f,
+            self.params.soc_target, self.params.terminal_cost_weight
+        )
+        jit_time = time.time() - jit_start
+        logger.info(f"  [SDP] JIT solve time: {jit_time:.4f}s")
+        
+        if verbose:
+             print(f"  [SDP] JIT solve concluído em {jit_time:.4f}s")
 
-        # Inicializar value function e política
-        self.value_function = [None] * (N + 1)
-        self.policy = [None] * N
+        # Converte Numba Lists de volta para listas Python padrão
+        # para compatibilidade com o resto do código (ex: get_action)
+        self.policy = [policy_list_jit[i] for i in range(len(policy_list_jit))]
+        self.value_function = [value_function_list_jit[i] for i in range(len(value_function_list_jit))]
 
-        # Condição terminal (k=N)
-        terminal_start = time.time()
-        n_R_N = len(self.R_grids[N])
-        self.value_function[N] = np.zeros((n_x, n_R_N))
-        for i in range(n_x):
-            terminal_val = self.terminal_cost(self.X_grid[i])
-            self.value_function[N][i, :] = terminal_val
-        terminal_time = time.time() - terminal_start
-        logger.info(f"  [SDP] Terminal cost initialization: {terminal_time:.4f}s")
-
-        # Backward DP
-        backward_start = time.time()
-        step_times = []
-
-        for k in range(N - 1, -1, -1):
-            step_start = time.time()
-
-            if verbose and k % 10 == 0:
-                print(f"  Solving step {k}/{N}...")
-
-            n_R_k = len(self.R_grids[k])
-            J_k = np.zeros((n_x, n_R_k))
-            mu_k = np.zeros((n_x, n_R_k))
-
-            for i in range(n_x):
-                x_i = self.X_grid[i]
-
-                # Ações viáveis
-                U_i = self.plant.feasible_actions(x_i, self.X_grid)
-
-                for j in range(n_R_k):
-                    R_kj = self.R_grids[k][j]
-
-                    # Minimização sobre ações
-                    min_cost = np.inf
-                    best_u = 0.0
-
-                    for u in U_i:
-                        # Custo imediato
-                        g = self.stage_cost(u, R_kj)
-
-                        # Próximo estado
-                        x_next = self.plant.next_soc(x_i, u)
-
-                        # Esperança do custo futuro
-                        E_J = self._expected_future_cost(
-                            x_next, R_kj, k, R_bar
-                        )
-
-                        total_cost = g + E_J
-
-                        if total_cost < min_cost:
-                            min_cost = total_cost
-                            best_u = u
-
-                    J_k[i, j] = min_cost
-                    mu_k[i, j] = best_u
-
-            self.value_function[k] = J_k
-            self.policy[k] = mu_k
-
-            step_time = time.time() - step_start
-            step_times.append(step_time)
-
-        backward_time = time.time() - backward_start
         total_solve_time = time.time() - solve_start_time
-
-        # Statistics
-        avg_step_time = np.mean(step_times)
-        max_step_time = np.max(step_times)
-        min_step_time = np.min(step_times)
-
-        logger.info(f"  [SDP] Backward DP completed: {backward_time:.4f}s")
-        logger.info(f"  [SDP] Step times - Avg: {avg_step_time:.4f}s, Min: {min_step_time:.4f}s, Max: {max_step_time:.4f}s")
         logger.info(f"  [SDP] Total solve_sdp time: {total_solve_time:.4f}s")
-
         if verbose:
             print(f"  SDP solved in {total_solve_time:.2f}s!")
 
@@ -532,16 +720,9 @@ class SDPController:
         """
         Calcular esperança do custo futuro usando quadratura.
 
-        E[J_{k+1}(x', R_{k+1})] usando quadratura de 5 pontos.
-
-        Args:
-            x_next: Próximo SOC
-            R_k: Resíduo atual
-            k: Passo atual
-            R_bar: Previsão base
-
-        Returns:
-            Esperança do custo futuro
+        (Esta função não é mais chamada por solve_sdp, pois
+         a lógica está em _expected_future_cost_jit.
+         Mantida para compatibilidade.)
         """
         # Distribuição de transição
         rho = self.residual_model.transition_mean(
@@ -570,14 +751,7 @@ class SDPController:
         Interpolar value function J_k(x, R).
 
         Usa interpolação bilinear.
-
-        Args:
-            x: SOC
-            R: Resíduo
-            k: Passo
-
-        Returns:
-            J_k(x, R) interpolado
+        (Função original mantida, chamada por get_action, etc.)
         """
         # Encontrar índices vizinhos em X_grid
         i_x = np.searchsorted(self.X_grid, x)
@@ -628,16 +802,8 @@ class SDPController:
                    k: int) -> float:
         """
         Obter ação ótima por interpolação.
-
-        Usa interpolação bilinear na política.
-
-        Args:
-            x: SOC atual
-            R: Resíduo atual
-            k: Passo atual
-
-        Returns:
-            Ação ótima u*
+        (Função original mantida, pois é rápida o suficiente
+         para ser chamada uma vez por passo de tempo.)
         """
         if self.policy is None or k >= len(self.policy):
             return 0.0
@@ -700,20 +866,7 @@ class SDPController:
                       load_forecaster=None) -> float:
         """
         Computar ação para o passo atual.
-
-        Args:
-            timestamp: Timestamp atual
-            solar_power: Produção solar atual (kW)
-            load_power: Consumo atual (kW)
-            battery: Objeto Battery
-            tariff: Objeto Tariff
-            solar_panel: Objeto SolarPanel
-            house: Objeto House
-            pv_forecaster: Forecaster de PV (ProfilePersistenceForecaster)
-            load_forecaster: Forecaster de carga (ProfilePersistenceForecaster)
-
-        Returns:
-            Ação ótima (kW), positivo=carga, negativo=descarga
+        (Função original mantida.)
         """
         action_start = time.time()
 
@@ -760,15 +913,11 @@ class SDPController:
                       load_forecaster):
         """
         Atualizar política resolvendo SDP.
-
-        Args:
-            timestamp: Timestamp atual
-            pv_forecaster: Forecaster de PV
-            load_forecaster: Forecaster de carga
+        (Função original mantida.)
         """
         policy_update_start = time.time()
-        print(f"\n[SDP] Updating policy at {timestamp}...")
-        logger.info(f"[SDP] Starting policy update at {timestamp}")
+        print(f"\n[{self.name}] Updating policy at {timestamp}...")
+        logger.info(f"[{self.name}] Starting policy update at {timestamp}")
 
         # Obter previsões base R̄
         forecast_start = time.time()
@@ -776,29 +925,29 @@ class SDPController:
             timestamp, pv_forecaster, load_forecaster
         )
         forecast_time = time.time() - forecast_start
-        logger.info(f"  [SDP] Forecast generation: {forecast_time:.4f}s")
+        logger.info(f"  [{self.name}] Forecast generation: {forecast_time:.4f}s")
 
         # Salvar previsão base
         self.R_bar_forecast = R_bar
 
-        # Criar grelhas
+        # Criar grelhas (agora cria Numba Lists)
         grid_start = time.time()
         self.create_grids(R_bar)
         grid_time = time.time() - grid_start
-        logger.info(f"  [SDP] Grid creation: {grid_time:.4f}s")
+        logger.info(f"  [{self.name}] Grid creation: {grid_time:.4f}s")
 
-        # Resolver SDP
+        # Resolver SDP (agora chama o wrapper JIT)
         solve_start = time.time()
         self.solve_sdp(R_bar, verbose=True)
         solve_time = time.time() - solve_start
-        logger.info(f"  [SDP] SDP solve: {solve_time:.4f}s")
+        logger.info(f"  [{self.name}] SDP solve: {solve_time:.4f}s")
 
         # Atualizar timestamp
         self.last_policy_update = timestamp
 
         total_update_time = time.time() - policy_update_start
-        logger.info(f"[SDP] Policy update completed in {total_update_time:.4f}s")
-        print(f"[SDP] Policy update completed in {total_update_time:.2f}s")
+        logger.info(f"[{self.name}] Policy update completed in {total_update_time:.4f}s")
+        print(f"[{self.name}] Policy update completed in {total_update_time:.2f}s")
 
     def _get_base_forecast(self,
                           start_time: datetime,
@@ -806,15 +955,7 @@ class SDPController:
                           load_forecaster) -> np.ndarray:
         """
         Obter previsão base R̄ = P̄_pv - P̄_load.
-
-        Args:
-            start_time: Timestamp inicial
-            pv_forecaster: Forecaster de PV
-            load_forecaster: Forecaster de carga
-
-        Returns:
-            Array R̄ para horizonte N+1 (índices 0 a N)
-            Precisa de N+1 elementos para calcular transições em k=N-1
+        (Função original mantida.)
         """
         N = self.params.N
 

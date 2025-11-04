@@ -12,13 +12,16 @@ class SolarPanel:
 
     def __init__(self,
                  capacity_kw: float,
-                 data_file: Optional[str] = None):
+                 data_file: Optional[str] = None,
+                 scale_factor: float = 1.0):
         """
         Args:
             capacity_kw: Installed solar capacity in kW
             data_file: Path to CSV file with historical production data
+            scale_factor: Scaling factor for solar production (1.0 = 100%, 0.5 = 50%, etc.)
         """
         self.capacity_kw = capacity_kw
+        self.scale_factor = scale_factor
         self.production_data = None
         self.total_production_kwh = 0.0
 
@@ -53,6 +56,10 @@ class SolarPanel:
             # Use first PV system as default
             self.production_data = df[['month', 'day', 'hour', 'minute', 'pv_1']].copy()
 
+            # Optimize lookups: Create multi-index for O(1) access
+            self.production_data.set_index(['month', 'day', 'hour', 'minute'], inplace=True)
+            self.production_data.sort_index(inplace=True)
+
             print(f"Loaded solar data: {len(self.production_data)} time steps")
             print(f"Original date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
             print(f"Data will be matched by month/day/hour, ignoring year")
@@ -79,7 +86,7 @@ class SolarPanel:
             else:
                 # Simple sine wave model
                 hour_angle = (hour - 7) / 12 * np.pi
-                return self.capacity_kw * np.sin(hour_angle)
+                return self.capacity_kw * self.scale_factor * np.sin(hour_angle)
 
         try:
             # Extract lookup key from timestamp (ignoring year)
@@ -88,39 +95,32 @@ class SolarPanel:
             hour = timestamp.hour
             minute = timestamp.minute
 
-            # Find matching row
-            mask = (
-                (self.production_data['month'] == month) &
-                (self.production_data['day'] == day) &
-                (self.production_data['hour'] == hour) &
-                (self.production_data['minute'] == minute)
-            )
-
-            matches = self.production_data[mask]
-
-            if len(matches) > 0:
-                production = matches.iloc[0]['pv_1']
-            else:
-                # If no exact match, find closest by hour
-                mask_day = (
-                    (self.production_data['month'] == month) &
-                    (self.production_data['day'] == day)
-                )
-                day_data = self.production_data[mask_day].copy()
-                if len(day_data) > 0:
-                    # Find closest hour
+            # O(1) lookup using multi-index
+            try:
+                production = self.production_data.loc[(month, day, hour, minute), 'pv_1']
+                # If multiple matches (shouldn't happen), take first
+                if hasattr(production, 'iloc'):
+                    production = production.iloc[0]
+            except KeyError:
+                # If no exact match, try to find closest time on same day
+                try:
+                    day_data = self.production_data.loc[(month, day)]
+                    # Calculate time difference for all entries on this day
                     time_minutes = hour * 60 + minute
-                    day_data['time_minutes'] = day_data['hour'] * 60 + day_data['minute']
-                    day_data['time_diff'] = abs(day_data['time_minutes'] - time_minutes)
-                    min_idx = day_data['time_diff'].idxmin()
-                    production = day_data.loc[min_idx, 'pv_1']
-                else:
+                    day_index = day_data.index
+                    time_diffs = [abs((h * 60 + m) - time_minutes) for h, m in day_index]
+                    min_idx = np.argmin(time_diffs)
+                    production = day_data.iloc[min_idx]['pv_1']
+                except (KeyError, IndexError):
                     return 0.0
 
             # Scale by capacity (assuming data is in W, converting to kW)
             scaled_production = production / 1000.0  # W to kW
 
-            return max(0.0, min(scaled_production, self.capacity_kw))
+            # Apply scale factor
+            scaled_production *= self.scale_factor
+
+            return max(0.0, min(scaled_production, self.capacity_kw * self.scale_factor))
 
         except Exception as e:
             print(f"Error getting production at {timestamp}: {e}")

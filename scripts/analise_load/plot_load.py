@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 # ========== VARIÁVEIS HARD CODED ==========
 DATA_PATH = 'data/merged_consumos.xlsx'
 CONSUMO_COLUMN = 'Consumo registado (kW)'
-DATE_BEGIN = '2025-01-01'
-DATE_END = '2025-01-31'
+DATE_BEGIN = '2025-04-01'
+DATE_END = '2025-04-07'
 # ==========================================
 
 def plot_consumos():

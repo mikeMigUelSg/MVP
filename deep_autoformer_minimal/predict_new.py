@@ -12,6 +12,27 @@ def load_config(path):
     with open(path, "r") as f:
         return yaml.safe_load(f)
 
+def generate_dayofweek_features(timestamps):
+    """
+    Gera features de dia da semana (sin/cos) para uma lista de timestamps
+
+    Args:
+        timestamps: array de timestamps (pandas Timestamp ou similar)
+
+    Returns:
+        array [N, 2] com [dayofweek_sin, dayofweek_cos]
+    """
+    if isinstance(timestamps, pd.Series):
+        dayofweek = timestamps.dt.dayofweek
+    else:
+        # Se for um array de timestamps individuais
+        dayofweek = pd.DatetimeIndex(timestamps).dayofweek
+
+    dayofweek_sin = np.sin(2 * np.pi * dayofweek / 7)
+    dayofweek_cos = np.cos(2 * np.pi * dayofweek / 7)
+
+    return np.column_stack([dayofweek_sin, dayofweek_cos])
+
 def predict_day_ahead(cfg_path, model_path, new_csv_path, plot=True, n_days=10):
     """
     Faz previsões day-ahead: usa dados de um dia para prever o dia seguinte completo
@@ -80,18 +101,32 @@ def predict_day_ahead(cfg_path, model_path, new_csv_path, plot=True, n_days=10):
     model.eval()
 
     print(f"\nModelo carregado de: {model_path}")
+    print(f"Features: {feature_cols if feature_cols else 'Nenhuma (apenas target)'}")
     print(f"Fazendo previsões day-ahead para {n_days} dias...")
     print(f"Usando últimos {seq_len} time steps como contexto")
     print(f"Prevendo {pred_len} time steps à frente por iteração")
 
     # Preparar dados
     target_col = cfg["data"]["target_col"]
+    feature_cols = cfg["data"].get("feature_cols", [])
+
     values = df[target_col].values
 
-    # Normalizar usando o scaler do dataset original
+    # Normalizar target usando o scaler do dataset original
     from sklearn.preprocessing import StandardScaler
-    scaler = ds_original.scaler_y
-    values_scaled = scaler.transform(values.reshape(-1, 1)).flatten()
+    scaler_y = ds_original.scaler_y
+    values_scaled = scaler_y.transform(values.reshape(-1, 1)).flatten()
+
+    # Preparar features se existirem
+    if feature_cols:
+        features = df[feature_cols].values  # [N, num_features]
+        scaler_x = ds_original.scaler_x
+        if scaler_x is not None:
+            features_scaled = scaler_x.transform(features)
+        else:
+            features_scaled = features
+    else:
+        features_scaled = None
 
     all_results = []
 
@@ -111,8 +146,16 @@ def predict_day_ahead(cfg_path, model_path, new_csv_path, plot=True, n_days=10):
                 break
 
             # Obter contexto (dia anterior ou últimos seq_len steps)
-            context = values_scaled[context_start:context_end]
+            context_target = values_scaled[context_start:context_end]
             target_real = values[target_start:target_end]
+
+            # Obter features para o contexto
+            if features_scaled is not None:
+                context_features = features_scaled[context_start:context_end]
+                # Concatenar target + features: [seq_len, 1 + num_features]
+                context = np.column_stack([context_target, context_features])
+            else:
+                context = context_target.reshape(-1, 1)
 
             # Fazer previsão iterativa para cobrir todo o dia seguinte
             predictions = []
@@ -122,13 +165,35 @@ def predict_day_ahead(cfg_path, model_path, new_csv_path, plot=True, n_days=10):
             n_iterations = (steps_per_day + pred_len - 1) // pred_len
 
             for iter_idx in range(n_iterations):
-                # Preparar encoder input (contexto)
-                enc_input = torch.FloatTensor(current_context[-seq_len:]).reshape(seq_len, 1).to(device)
+                # Preparar encoder input (contexto: target + features)
+                enc_input = torch.FloatTensor(current_context[-seq_len:]).to(device)  # [seq_len, features]
 
-                # Preparar decoder input (últimos label_len + zeros para pred_len)
+                # Preparar decoder input
                 label_len = int(cfg["data"]["label_len"])
-                dec_input = torch.zeros(label_len + pred_len, 1).to(device)
+                num_features = enc_input.shape[1]
+                dec_input = torch.zeros(label_len + pred_len, num_features).to(device)
+
+                # Preencher label_len com o final do contexto
                 dec_input[:label_len, :] = enc_input[-label_len:, :]
+
+                # Para pred_len, precisamos gerar features futuras conhecidas (dia da semana)
+                if features_scaled is not None and len(feature_cols) > 0:
+                    # Calcular timestamps futuros
+                    last_context_timestamp = df['date'].iloc[context_end - 1]
+                    freq = pd.infer_freq(df['date']) or '15T'  # 15 minutos por padrão
+                    future_timestamps = pd.date_range(
+                        start=last_context_timestamp + pd.Timedelta(freq),
+                        periods=pred_len,
+                        freq=freq
+                    )
+
+                    # Gerar features para timestamps futuros
+                    future_features = generate_dayofweek_features(future_timestamps)
+                    if scaler_x is not None:
+                        future_features = scaler_x.transform(future_features)
+
+                    # Preencher decoder com features futuras (target fica zero)
+                    dec_input[label_len:, 1:] = torch.FloatTensor(future_features).to(device)
 
                 # Adicionar batch dimension
                 enc_batch = enc_input.unsqueeze(0)
@@ -141,15 +206,34 @@ def predict_day_ahead(cfg_path, model_path, new_csv_path, plot=True, n_days=10):
                 # Adicionar às previsões
                 predictions.extend(pred_np)
 
-                # Atualizar contexto com as previsões para próxima iteração
-                current_context = np.concatenate([current_context, pred_np])
+                # Atualizar contexto com as previsões + features
+                if features_scaled is not None:
+                    # Adicionar features dos próximos pred_len steps
+                    next_features = features_scaled[context_end:context_end + pred_len]
+                    # Se não houver features suficientes, gerar
+                    if len(next_features) < pred_len:
+                        next_timestamps = pd.date_range(
+                            start=df['date'].iloc[context_end - 1] + pd.Timedelta(freq),
+                            periods=pred_len,
+                            freq=freq
+                        )
+                        next_features = generate_dayofweek_features(next_timestamps)
+                        if scaler_x is not None:
+                            next_features = scaler_x.transform(next_features)
+
+                    pred_with_features = np.column_stack([pred_np[:pred_len], next_features[:pred_len]])
+                    current_context = np.concatenate([current_context, pred_with_features])
+                else:
+                    current_context = np.concatenate([current_context, pred_np[:pred_len].reshape(-1, 1)])
 
             # Pegar apenas os primeiros steps_per_day previstos
             predictions = np.array(predictions[:steps_per_day])
 
             # Desnormalizar
-            pred_denorm = scaler.inverse_transform(predictions.reshape(-1, 1)).flatten()
-            context_denorm = scaler.inverse_transform(context.reshape(-1, 1)).flatten()
+            pred_denorm = scaler_y.inverse_transform(predictions.reshape(-1, 1)).flatten()
+            # Contexto: extrair apenas o target (primeira coluna) para desnormalizar
+            context_target_only = context[:, 0].reshape(-1, 1) if context.ndim > 1 else context.reshape(-1, 1)
+            context_denorm = scaler_y.inverse_transform(context_target_only).flatten()
 
             # Calcular métricas
             mae = np.mean(np.abs(pred_denorm - target_real))

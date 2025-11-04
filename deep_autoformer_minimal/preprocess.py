@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import os
 
 # ========== VARIÁVEIS HARD CODED ==========
@@ -11,8 +12,8 @@ TIME_COLUMN = 'Hora'
 TARGET_COLUMN = 'Consumo registado (kW)'
 
 # Período para filtrar
-DATE_BEGIN = '2025-04-01'
-DATE_END = '2025-07-01' 
+DATE_BEGIN = '2025-01-01'
+DATE_END = '2025-03-01' 
 
 # Caminho de saída
 OUTPUT_CSV = 'data/data.csv'
@@ -40,10 +41,20 @@ def preprocess_data():
     # Ordenar por data/hora
     df = df.sort_values('DateTime')
 
+    # Extrair dia da semana (0=Segunda, 6=Domingo)
+    dayofweek = df['DateTime'].dt.dayofweek
+
+    # Encoding cíclico para capturar a natureza cíclica dos dias da semana
+    # Isto garante que Segunda (0) está perto de Domingo (6)
+    dayofweek_sin = np.sin(2 * np.pi * dayofweek / 7)
+    dayofweek_cos = np.cos(2 * np.pi * dayofweek / 7)
+
     # Selecionar apenas as colunas necessárias e renomear
     df_output = pd.DataFrame({
         'date': df['DateTime'],
-        'target': df[TARGET_COLUMN]
+        'target': df[TARGET_COLUMN],
+        'dayofweek_sin': dayofweek_sin,
+        'dayofweek_cos': dayofweek_cos
     })
 
     # Criar diretório de saída se não existir
@@ -55,10 +66,15 @@ def preprocess_data():
     print(f"\nDados guardados em: {OUTPUT_CSV}")
     print(f"\n=== Estatísticas ===")
     print(f"Total de registos: {len(df_output)}")
-    print(f"Média: {df_output['target'].mean():.2f} kW")
-    print(f"Máximo: {df_output['target'].max():.2f} kW")
-    print(f"Mínimo: {df_output['target'].min():.2f} kW")
-    print(f"Período: {df_output['date'].min()} a {df_output['date'].max()}")
+    print(f"Colunas: {list(df_output.columns)}")
+    print(f"\nTarget (consumo):")
+    print(f"  Média: {df_output['target'].mean():.2f} kW")
+    print(f"  Máximo: {df_output['target'].max():.2f} kW")
+    print(f"  Mínimo: {df_output['target'].min():.2f} kW")
+    print(f"\nFeatures temporais:")
+    print(f"  dayofweek_sin: [{df_output['dayofweek_sin'].min():.3f}, {df_output['dayofweek_sin'].max():.3f}]")
+    print(f"  dayofweek_cos: [{df_output['dayofweek_cos'].min():.3f}, {df_output['dayofweek_cos'].max():.3f}]")
+    print(f"\nPeríodo: {df_output['date'].min()} a {df_output['date'].max()}")
 
     # Verificar dados em falta
     missing = df_output.isnull().sum()

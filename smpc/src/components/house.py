@@ -61,6 +61,13 @@ class House:
             self.consumption_data = df[['month', 'day', 'hour', 'minute', consumption_col]].copy()
             self.consumption_data.rename(columns={consumption_col: 'consumption'}, inplace=True)
 
+            # Optimize lookups: Create multi-index for O(1) access
+            self.consumption_data.set_index(['month', 'day', 'hour', 'minute'], inplace=True)
+            self.consumption_data.sort_index(inplace=True)
+
+            # Pre-compute mean for fallback
+            self._mean_consumption = self.consumption_data['consumption'].mean()
+
             print(f"Loaded consumption data: {len(self.consumption_data)} time steps")
             print(f"Original date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
             print(f"Average consumption: {self.consumption_data['consumption'].mean():.3f} kW")
@@ -100,35 +107,25 @@ class House:
             hour = timestamp.hour
             minute = timestamp.minute
 
-            # Find matching row
-            mask = (
-                (self.consumption_data['month'] == month) &
-                (self.consumption_data['day'] == day) &
-                (self.consumption_data['hour'] == hour) &
-                (self.consumption_data['minute'] == minute)
-            )
-
-            matches = self.consumption_data[mask]
-
-            if len(matches) > 0:
-                consumption = matches.iloc[0]['consumption']
-            else:
-                # If no exact match, find closest by hour
-                mask_day = (
-                    (self.consumption_data['month'] == month) &
-                    (self.consumption_data['day'] == day)
-                )
-                day_data = self.consumption_data[mask_day].copy()
-                if len(day_data) > 0:
-                    # Find closest time
+            # O(1) lookup using multi-index
+            try:
+                consumption = self.consumption_data.loc[(month, day, hour, minute), 'consumption']
+                # If multiple matches (shouldn't happen), take first
+                if hasattr(consumption, 'iloc'):
+                    consumption = consumption.iloc[0]
+            except KeyError:
+                # If no exact match, try to find closest time on same day
+                try:
+                    day_data = self.consumption_data.loc[(month, day)]
+                    # Calculate time difference for all entries on this day
                     time_minutes = hour * 60 + minute
-                    day_data['time_minutes'] = day_data['hour'] * 60 + day_data['minute']
-                    day_data['time_diff'] = abs(day_data['time_minutes'] - time_minutes)
-                    min_idx = day_data['time_diff'].idxmin()
-                    consumption = day_data.loc[min_idx, 'consumption']
-                else:
-                    # Fallback to average
-                    consumption = self.consumption_data['consumption'].mean()
+                    day_index = day_data.index
+                    time_diffs = [abs((h * 60 + m) - time_minutes) for h, m in day_index]
+                    min_idx = np.argmin(time_diffs)
+                    consumption = day_data.iloc[min_idx]['consumption']
+                except (KeyError, IndexError):
+                    # Fallback to pre-computed mean
+                    consumption = self._mean_consumption
 
             return max(0.0, consumption)
 

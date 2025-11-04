@@ -66,16 +66,18 @@ class Battery:
             dt_hours: Time step duration in hours
 
         Returns:
-            Maximum charge power in kW
+            Maximum charge power in kW (AC side)
         """
-        # Maximum energy that can be stored
+        # Maximum energy that can be stored (DC side)
         max_energy_increase = (self.max_soc * self.capacity_kwh) - self.energy_kwh
 
-        # Maximum power considering efficiency
+        # Maximum AC power needed to store this energy considering efficiency
+        # AC_energy = DC_energy / efficiency
+        # AC_power = AC_energy / dt = DC_energy / (efficiency * dt)
         max_power_energy = max_energy_increase / (self.efficiency_charge * dt_hours)
 
-        # Limited by max power rating
-        return min(self.max_power_kw, max_power_energy)
+        # Limited by max charge power rating
+        return min(self.max_charge_power_kw, max_power_energy)
 
     def get_available_discharge_power(self, dt_hours: float) -> float:
         """
@@ -85,16 +87,18 @@ class Battery:
             dt_hours: Time step duration in hours
 
         Returns:
-            Maximum discharge power in kW
+            Maximum discharge power in kW (AC side)
         """
-        # Maximum energy that can be extracted
+        # Maximum energy that can be extracted (DC side)
         max_energy_decrease = self.energy_kwh - (self.min_soc * self.capacity_kwh)
 
-        # Maximum power considering efficiency
+        # Maximum AC power output from this DC energy considering efficiency
+        # AC_energy = DC_energy * efficiency
+        # AC_power = AC_energy / dt = DC_energy * efficiency / dt
         max_power_energy = max_energy_decrease * self.efficiency_discharge / dt_hours
 
-        # Limited by max power rating
-        return min(self.max_power_kw, max_power_energy)
+        # Limited by max discharge power rating
+        return min(self.max_discharge_power_kw, max_power_energy)
 
     def charge(self, power_kw: float, dt_hours: float) -> float:
         """

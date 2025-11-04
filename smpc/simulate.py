@@ -68,7 +68,8 @@ def create_solar(config: dict) -> SolarPanel:
     solar_config = config['solar']
     return SolarPanel(
         capacity_kw=solar_config['capacity_kw'],
-        data_file=solar_config['data_file']
+        data_file=solar_config['data_file'],
+        scale_factor=solar_config.get('scale_factor', 1.0)
     )
 
 
@@ -206,10 +207,12 @@ def create_sdp_controller(config: dict, battery: Battery,
     # Get simulation start date to create historical data before it
     sim_start = datetime.strptime(config['simulation']['start_date'], '%Y-%m-%d %H:%M:%S')
 
-    # Create historical data (30 days before simulation start for forecasters)
+    # Create historical data (need enough days for calibration + forecasters)
     print("   Loading historical data...")
-    historical_data = load_historical_data(solar, house, sim_start, days=30)
-    print(f"   Historical data created: {len(historical_data)} records")
+    # Load more days if calibration is enabled
+    history_days = max(30, sdp_config['calibration']['calibration_days'] + 7) if sdp_config['calibration']['enabled'] else 30
+    historical_data = load_historical_data(solar, house, sim_start, days=history_days)
+    print(f"   Historical data created: {len(historical_data)} records ({history_days} days)")
     print(f"   Date range: {historical_data['timestamp'].min()} to {historical_data['timestamp'].max()}")
 
     # Create PV forecaster
@@ -233,8 +236,44 @@ def create_sdp_controller(config: dict, battery: Battery,
     # 5. Optional: Calibration
     if sdp_config['calibration']['enabled']:
         print("\n5. Calibrating SDP parameters...")
-        print("   (Calibration not yet implemented - using config values)")
-        # TODO: Implement calibration using src.controllers.sdp_calibration
+
+        from src.controllers.sdp_calibration import quick_calibrate
+
+        print("   Running automatic calibration...")
+        print(f"   Calibration days: {sdp_config['calibration']['calibration_days']}")
+
+        # Use a date from the historical data for calibration
+        # Start from the beginning of available historical data
+        calib_start = historical_data['timestamp'].min()
+
+        try:
+            calib_results = quick_calibrate(
+                historical_data=historical_data,
+                start_time=calib_start,
+                pv_forecaster=pv_forecaster,
+                load_forecaster=load_forecaster,
+                dt_minutes=sim_config['timestep_minutes']
+            )
+
+            # Update parameters with calibrated values
+            params.t_half_minutes = calib_results['t_half_minutes']
+            params.sigma_R = calib_results['sigma_kw']
+
+            print(f"   ✓ Calibration complete!")
+            print(f"   Calibrated t_half: {params.t_half_minutes:.1f} min (was {sdp_config['half_life_minutes']:.1f})")
+            print(f"   Calibrated sigma:  {params.sigma_R:.3f} kW (was {sdp_config['sigma_residual_kw']:.3f})")
+
+            # Re-create residual model with calibrated parameters
+            residual_model = ResidualModel(
+                t_half_minutes=params.t_half_minutes,
+                dt_minutes=params.dt_minutes,
+                sigma=params.sigma_R
+            )
+            print(f"   Updated κ (persistence coef): {residual_model.kappa:.4f}")
+
+        except Exception as e:
+            print(f"   ⚠ Calibration failed: {e}")
+            print(f"   Using config values: t_half={params.t_half_minutes:.1f} min, sigma={params.sigma_R:.3f} kW")
 
     # 6. Determine buy/sell prices
     print("\n6. Setting tariff prices...")
@@ -247,7 +286,7 @@ def create_sdp_controller(config: dict, battery: Battery,
         buy_price = config['tariff']['simple']['price']
         print(f"   Buy price: {buy_price:.3f} €/kWh")
 
-    sell_price = sdp_config['sell_price']
+    sell_price = config['grid']['export_price']
     print(f"   Sell price: {sell_price:.3f} €/kWh")
 
     # 7. Create SDP controller
@@ -290,7 +329,7 @@ def create_controller(config: dict, battery: Battery,
         mpc_config = config['controller']['mpc']
         return MPCController(
             horizon_steps=mpc_config['horizon_steps'],
-            export_price=mpc_config['export_price']
+            export_price=config['grid']['export_price']
         )
 
     elif controller_type == 'sdp':
@@ -352,7 +391,8 @@ def run_simulation(config: dict):
         solar=solar,
         house=house,
         tariff=tariff,
-        controller=controller
+        controller=controller,
+        export_price=config['grid']['export_price']
     )
 
     setup_time = time.time() - setup_start
@@ -380,37 +420,57 @@ def run_simulation(config: dict):
     summary = system.get_summary()
     print_summary(summary)
 
-    # Calculate additional energy metrics
+    # Calculate additional energy metrics for battery
     dt_hours = timestep / 60.0
-
-    total_solar_produced = results_df['solar_power'].sum() * dt_hours
-    total_load_consumed = results_df['load_power'].sum() * dt_hours
     total_battery_charged = results_df[results_df['battery_power'] > 0]['battery_power'].sum() * dt_hours
     total_battery_discharged = -results_df[results_df['battery_power'] < 0]['battery_power'].sum() * dt_hours
+    battery_roundtrip_eff = (total_battery_discharged / total_battery_charged * 100) if total_battery_charged > 0 else 0
+
+    # Get energy balance comparison across all scenarios
+    energy_balance = system.get_energy_balance_comparison(results_df)
 
     print("\n" + "-"*70)
-    print("ENERGY BALANCE")
+    print("ENERGY BALANCE COMPARISON")
     print("-"*70)
 
-    print(f"\nTotal Solar Produced:     {total_solar_produced:>10.2f} kWh")
-    print(f"Total Load Consumed:      {total_load_consumed:>10.2f} kWh")
-    print(f"Total Grid Import:        {summary['total_grid_import_kwh']:>10.2f} kWh")
-    print(f"Total Grid Export:        {summary['total_grid_export_kwh']:>10.2f} kWh")
-    print(f"Total Battery Charged:    {total_battery_charged:>10.2f} kWh")
-    print(f"Total Battery Discharged: {total_battery_discharged:>10.2f} kWh")
+    # Extract data for each scenario
+    with_bat = energy_balance['system_with_battery']
+    pv_only = energy_balance['pv_without_battery']
+    no_pv = energy_balance['no_pv_no_battery']
 
-    # Calculate ratios
-    solar_to_load_ratio = (total_solar_produced / total_load_consumed * 100) if total_load_consumed > 0 else 0
-    solar_used_locally = total_solar_produced - summary['total_grid_export_kwh']
-    solar_utilization = (solar_used_locally / total_solar_produced * 100) if total_solar_produced > 0 else 0
+    # Column widths
+    metric_width = 30
+    value_width = 18
 
-    print(f"\nSolar/Load Ratio:         {solar_to_load_ratio:>10.1f} %")
-    print(f"Solar Self-Consumption:   {solar_utilization:>10.1f} %")
-    print(f"Load Self-Sufficiency:    {summary['self_sufficiency_rate']*100:>10.1f} %")
+    # Header
+    print(f"\n{'Metric':<{metric_width}} | {'With Battery':^{value_width}} | {'PV Only':^{value_width}} | {'No PV':^{value_width}}")
+    print("-" * metric_width + "-+-" + "-" * value_width + "-+-" + "-" * value_width + "-+-" + "-" * value_width)
 
-    # Battery efficiency
-    battery_roundtrip_eff = (total_battery_discharged / total_battery_charged * 100) if total_battery_charged > 0 else 0
-    print(f"Battery Round-Trip Eff:   {battery_roundtrip_eff:>10.1f} %")
+    # Helper function to format values
+    def fmt_kwh(val):
+        return f"{val:>10.2f} kWh"
+
+    def fmt_pct(val):
+        return f"{val:>10.1f} %"
+
+    # Energy flows
+    print(f"{'Total Solar Produced':<{metric_width}} | {fmt_kwh(with_bat['solar_produced_kwh']):^{value_width}} | {fmt_kwh(pv_only['solar_produced_kwh']):^{value_width}} | {fmt_kwh(no_pv['solar_produced_kwh']):^{value_width}}")
+    print(f"{'Total Load Consumed':<{metric_width}} | {fmt_kwh(with_bat['load_consumed_kwh']):^{value_width}} | {fmt_kwh(pv_only['load_consumed_kwh']):^{value_width}} | {fmt_kwh(no_pv['load_consumed_kwh']):^{value_width}}")
+    print(f"{'Total Grid Import':<{metric_width}} | {fmt_kwh(with_bat['grid_import_kwh']):^{value_width}} | {fmt_kwh(pv_only['grid_import_kwh']):^{value_width}} | {fmt_kwh(no_pv['grid_import_kwh']):^{value_width}}")
+    print(f"{'Total Grid Export':<{metric_width}} | {fmt_kwh(with_bat['grid_export_kwh']):^{value_width}} | {fmt_kwh(pv_only['grid_export_kwh']):^{value_width}} | {fmt_kwh(no_pv['grid_export_kwh']):^{value_width}}")
+
+    print()
+
+    # Efficiency metrics
+    print(f"{'Solar/Load Ratio':<{metric_width}} | {fmt_pct(with_bat['solar_to_load_ratio_pct']):^{value_width}} | {fmt_pct(pv_only['solar_to_load_ratio_pct']):^{value_width}} | {fmt_pct(no_pv['solar_to_load_ratio_pct']):^{value_width}}")
+    print(f"{'Solar Self-Consumption':<{metric_width}} | {fmt_pct(with_bat['solar_self_consumption_pct']):^{value_width}} | {fmt_pct(pv_only['solar_self_consumption_pct']):^{value_width}} | {fmt_pct(no_pv['solar_self_consumption_pct']):^{value_width}}")
+    print(f"{'Load Self-Sufficiency':<{metric_width}} | {fmt_pct(with_bat['load_self_sufficiency_pct']):^{value_width}} | {fmt_pct(pv_only['load_self_sufficiency_pct']):^{value_width}} | {fmt_pct(no_pv['load_self_sufficiency_pct']):^{value_width}}")
+
+    # Battery-specific metrics (only for "With Battery" scenario)
+    print()
+    print(f"{'Total Battery Charged':<{metric_width}} | {fmt_kwh(total_battery_charged):^{value_width}} | {'N/A':^{value_width}} | {'N/A':^{value_width}}")
+    print(f"{'Total Battery Discharged':<{metric_width}} | {fmt_kwh(total_battery_discharged):^{value_width}} | {'N/A':^{value_width}} | {'N/A':^{value_width}}")
+    print(f"{'Battery Round-Trip Eff':<{metric_width}} | {fmt_pct(battery_roundtrip_eff):^{value_width}} | {'N/A':^{value_width}} | {'N/A':^{value_width}}")
 
     # Calculate savings
     savings = system.get_savings(results_df)
@@ -442,14 +502,37 @@ def run_simulation(config: dict):
         complete_summary = {
             **summary,
             **savings,
-            'energy_balance': {
-                'total_solar_produced_kwh': float(total_solar_produced),
-                'total_load_consumed_kwh': float(total_load_consumed),
-                'total_battery_charged_kwh': float(total_battery_charged),
-                'total_battery_discharged_kwh': float(total_battery_discharged),
-                'solar_to_load_ratio_pct': float(solar_to_load_ratio),
-                'solar_utilization_pct': float(solar_utilization),
-                'battery_roundtrip_efficiency_pct': float(battery_roundtrip_eff)
+            'energy_balance_comparison': {
+                'system_with_battery': {
+                    'solar_produced_kwh': float(with_bat['solar_produced_kwh']),
+                    'load_consumed_kwh': float(with_bat['load_consumed_kwh']),
+                    'grid_import_kwh': float(with_bat['grid_import_kwh']),
+                    'grid_export_kwh': float(with_bat['grid_export_kwh']),
+                    'solar_to_load_ratio_pct': float(with_bat['solar_to_load_ratio_pct']),
+                    'solar_self_consumption_pct': float(with_bat['solar_self_consumption_pct']),
+                    'load_self_sufficiency_pct': float(with_bat['load_self_sufficiency_pct']),
+                    'battery_charged_kwh': float(total_battery_charged),
+                    'battery_discharged_kwh': float(total_battery_discharged),
+                    'battery_roundtrip_efficiency_pct': float(battery_roundtrip_eff)
+                },
+                'pv_without_battery': {
+                    'solar_produced_kwh': float(pv_only['solar_produced_kwh']),
+                    'load_consumed_kwh': float(pv_only['load_consumed_kwh']),
+                    'grid_import_kwh': float(pv_only['grid_import_kwh']),
+                    'grid_export_kwh': float(pv_only['grid_export_kwh']),
+                    'solar_to_load_ratio_pct': float(pv_only['solar_to_load_ratio_pct']),
+                    'solar_self_consumption_pct': float(pv_only['solar_self_consumption_pct']),
+                    'load_self_sufficiency_pct': float(pv_only['load_self_sufficiency_pct'])
+                },
+                'no_pv_no_battery': {
+                    'solar_produced_kwh': float(no_pv['solar_produced_kwh']),
+                    'load_consumed_kwh': float(no_pv['load_consumed_kwh']),
+                    'grid_import_kwh': float(no_pv['grid_import_kwh']),
+                    'grid_export_kwh': float(no_pv['grid_export_kwh']),
+                    'solar_to_load_ratio_pct': float(no_pv['solar_to_load_ratio_pct']),
+                    'solar_self_consumption_pct': float(no_pv['solar_self_consumption_pct']),
+                    'load_self_sufficiency_pct': float(no_pv['load_self_sufficiency_pct'])
+                }
             }
         }
 

@@ -57,6 +57,9 @@ class ProfilePersistenceForecaster:
         self.data = self.data.sort_values('timestamp')
         self.data.set_index('timestamp', inplace=True)
 
+        # Pre-compute profile cache for fast lookups
+        self._build_profile_cache()
+
     def set_data(self, data: pd.DataFrame, value_column: str = 'value'):
         """
         Configurar dados para previsão.
@@ -72,6 +75,24 @@ class ProfilePersistenceForecaster:
         self.data = data.copy()
         self._process_data()
 
+    def _build_profile_cache(self):
+        """
+        Pre-compute average profiles for fast forecast generation.
+        Creates lookup table indexed by (weekday, hour, minute).
+        """
+        # 7 days, 24 hours, 60 minutes, multiple value columns
+        # We'll use a dict for flexibility with different value columns
+        self._profile_cache = {}
+
+        # Get all value columns (exclude indexing columns)
+        value_cols = [col for col in self.data.columns if col not in ['weekday', 'hour', 'minute']]
+
+        for value_col in value_cols:
+            # Group by weekday, hour, minute and compute mean
+            # This replaces nested loops with vectorized pandas groupby
+            grouped = self.data.groupby(['weekday', 'hour', 'minute'])[value_col].mean()
+            self._profile_cache[value_col] = grouped
+
     def get_forecast(self,
                      start_time: datetime,
                      n_steps: int,
@@ -79,8 +100,7 @@ class ProfilePersistenceForecaster:
         """
         Obter previsão usando persistência de perfil.
 
-        Para cada passo futuro, calcula a média do mesmo dia-da-semana e hora
-        nas últimas n_weeks semanas.
+        Usa perfis pré-agregados para O(1) lookup por (weekday, hour, minute).
 
         Args:
             start_time: Timestamp inicial da previsão
@@ -93,34 +113,25 @@ class ProfilePersistenceForecaster:
         if self.data is None:
             raise ValueError("No data set. Use set_data() first.")
 
+        # Vectorized approach: generate all timestamps at once
+        timestamps = pd.date_range(start_time, periods=n_steps, freq=f'{self.dt_minutes}min')
+        weekdays = timestamps.weekday
+        hours = timestamps.hour
+        minutes = timestamps.minute
+
         forecast = np.zeros(n_steps)
-        current_time = start_time
+        profile = self._profile_cache.get(value_column)
 
+        if profile is None:
+            raise ValueError(f"Value column '{value_column}' not found in profile cache")
+
+        # O(1) lookup for each timestep using pre-computed profiles
         for i in range(n_steps):
-            # Obter dia-da-semana e hora/minuto do passo atual
-            weekday = current_time.weekday()
-            hour = current_time.hour
-            minute = current_time.minute
-
-            # Buscar mesmos momentos nas últimas n_weeks semanas
-            values = []
-            for week in range(1, self.n_weeks + 1):
-                # Data correspondente na semana anterior
-                past_time = current_time - timedelta(weeks=week)
-
-                # Buscar valor exato ou mais próximo
-                value = self._get_value_at_time(past_time, weekday, hour, minute, value_column)
-                if value is not None:
-                    values.append(value)
-
-            # Média dos valores encontrados
-            if len(values) > 0:
-                forecast[i] = np.mean(values)
-            else:
-                # Fallback: usar média de todos os valores do mesmo dia-da-semana e hora
-                forecast[i] = self._get_fallback_value(weekday, hour, minute, value_column)
-
-            current_time += timedelta(minutes=self.dt_minutes)
+            try:
+                forecast[i] = profile.loc[(weekdays[i], hours[i], minutes[i])]
+            except KeyError:
+                # Fallback: use fallback value
+                forecast[i] = self._get_fallback_value(weekdays[i], hours[i], minutes[i], value_column)
 
         return forecast
 

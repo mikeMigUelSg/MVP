@@ -33,7 +33,8 @@ class EnergyManagementSystem:
                  solar: SolarPanel,
                  house: House,
                  tariff: Tariff,
-                 controller: Union[RuleBasedController, MPCController, SDPController]):
+                 controller: Union[RuleBasedController, MPCController, SDPController],
+                 export_price: float = 0.05):
         """
         Args:
             battery: Battery component
@@ -41,12 +42,14 @@ class EnergyManagementSystem:
             house: House component
             tariff: Electricity tariff
             controller: Control strategy (rule-based or MPC)
+            export_price: Price for exporting energy to grid in €/kWh
         """
         self.battery = battery
         self.solar = solar
         self.house = house
         self.tariff = tariff
         self.controller = controller
+        self.export_price = export_price
 
         # Tracking variables
         self.history = {
@@ -130,6 +133,18 @@ class EnergyManagementSystem:
             )
         controller_time = time.time() - controller_start
 
+        # Constraint: Battery cannot discharge to export to grid
+        # Only solar excess can be exported
+        if battery_power_cmd < 0:  # If battery wants to discharge
+            net_demand = load_power - solar_power
+            if net_demand < 0:
+                # There's already excess solar, battery should not discharge
+                battery_power_cmd = 0.0
+            else:
+                # Battery can only discharge to meet demand, not to export
+                # Limit discharge to net_demand
+                battery_power_cmd = max(battery_power_cmd, -net_demand)
+
         # Execute battery action
         battery_start = time.time()
         battery_result = self.battery.step(battery_power_cmd, dt_hours)
@@ -151,9 +166,8 @@ class EnergyManagementSystem:
         # Import cost
         import_cost = grid_import * dt_hours * price
 
-        # Export revenue (fixed price, e.g., 0.05 €/kWh)
-        export_price_value = getattr(self.controller, 'export_price', 0.05)
-        export_revenue = grid_export * dt_hours * export_price_value
+        # Export revenue
+        export_revenue = grid_export * dt_hours * self.export_price
 
         # Net cost for this time step
         step_cost = import_cost - export_revenue
@@ -307,7 +321,6 @@ class EnergyManagementSystem:
         Returns:
             Dictionary with baseline costs and energy flows
         """
-        export_price_value = getattr(self.controller, 'export_price', 0.05)
         dt_hours = 15 / 60.0  # Assuming 15 min timestep
 
         # Scenario 1: With PV, without battery
@@ -333,7 +346,7 @@ class EnergyManagementSystem:
                 # Export excess solar to grid (negative cost = revenue)
                 export_power = -net_demand
                 baseline_pv_export += export_power * dt_hours
-                baseline_pv_cost -= export_power * dt_hours * export_price_value
+                baseline_pv_cost -= export_power * dt_hours * self.export_price
 
             # Scenario 2: No PV, no battery (only grid)
             load = row['load_power']
@@ -350,6 +363,73 @@ class EnergyManagementSystem:
                 'cost': baseline_no_pv_cost,
                 'import_kwh': baseline_no_pv_import,
                 'export_kwh': 0.0
+            }
+        }
+
+    def get_energy_balance_comparison(self, df: pd.DataFrame) -> dict:
+        """
+        Calculate complete energy balance for all three scenarios
+
+        Args:
+            df: Simulation results DataFrame
+
+        Returns:
+            Dictionary with energy balance for all scenarios
+        """
+        baselines = self.calculate_baseline_cost(df)
+        dt_hours = 15 / 60.0  # Assuming 15 min timestep
+
+        # Total solar produced and load consumed (same for all scenarios with PV)
+        total_solar_kwh = df['solar_power'].sum() * dt_hours
+        total_load_kwh = df['load_power'].sum() * dt_hours
+
+        # Scenario 1: System with battery (current system)
+        system_import = self.total_grid_import_kwh
+        system_export = self.total_grid_export_kwh
+        system_solar_used_locally = total_solar_kwh - system_export
+        system_solar_self_consumption = (system_solar_used_locally / total_solar_kwh * 100) if total_solar_kwh > 0 else 0
+        system_load_self_sufficiency = ((total_load_kwh - system_import) / total_load_kwh * 100) if total_load_kwh > 0 else 0
+
+        # Scenario 2: PV without battery
+        pv_import = baselines['pv_no_battery']['import_kwh']
+        pv_export = baselines['pv_no_battery']['export_kwh']
+        pv_solar_used_locally = total_solar_kwh - pv_export
+        pv_solar_self_consumption = (pv_solar_used_locally / total_solar_kwh * 100) if total_solar_kwh > 0 else 0
+        pv_load_self_sufficiency = ((total_load_kwh - pv_import) / total_load_kwh * 100) if total_load_kwh > 0 else 0
+
+        # Scenario 3: No PV, no battery
+        no_pv_import = baselines['no_pv_no_battery']['import_kwh']
+
+        # Solar to load ratio (only for scenarios with PV)
+        solar_to_load_ratio = (total_solar_kwh / total_load_kwh * 100) if total_load_kwh > 0 else 0
+
+        return {
+            'system_with_battery': {
+                'solar_produced_kwh': total_solar_kwh,
+                'load_consumed_kwh': total_load_kwh,
+                'grid_import_kwh': system_import,
+                'grid_export_kwh': system_export,
+                'solar_to_load_ratio_pct': solar_to_load_ratio,
+                'solar_self_consumption_pct': system_solar_self_consumption,
+                'load_self_sufficiency_pct': system_load_self_sufficiency
+            },
+            'pv_without_battery': {
+                'solar_produced_kwh': total_solar_kwh,
+                'load_consumed_kwh': total_load_kwh,
+                'grid_import_kwh': pv_import,
+                'grid_export_kwh': pv_export,
+                'solar_to_load_ratio_pct': solar_to_load_ratio,
+                'solar_self_consumption_pct': pv_solar_self_consumption,
+                'load_self_sufficiency_pct': pv_load_self_sufficiency
+            },
+            'no_pv_no_battery': {
+                'solar_produced_kwh': 0.0,
+                'load_consumed_kwh': total_load_kwh,
+                'grid_import_kwh': no_pv_import,
+                'grid_export_kwh': 0.0,
+                'solar_to_load_ratio_pct': 0.0,
+                'solar_self_consumption_pct': 0.0,
+                'load_self_sufficiency_pct': 0.0
             }
         }
 

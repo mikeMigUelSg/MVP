@@ -1,30 +1,29 @@
-
-# Default configuration (edit paths before running)
 data:
-  csv_path: data/data.csv   # must exist
-  seq_len: 192       # Contexto: 2 dias (192 x 15min = 48h) - mais rápido!
-  label_len: 48     # Overlap entre encoder e decoder
-  pred_len: 96      # Previsão: 1 dia completo à frente (day-ahead)
+  csv_path: data/data.csv
+  seq_len: 288        # ~3 dias de contexto (3×96). Bom equilíbrio p/ day-ahead
+  label_len: 48       # parte “conhecida” do decoder; metade do horizonte
+  pred_len: 96        # 24 h à frente (15 min)
   target_col: target
-  feature_cols: []
+  # Features temporais: encoding cíclico do dia da semana
+  feature_cols: [dayofweek_sin, dayofweek_cos]
 
 model:
-  d_model: 128      # Reduzido de 256 (mais rápido)
-  n_heads: 4
+  d_model: 512        # 128 funciona; 256 tende a melhorar sem pesar muito
+  n_heads: 8
   e_layers: 2
   d_layers: 1
-  d_ff: 256         # Reduzido de 512 (mais rápido)
-  top_k: 5          # Reduzido de 8 (mais rápido)
-  kernel_size: 25
+  d_ff: 512
+  top_k: 5            # nº de defasagens dominantes (mantém 3–5)
+  kernel_size: 13     # janela de média móvel da decomposição (recomendado p/ 15 min)
   dropout: 0.1
-  add_deep_mlp: true
+  add_deep_mlp: true  # “Deep-Autoformer”: 1 MLP extra melhora os resultados
 
 train:
   lr: 0.0003
   weight_decay: 0.0001
-  batch_size: 128    # Aumentado de 64 (menos batches = mais rápido)
+  batch_size: 128
   epochs: 30
   train_ratio: 0.7
   val_ratio: 0.15
-  patience: 5  # Para treino mais cedo se val loss não melhorar por 5 epochs
-  device: mps  # Options: auto, mps (Mac GPU), cuda (NVIDIA GPU), cpu
+  patience: 5
+  device: mps         # usa “cuda” se tiveres NVIDIA

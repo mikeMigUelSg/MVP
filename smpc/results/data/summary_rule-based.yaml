@@ -14,93 +14,113 @@ baseline_no_pv_cost: !!python/object/apply:numpy.core.multiarray.scalar
   - -1
   - 0
 - !!binary |
-  4lJcVfZdFUA=
+  fZyiI7lMNUA=
 baseline_no_pv_import_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  Ld0kBoFVREA=
+  Ei2yne+/YUA=
 baseline_pv_cost: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  xpRIopch7T8=
+  iXZOs8BwKkA=
 baseline_pv_export_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  abx0kxiNQkA=
+  ZU6XxYRGU0A=
 baseline_pv_import_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  rRxaZDupNkA=
+  bA1slaAIVkA=
 battery_cycles: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  9lypYcvj5j8=
+  RfSFhHZpGUA=
 battery_degradation_cost: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  xbC659VPwj8=
+  zClr0F5U9D8=
 controller: Rule-Based
-energy_balance:
-  battery_roundtrip_efficiency_pct: 76.65714899757454
-  solar_to_load_ratio_pct: 135.51010622602539
-  solar_utilization_pct: 47.45063215340436
-  total_battery_charged_kwh: 8.14275
-  total_battery_discharged_kwh: 6.242
-  total_load_consumed_kwh: 40.668
-  total_solar_produced_kwh: 55.10925
+energy_balance_comparison:
+  no_pv_no_battery:
+    grid_export_kwh: 0.0
+    grid_import_kwh: 141.9980000000001
+    load_consumed_kwh: 141.998
+    load_self_sufficiency_pct: 0.0
+    solar_produced_kwh: 0.0
+    solar_self_consumption_pct: 0.0
+    solar_to_load_ratio_pct: 0.0
+  pv_without_battery:
+    grid_export_kwh: 77.10185374999999
+    grid_import_kwh: 88.13480124999995
+    load_consumed_kwh: 141.998
+    load_self_sufficiency_pct: 37.932364364286855
+    solar_produced_kwh: 130.96505249999998
+    solar_self_consumption_pct: 41.127917503030055
+    solar_to_load_ratio_pct: 92.23020922829899
+  system_with_battery:
+    battery_charged_kwh: 69.89840190586419
+    battery_discharged_kwh: 57.73613554375001
+    battery_roundtrip_efficiency_pct: 82.60007950039582
+    grid_export_kwh: 7.203451844135793
+    grid_import_kwh: 30.398665706249997
+    load_consumed_kwh: 141.998
+    load_self_sufficiency_pct: 78.59218742077353
+    solar_produced_kwh: 130.96505249999998
+    solar_self_consumption_pct: 94.49971446074456
+    solar_to_load_ratio_pct: 92.23020922829899
 savings_pct_vs_no_pv: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  e6hRIUBsV0A=
+  UFgKXh4oUkA=
 savings_pct_vs_pv: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  nn7D3cB9T0A=
+  EE68je3yS0A=
 savings_vs_no_pv: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  K+TzjeIEFEA=
+  iLYEV0jwLkA=
 savings_vs_pv: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  EB8FZ/lY4j8=
+  Lugbhi2PHUA=
 self_consumption_rate: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  efkuw09e3j8=
+  JeDcpmo97j8=
 self_sufficiency_rate: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  UkwfA5wU4z8=
+  L91doUUm6T8=
 system_cost: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  beuGdjyR1T8=
+  5ASB4FNSF0A=
 system_export_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  0vdT46X1PEA=
+  GX8jrlXQHEA=
 system_import_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  4HoUrkdrMEA=
+  Z2Gq9A5mPkA=
 total_consumption_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  Ld0kBoFVREA=
+  Ei2yne+/YUA=
 total_cost: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  beuGdjyR1T8=
+  5ASB4FNSF0A=
 total_grid_export_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  0vdT46X1PEA=
+  GX8jrlXQHEA=
 total_grid_import_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  4HoUrkdrMEA=
+  Z2Gq9A5mPkA=
 total_solar_production_kwh: !!python/object/apply:numpy.core.multiarray.scalar
 - *id001
 - !!binary |
-  QIts5/uNS0A=
+  is3HteFeYEA=
