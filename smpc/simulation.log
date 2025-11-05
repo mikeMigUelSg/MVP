@@ -13508,3 +13508,1711 @@
 2025-11-04 20:39:03,793 - src.system - INFO - [System] Step time stats - Avg: 128.82ms, Min: 0.24ms, Max: 4483.28ms, P95: 1.39ms
 2025-11-04 20:39:03,795 - root - INFO - [Main] Simulation completed in 123.67s
 2025-11-04 20:39:06,457 - root - INFO - [Main] Total execution time: 128.28s
+2025-11-05 11:12:52,282 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 11:12:54,455 - root - INFO - [Main] Setup completed in 2.16s
+2025-11-05 11:12:54,455 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-05-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 11:12:54,455 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 11:12:54,458 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 11:12:54,748 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2899s
+2025-11-05 11:12:59,056 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 4.3083s
+2025-11-05 11:12:59,136 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 4.3880s
+2025-11-05 11:12:59,136 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 4.3882s
+2025-11-05 11:12:59,136 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 4.6806s
+2025-11-05 11:12:59,146 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 11:12:59,148 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:12:59,151 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:13:02,137 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9853s
+2025-11-05 11:13:02,137 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9860s
+2025-11-05 11:13:02,137 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9861s
+2025-11-05 11:13:02,137 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9917s
+2025-11-05 11:13:02,148 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 11:13:02,150 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 11:13:02,153 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 11:13:05,131 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9782s
+2025-11-05 11:13:05,132 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9787s
+2025-11-05 11:13:05,132 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9788s
+2025-11-05 11:13:05,132 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9842s
+2025-11-05 11:13:05,141 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 11:13:05,144 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 11:13:05,147 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:13:08,151 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0036s
+2025-11-05 11:13:08,151 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0041s
+2025-11-05 11:13:08,151 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0041s
+2025-11-05 11:13:08,151 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0099s
+2025-11-05 11:13:08,160 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 11:13:08,163 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0029s
+2025-11-05 11:13:08,166 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:13:11,110 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9441s
+2025-11-05 11:13:11,111 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9446s
+2025-11-05 11:13:11,111 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9446s
+2025-11-05 11:13:11,111 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9506s
+2025-11-05 11:13:11,121 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 11:13:11,123 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 11:13:11,126 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:13:14,287 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1609s
+2025-11-05 11:13:14,288 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1613s
+2025-11-05 11:13:14,288 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1614s
+2025-11-05 11:13:14,288 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1670s
+2025-11-05 11:13:14,296 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 11:13:14,299 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:13:14,301 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:13:17,258 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9562s
+2025-11-05 11:13:17,258 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9567s
+2025-11-05 11:13:17,258 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9567s
+2025-11-05 11:13:17,258 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9620s
+2025-11-05 11:13:17,267 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 11:13:17,270 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 11:13:17,273 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 11:13:20,205 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9318s
+2025-11-05 11:13:20,205 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9323s
+2025-11-05 11:13:20,205 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9323s
+2025-11-05 11:13:20,206 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9382s
+2025-11-05 11:13:20,215 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-26 00:00:00
+2025-11-05 11:13:20,217 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 11:13:20,220 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:13:23,357 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1366s
+2025-11-05 11:13:23,357 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1370s
+2025-11-05 11:13:23,357 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1371s
+2025-11-05 11:13:23,357 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1427s
+2025-11-05 11:13:23,367 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-26 06:00:00
+2025-11-05 11:13:23,370 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0029s
+2025-11-05 11:13:23,373 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:13:26,340 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9674s
+2025-11-05 11:13:26,341 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9678s
+2025-11-05 11:13:26,341 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9679s
+2025-11-05 11:13:26,341 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9741s
+2025-11-05 11:13:26,349 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-26 12:00:00
+2025-11-05 11:13:26,352 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 11:13:26,355 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:13:29,478 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1223s
+2025-11-05 11:13:29,478 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1228s
+2025-11-05 11:13:29,478 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1228s
+2025-11-05 11:13:29,478 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1287s
+2025-11-05 11:13:29,487 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-26 18:00:00
+2025-11-05 11:13:29,490 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:13:29,492 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:13:32,574 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0820s
+2025-11-05 11:13:32,575 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0824s
+2025-11-05 11:13:32,575 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0825s
+2025-11-05 11:13:32,575 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0879s
+2025-11-05 11:13:32,584 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-27 00:00:00
+2025-11-05 11:13:32,586 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 11:13:32,589 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:13:35,730 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1410s
+2025-11-05 11:13:35,731 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1424s
+2025-11-05 11:13:35,732 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1424s
+2025-11-05 11:13:35,732 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1476s
+2025-11-05 11:13:35,742 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-27 06:00:00
+2025-11-05 11:13:35,744 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:13:35,747 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:13:38,717 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9697s
+2025-11-05 11:13:38,717 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9701s
+2025-11-05 11:13:38,717 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9701s
+2025-11-05 11:13:38,718 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9759s
+2025-11-05 11:13:38,726 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-27 12:00:00
+2025-11-05 11:13:38,729 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 11:13:38,732 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 11:13:41,760 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0284s
+2025-11-05 11:13:41,762 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0298s
+2025-11-05 11:13:41,762 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0298s
+2025-11-05 11:13:41,762 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0356s
+2025-11-05 11:13:41,771 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-27 18:00:00
+2025-11-05 11:13:41,774 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 11:13:41,777 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 11:13:44,823 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0453s
+2025-11-05 11:13:44,823 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0457s
+2025-11-05 11:13:44,823 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0458s
+2025-11-05 11:13:44,823 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0516s
+2025-11-05 11:13:44,832 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-28 00:00:00
+2025-11-05 11:13:44,835 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 11:13:44,838 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:13:47,773 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9355s
+2025-11-05 11:13:47,774 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9358s
+2025-11-05 11:13:47,774 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9359s
+2025-11-05 11:13:47,774 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9415s
+2025-11-05 11:13:47,783 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-28 06:00:00
+2025-11-05 11:13:47,786 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 11:13:47,789 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:13:50,857 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0682s
+2025-11-05 11:13:50,857 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0686s
+2025-11-05 11:13:50,857 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0686s
+2025-11-05 11:13:50,857 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0742s
+2025-11-05 11:13:50,866 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-28 12:00:00
+2025-11-05 11:13:50,868 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:13:50,871 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:13:53,861 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9895s
+2025-11-05 11:13:53,861 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9899s
+2025-11-05 11:13:53,861 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9900s
+2025-11-05 11:13:53,861 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9953s
+2025-11-05 11:13:53,870 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-28 18:00:00
+2025-11-05 11:13:53,873 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 11:13:53,876 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:13:56,932 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0561s
+2025-11-05 11:13:56,932 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0566s
+2025-11-05 11:13:56,932 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0566s
+2025-11-05 11:13:56,932 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0620s
+2025-11-05 11:13:56,942 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-29 00:00:00
+2025-11-05 11:13:56,944 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 11:13:56,947 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:14:03,622 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 11:14:05,668 - root - INFO - [Main] Setup completed in 2.04s
+2025-11-05 11:14:05,668 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 11:14:05,669 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 11:14:05,671 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 11:14:05,887 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2159s
+2025-11-05 11:14:10,148 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 4.2612s
+2025-11-05 11:14:10,225 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 4.3382s
+2025-11-05 11:14:10,225 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 4.3384s
+2025-11-05 11:14:10,225 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 4.5568s
+2025-11-05 11:14:10,235 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 11:14:10,238 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:14:10,241 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:14:13,221 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9804s
+2025-11-05 11:14:13,222 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9809s
+2025-11-05 11:14:13,222 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9809s
+2025-11-05 11:14:13,222 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9865s
+2025-11-05 11:14:13,232 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 11:14:13,235 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 11:14:13,237 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:14:16,337 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0997s
+2025-11-05 11:14:16,339 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1016s
+2025-11-05 11:14:16,339 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1017s
+2025-11-05 11:14:16,339 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1071s
+2025-11-05 11:14:16,349 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 11:14:16,352 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 11:14:16,354 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:14:19,410 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0557s
+2025-11-05 11:14:19,411 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0561s
+2025-11-05 11:14:19,411 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0561s
+2025-11-05 11:14:19,411 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0614s
+2025-11-05 11:14:19,419 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 11:14:19,422 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 11:14:19,425 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:14:22,574 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1488s
+2025-11-05 11:14:22,577 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1514s
+2025-11-05 11:14:22,577 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1515s
+2025-11-05 11:14:22,577 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1572s
+2025-11-05 11:14:22,586 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 11:14:22,588 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 11:14:22,591 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 11:14:25,523 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9319s
+2025-11-05 11:14:25,524 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9324s
+2025-11-05 11:14:25,524 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9324s
+2025-11-05 11:14:25,524 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9380s
+2025-11-05 11:14:25,533 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 11:14:25,536 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 11:14:25,538 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:14:28,646 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1071s
+2025-11-05 11:14:28,647 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1089s
+2025-11-05 11:14:28,647 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1089s
+2025-11-05 11:14:28,647 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1144s
+2025-11-05 11:14:28,657 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 11:14:28,659 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 11:14:28,662 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:14:31,595 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9325s
+2025-11-05 11:14:31,595 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9329s
+2025-11-05 11:14:31,595 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9329s
+2025-11-05 11:14:31,595 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9383s
+2025-11-05 11:14:31,604 - src.system - INFO - [System] Simulation complete: 192 steps in 25.94s
+2025-11-05 11:14:31,604 - src.system - INFO - [System] Step time stats - Avg: 135.08ms, Min: 0.25ms, Max: 4557.31ms, P95: 0.84ms
+2025-11-05 11:14:31,604 - root - INFO - [Main] Simulation completed in 25.94s
+2025-11-05 11:14:33,919 - root - INFO - [Main] Total execution time: 30.29s
+2025-11-05 11:29:37,592 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 11:29:39,661 - root - INFO - [Main] Setup completed in 2.05s
+2025-11-05 11:29:39,661 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 11:29:39,661 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 11:29:39,664 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:29:39,942 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2780s
+2025-11-05 11:29:45,187 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.2450s
+2025-11-05 11:29:45,245 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.3029s
+2025-11-05 11:29:45,245 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.3031s
+2025-11-05 11:29:45,245 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.5837s
+2025-11-05 11:29:45,255 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 11:29:45,257 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 11:29:45,260 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 11:29:48,296 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0361s
+2025-11-05 11:29:48,297 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0365s
+2025-11-05 11:29:48,297 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0366s
+2025-11-05 11:29:48,297 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0420s
+2025-11-05 11:29:48,307 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 11:29:48,309 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 11:29:48,312 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:29:51,238 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9252s
+2025-11-05 11:29:51,238 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9257s
+2025-11-05 11:29:51,238 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9257s
+2025-11-05 11:29:51,238 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9314s
+2025-11-05 11:29:51,247 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 11:29:51,250 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 11:29:51,253 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:29:54,375 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1221s
+2025-11-05 11:29:54,375 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1224s
+2025-11-05 11:29:54,375 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1225s
+2025-11-05 11:29:54,375 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1281s
+2025-11-05 11:29:54,384 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 11:29:54,387 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 11:29:54,390 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:29:57,411 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0214s
+2025-11-05 11:29:57,412 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0218s
+2025-11-05 11:29:57,412 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0218s
+2025-11-05 11:29:57,412 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0277s
+2025-11-05 11:29:57,421 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 11:29:57,424 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:29:57,427 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:30:00,357 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9304s
+2025-11-05 11:30:00,357 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9309s
+2025-11-05 11:30:00,357 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9309s
+2025-11-05 11:30:00,357 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9363s
+2025-11-05 11:30:00,367 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 11:30:00,369 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 11:30:00,373 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:30:03,285 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9120s
+2025-11-05 11:30:03,285 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9124s
+2025-11-05 11:30:03,285 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9125s
+2025-11-05 11:30:03,285 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9185s
+2025-11-05 11:30:03,294 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 11:30:03,297 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 11:30:03,300 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:30:06,404 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1045s
+2025-11-05 11:30:06,406 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1059s
+2025-11-05 11:30:06,406 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1059s
+2025-11-05 11:30:06,406 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1117s
+2025-11-05 11:30:06,416 - src.system - INFO - [System] Simulation complete: 192 steps in 26.75s
+2025-11-05 11:30:06,416 - src.system - INFO - [System] Step time stats - Avg: 139.34ms, Min: 0.25ms, Max: 5584.25ms, P95: 0.68ms
+2025-11-05 11:30:06,417 - root - INFO - [Main] Simulation completed in 26.76s
+2025-11-05 11:30:08,688 - root - INFO - [Main] Total execution time: 31.08s
+2025-11-05 11:39:28,169 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 11:39:30,193 - root - INFO - [Main] Setup completed in 2.02s
+2025-11-05 11:39:30,194 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 11:39:30,194 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 11:39:30,196 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:39:30,513 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.3164s
+2025-11-05 11:39:35,818 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.3046s
+2025-11-05 11:39:35,871 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.3583s
+2025-11-05 11:39:35,872 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.3585s
+2025-11-05 11:39:35,872 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.6775s
+2025-11-05 11:39:35,881 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 11:39:35,884 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 11:39:35,887 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:39:38,918 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0317s
+2025-11-05 11:39:38,919 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0322s
+2025-11-05 11:39:38,919 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0322s
+2025-11-05 11:39:38,919 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0375s
+2025-11-05 11:39:38,928 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 11:39:38,931 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 11:39:38,934 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:39:41,803 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.8696s
+2025-11-05 11:39:41,804 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.8701s
+2025-11-05 11:39:41,804 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.8701s
+2025-11-05 11:39:41,804 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.8763s
+2025-11-05 11:39:41,813 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 11:39:41,816 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:39:41,819 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:39:44,691 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.8727s
+2025-11-05 11:39:44,692 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.8734s
+2025-11-05 11:39:44,692 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.8735s
+2025-11-05 11:39:44,692 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.8791s
+2025-11-05 11:39:44,702 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 11:39:44,705 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 11:39:44,708 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:39:47,618 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9105s
+2025-11-05 11:39:47,618 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9109s
+2025-11-05 11:39:47,619 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9110s
+2025-11-05 11:39:47,619 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9167s
+2025-11-05 11:39:47,628 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 11:39:47,631 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 11:39:47,633 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:39:50,553 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9200s
+2025-11-05 11:39:50,554 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9204s
+2025-11-05 11:39:50,554 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9205s
+2025-11-05 11:39:50,554 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9261s
+2025-11-05 11:39:50,563 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 11:39:50,566 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 11:39:50,569 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:39:53,435 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.8659s
+2025-11-05 11:39:53,435 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.8663s
+2025-11-05 11:39:53,435 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.8664s
+2025-11-05 11:39:53,435 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.8721s
+2025-11-05 11:39:53,444 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 11:39:53,447 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:39:53,450 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:39:56,390 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9404s
+2025-11-05 11:39:56,390 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9408s
+2025-11-05 11:39:56,390 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9409s
+2025-11-05 11:39:56,390 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9464s
+2025-11-05 11:39:56,401 - src.system - INFO - [System] Simulation complete: 192 steps in 26.21s
+2025-11-05 11:39:56,401 - src.system - INFO - [System] Step time stats - Avg: 136.49ms, Min: 0.25ms, Max: 5678.02ms, P95: 0.68ms
+2025-11-05 11:39:56,402 - root - INFO - [Main] Simulation completed in 26.21s
+2025-11-05 11:39:58,653 - root - INFO - [Main] Total execution time: 30.48s
+2025-11-05 11:45:29,650 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 11:45:31,648 - root - INFO - [Main] Setup completed in 1.99s
+2025-11-05 11:45:31,648 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 11:45:31,648 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 11:45:31,651 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 11:45:31,857 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2066s
+2025-11-05 11:45:37,080 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.2222s
+2025-11-05 11:45:37,140 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.2823s
+2025-11-05 11:45:37,140 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.2824s
+2025-11-05 11:45:37,140 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.4914s
+2025-11-05 11:45:37,150 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 11:45:37,153 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 11:45:37,156 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 11:45:40,186 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0297s
+2025-11-05 11:45:40,186 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0302s
+2025-11-05 11:45:40,186 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0302s
+2025-11-05 11:45:40,186 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0363s
+2025-11-05 11:45:40,196 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 11:45:40,198 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 11:45:40,201 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 11:45:43,368 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1663s
+2025-11-05 11:45:43,368 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1667s
+2025-11-05 11:45:43,368 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1667s
+2025-11-05 11:45:43,368 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1727s
+2025-11-05 11:45:43,377 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 11:45:43,380 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 11:45:43,383 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0033s
+2025-11-05 11:45:46,344 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9602s
+2025-11-05 11:45:46,344 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9606s
+2025-11-05 11:45:46,344 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9606s
+2025-11-05 11:45:46,344 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9670s
+2025-11-05 11:45:46,353 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 11:45:46,356 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 11:45:46,359 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:45:49,313 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9543s
+2025-11-05 11:45:49,313 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9548s
+2025-11-05 11:45:49,313 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9548s
+2025-11-05 11:45:49,313 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9605s
+2025-11-05 11:45:49,323 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 11:45:49,326 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 11:45:49,329 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:45:52,294 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9651s
+2025-11-05 11:45:52,294 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9655s
+2025-11-05 11:45:52,294 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9655s
+2025-11-05 11:45:52,294 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9716s
+2025-11-05 11:45:52,303 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 11:45:52,306 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 11:45:52,309 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:45:55,232 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9231s
+2025-11-05 11:45:55,233 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9235s
+2025-11-05 11:45:55,233 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9236s
+2025-11-05 11:45:55,233 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9297s
+2025-11-05 11:45:55,242 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 11:45:55,245 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 11:45:55,248 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:45:58,156 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9081s
+2025-11-05 11:45:58,156 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9085s
+2025-11-05 11:45:58,156 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9085s
+2025-11-05 11:45:58,156 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9144s
+2025-11-05 11:45:58,165 - src.system - INFO - [System] Simulation complete: 192 steps in 26.52s
+2025-11-05 11:45:58,165 - src.system - INFO - [System] Step time stats - Avg: 138.11ms, Min: 0.25ms, Max: 5491.92ms, P95: 0.72ms
+2025-11-05 11:45:58,166 - root - INFO - [Main] Simulation completed in 26.52s
+2025-11-05 11:46:00,422 - root - INFO - [Main] Total execution time: 30.77s
+2025-11-05 11:50:57,205 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 11:50:59,201 - root - INFO - [Main] Setup completed in 1.99s
+2025-11-05 11:50:59,201 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 11:50:59,201 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 11:50:59,204 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 11:50:59,423 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2195s
+2025-11-05 11:51:04,640 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.2164s
+2025-11-05 11:51:04,694 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.2704s
+2025-11-05 11:51:04,694 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.2706s
+2025-11-05 11:51:04,694 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.4925s
+2025-11-05 11:51:04,704 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 11:51:04,706 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:51:04,709 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:51:07,656 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9464s
+2025-11-05 11:51:07,656 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9468s
+2025-11-05 11:51:07,656 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9469s
+2025-11-05 11:51:07,656 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9525s
+2025-11-05 11:51:07,665 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 11:51:07,668 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 11:51:07,671 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:51:10,780 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1090s
+2025-11-05 11:51:10,780 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1094s
+2025-11-05 11:51:10,780 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1095s
+2025-11-05 11:51:10,780 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1156s
+2025-11-05 11:51:10,789 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 11:51:10,792 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 11:51:10,795 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:51:13,802 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0073s
+2025-11-05 11:51:13,802 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0077s
+2025-11-05 11:51:13,803 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0078s
+2025-11-05 11:51:13,803 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0135s
+2025-11-05 11:51:13,811 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 11:51:13,814 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 11:51:13,817 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:51:16,785 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9678s
+2025-11-05 11:51:16,785 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9682s
+2025-11-05 11:51:16,785 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9682s
+2025-11-05 11:51:16,785 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9738s
+2025-11-05 11:51:16,794 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 11:51:16,797 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 11:51:16,800 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:51:19,966 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1656s
+2025-11-05 11:51:19,966 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1660s
+2025-11-05 11:51:19,966 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1661s
+2025-11-05 11:51:19,966 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1718s
+2025-11-05 11:51:19,975 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 11:51:19,978 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 11:51:19,981 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:51:23,099 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1182s
+2025-11-05 11:51:23,100 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1186s
+2025-11-05 11:51:23,100 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1186s
+2025-11-05 11:51:23,100 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1243s
+2025-11-05 11:51:23,108 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 11:51:23,111 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 11:51:23,114 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:51:26,073 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9589s
+2025-11-05 11:51:26,073 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9593s
+2025-11-05 11:51:26,073 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9593s
+2025-11-05 11:51:26,073 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9650s
+2025-11-05 11:51:26,082 - src.system - INFO - [System] Simulation complete: 192 steps in 26.88s
+2025-11-05 11:51:26,083 - src.system - INFO - [System] Step time stats - Avg: 140.00ms, Min: 0.25ms, Max: 5492.98ms, P95: 0.71ms
+2025-11-05 11:51:26,083 - root - INFO - [Main] Simulation completed in 26.88s
+2025-11-05 11:51:28,296 - root - INFO - [Main] Total execution time: 31.09s
+2025-11-05 11:52:18,177 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 11:52:20,121 - root - INFO - [Main] Setup completed in 1.94s
+2025-11-05 11:52:20,121 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 11:52:20,122 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 11:52:20,124 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 11:52:20,341 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2168s
+2025-11-05 11:52:24,723 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 4.3820s
+2025-11-05 11:52:24,802 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 4.4613s
+2025-11-05 11:52:24,802 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 4.4615s
+2025-11-05 11:52:24,802 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 4.6807s
+2025-11-05 11:52:24,813 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 11:52:24,815 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 11:52:24,818 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:52:27,782 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9640s
+2025-11-05 11:52:27,783 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9644s
+2025-11-05 11:52:27,783 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9645s
+2025-11-05 11:52:27,783 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9702s
+2025-11-05 11:52:27,793 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 11:52:27,795 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 11:52:27,799 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 11:52:30,810 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0115s
+2025-11-05 11:52:30,811 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0120s
+2025-11-05 11:52:30,811 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0120s
+2025-11-05 11:52:30,811 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0182s
+2025-11-05 11:52:30,820 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 11:52:30,822 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 11:52:30,826 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 11:52:33,823 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9978s
+2025-11-05 11:52:33,824 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9983s
+2025-11-05 11:52:33,824 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9983s
+2025-11-05 11:52:33,824 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0044s
+2025-11-05 11:52:33,833 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 11:52:33,836 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0034s
+2025-11-05 11:52:33,840 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:52:36,799 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9596s
+2025-11-05 11:52:36,800 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9601s
+2025-11-05 11:52:36,800 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9602s
+2025-11-05 11:52:36,800 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9669s
+2025-11-05 11:52:36,810 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 11:52:36,812 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 11:52:36,815 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 11:52:39,782 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9669s
+2025-11-05 11:52:39,783 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9673s
+2025-11-05 11:52:39,783 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9674s
+2025-11-05 11:52:39,783 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9730s
+2025-11-05 11:52:39,792 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 11:52:39,795 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 11:52:39,797 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 11:52:42,885 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0879s
+2025-11-05 11:52:42,886 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0883s
+2025-11-05 11:52:42,886 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0884s
+2025-11-05 11:52:42,886 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0936s
+2025-11-05 11:52:42,895 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 11:52:42,898 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 11:52:42,901 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 11:52:45,874 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9732s
+2025-11-05 11:52:45,875 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9736s
+2025-11-05 11:52:45,875 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9736s
+2025-11-05 11:52:45,875 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9796s
+2025-11-05 11:52:45,883 - src.system - INFO - [System] Simulation complete: 192 steps in 25.76s
+2025-11-05 11:52:45,883 - src.system - INFO - [System] Step time stats - Avg: 134.18ms, Min: 0.25ms, Max: 4681.23ms, P95: 0.69ms
+2025-11-05 11:52:45,884 - root - INFO - [Main] Simulation completed in 25.76s
+2025-11-05 11:52:48,100 - root - INFO - [Main] Total execution time: 29.92s
+2025-11-05 12:08:07,997 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 12:08:10,084 - root - INFO - [Main] Setup completed in 2.07s
+2025-11-05 12:08:10,084 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 12:08:10,084 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 12:08:10,087 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 12:08:10,379 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2918s
+2025-11-05 12:08:15,747 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.3681s
+2025-11-05 12:08:15,803 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.4238s
+2025-11-05 12:08:15,803 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.4240s
+2025-11-05 12:08:15,803 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.7182s
+2025-11-05 12:08:15,812 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 12:08:15,814 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 12:08:15,817 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:08:18,754 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9363s
+2025-11-05 12:08:18,754 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9368s
+2025-11-05 12:08:18,754 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9368s
+2025-11-05 12:08:18,754 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9423s
+2025-11-05 12:08:18,764 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 12:08:18,767 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:08:18,770 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:08:21,763 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9937s
+2025-11-05 12:08:21,764 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9942s
+2025-11-05 12:08:21,764 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9943s
+2025-11-05 12:08:21,764 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0000s
+2025-11-05 12:08:21,773 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 12:08:21,776 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0029s
+2025-11-05 12:08:21,779 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 12:08:24,813 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0335s
+2025-11-05 12:08:24,814 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0349s
+2025-11-05 12:08:24,814 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0350s
+2025-11-05 12:08:24,814 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0413s
+2025-11-05 12:08:24,824 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 12:08:24,828 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0034s
+2025-11-05 12:08:24,831 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 12:08:27,741 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9095s
+2025-11-05 12:08:27,741 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9100s
+2025-11-05 12:08:27,741 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9100s
+2025-11-05 12:08:27,741 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9170s
+2025-11-05 12:08:27,751 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 12:08:27,753 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:08:27,756 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0033s
+2025-11-05 12:08:30,818 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0615s
+2025-11-05 12:08:30,818 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0619s
+2025-11-05 12:08:30,819 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0620s
+2025-11-05 12:08:30,819 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0680s
+2025-11-05 12:08:30,828 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 12:08:30,830 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:08:30,834 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:08:33,742 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9081s
+2025-11-05 12:08:33,742 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9085s
+2025-11-05 12:08:33,742 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9086s
+2025-11-05 12:08:33,742 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9144s
+2025-11-05 12:08:33,751 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 12:08:33,754 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:08:33,757 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 12:08:36,784 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0263s
+2025-11-05 12:08:36,784 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0267s
+2025-11-05 12:08:36,784 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0268s
+2025-11-05 12:08:36,784 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0328s
+2025-11-05 12:08:36,794 - src.system - INFO - [System] Simulation complete: 192 steps in 26.71s
+2025-11-05 12:08:36,794 - src.system - INFO - [System] Step time stats - Avg: 139.10ms, Min: 0.25ms, Max: 5718.67ms, P95: 0.69ms
+2025-11-05 12:08:36,795 - root - INFO - [Main] Simulation completed in 26.71s
+2025-11-05 12:08:39,042 - root - INFO - [Main] Total execution time: 31.03s
+2025-11-05 12:11:36,628 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 12:11:38,702 - root - INFO - [Main] Setup completed in 2.07s
+2025-11-05 12:11:38,702 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 12:11:38,703 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 12:11:38,705 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0021s
+2025-11-05 12:11:38,948 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2435s
+2025-11-05 12:11:44,310 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.3612s
+2025-11-05 12:11:44,364 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.4152s
+2025-11-05 12:11:44,364 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.4153s
+2025-11-05 12:11:44,364 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.6611s
+2025-11-05 12:11:44,373 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 12:11:44,375 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 12:11:44,378 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:11:47,314 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9356s
+2025-11-05 12:11:47,314 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9361s
+2025-11-05 12:11:47,314 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9362s
+2025-11-05 12:11:47,314 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9415s
+2025-11-05 12:11:47,325 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 12:11:47,327 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:11:47,330 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:11:50,362 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0314s
+2025-11-05 12:11:50,362 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0318s
+2025-11-05 12:11:50,362 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0318s
+2025-11-05 12:11:50,362 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0377s
+2025-11-05 12:11:50,372 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 12:11:50,375 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 12:11:50,378 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 12:11:53,328 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9502s
+2025-11-05 12:11:53,329 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9506s
+2025-11-05 12:11:53,329 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9507s
+2025-11-05 12:11:53,329 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9563s
+2025-11-05 12:11:53,338 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 12:11:53,341 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0029s
+2025-11-05 12:11:53,344 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:11:56,466 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1220s
+2025-11-05 12:11:56,466 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1225s
+2025-11-05 12:11:56,466 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1226s
+2025-11-05 12:11:56,466 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1286s
+2025-11-05 12:11:56,475 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 12:11:56,478 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:11:56,481 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 12:11:59,453 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9720s
+2025-11-05 12:11:59,453 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9724s
+2025-11-05 12:11:59,453 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9724s
+2025-11-05 12:11:59,453 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9781s
+2025-11-05 12:11:59,463 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 12:11:59,465 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:11:59,468 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:12:02,567 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0992s
+2025-11-05 12:12:02,568 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0995s
+2025-11-05 12:12:02,568 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0996s
+2025-11-05 12:12:02,568 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1051s
+2025-11-05 12:12:02,576 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 12:12:02,579 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:12:02,582 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:12:05,487 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9047s
+2025-11-05 12:12:05,489 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9069s
+2025-11-05 12:12:05,489 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9070s
+2025-11-05 12:12:05,489 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9128s
+2025-11-05 12:12:05,499 - src.system - INFO - [System] Simulation complete: 192 steps in 26.80s
+2025-11-05 12:12:05,499 - src.system - INFO - [System] Step time stats - Avg: 139.56ms, Min: 0.25ms, Max: 5661.58ms, P95: 0.71ms
+2025-11-05 12:12:05,500 - root - INFO - [Main] Simulation completed in 26.80s
+2025-11-05 12:12:07,766 - root - INFO - [Main] Total execution time: 31.13s
+2025-11-05 12:12:31,901 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 12:12:33,973 - root - INFO - [Main] Setup completed in 2.06s
+2025-11-05 12:12:33,973 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 12:12:33,973 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 12:12:33,975 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 12:12:34,218 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2424s
+2025-11-05 12:12:39,640 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.4222s
+2025-11-05 12:12:39,698 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.4800s
+2025-11-05 12:12:39,698 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.4801s
+2025-11-05 12:12:39,698 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.7251s
+2025-11-05 12:12:39,709 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 12:12:39,711 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 12:12:39,714 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 12:12:42,640 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9257s
+2025-11-05 12:12:42,641 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9262s
+2025-11-05 12:12:42,641 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9263s
+2025-11-05 12:12:42,641 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9321s
+2025-11-05 12:12:42,650 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 12:12:42,652 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 12:12:42,656 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0033s
+2025-11-05 12:12:45,621 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9653s
+2025-11-05 12:12:45,622 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9658s
+2025-11-05 12:12:45,622 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9658s
+2025-11-05 12:12:45,622 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9722s
+2025-11-05 12:12:45,634 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 12:12:45,637 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:12:45,640 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 12:12:48,544 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9040s
+2025-11-05 12:12:48,544 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9044s
+2025-11-05 12:12:48,544 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9044s
+2025-11-05 12:12:48,544 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9103s
+2025-11-05 12:12:48,553 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 12:12:48,556 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 12:12:48,559 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:12:51,619 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0601s
+2025-11-05 12:12:51,620 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0606s
+2025-11-05 12:12:51,620 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0606s
+2025-11-05 12:12:51,620 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0665s
+2025-11-05 12:12:51,628 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 12:12:51,631 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 12:12:51,634 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:12:54,685 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0513s
+2025-11-05 12:12:54,686 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0518s
+2025-11-05 12:12:54,686 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0518s
+2025-11-05 12:12:54,686 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0573s
+2025-11-05 12:12:54,695 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 12:12:54,697 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 12:12:54,700 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:12:57,632 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9322s
+2025-11-05 12:12:57,632 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9325s
+2025-11-05 12:12:57,632 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9326s
+2025-11-05 12:12:57,633 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9379s
+2025-11-05 12:12:57,641 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 12:12:57,644 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 12:12:57,647 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:13:00,764 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1165s
+2025-11-05 12:13:00,764 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1169s
+2025-11-05 12:13:00,764 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1170s
+2025-11-05 12:13:00,764 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1230s
+2025-11-05 12:13:00,773 - src.system - INFO - [System] Simulation complete: 192 steps in 26.80s
+2025-11-05 12:13:00,773 - src.system - INFO - [System] Step time stats - Avg: 139.58ms, Min: 0.25ms, Max: 5725.49ms, P95: 0.82ms
+2025-11-05 12:13:00,774 - root - INFO - [Main] Simulation completed in 26.80s
+2025-11-05 12:13:03,019 - root - INFO - [Main] Total execution time: 31.11s
+2025-11-05 12:16:52,921 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 12:16:55,391 - root - INFO - [Main] Setup completed in 2.46s
+2025-11-05 12:16:55,391 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 12:16:55,391 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 12:16:55,393 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 12:16:55,634 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2407s
+2025-11-05 12:17:01,368 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.7339s
+2025-11-05 12:17:01,458 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8232s
+2025-11-05 12:17:01,458 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8233s
+2025-11-05 12:17:01,458 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.0665s
+2025-11-05 12:17:01,467 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 12:17:01,470 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 12:17:01,473 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 12:17:04,718 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.2447s
+2025-11-05 12:17:04,718 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.2452s
+2025-11-05 12:17:04,718 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.2452s
+2025-11-05 12:17:04,718 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.2508s
+2025-11-05 12:17:04,727 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 12:17:04,730 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:17:04,733 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:17:07,994 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.2614s
+2025-11-05 12:17:07,995 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.2622s
+2025-11-05 12:17:07,995 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.2622s
+2025-11-05 12:17:07,995 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.2679s
+2025-11-05 12:17:08,005 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 12:17:08,008 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:17:08,011 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0033s
+2025-11-05 12:17:11,460 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.4490s
+2025-11-05 12:17:11,461 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.4495s
+2025-11-05 12:17:11,461 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.4495s
+2025-11-05 12:17:11,461 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.4556s
+2025-11-05 12:17:11,470 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 12:17:11,474 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0032s
+2025-11-05 12:17:11,477 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0033s
+2025-11-05 12:17:14,669 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1923s
+2025-11-05 12:17:14,670 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1927s
+2025-11-05 12:17:14,670 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1927s
+2025-11-05 12:17:14,670 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1995s
+2025-11-05 12:17:14,679 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 12:17:14,682 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 12:17:14,685 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 12:17:17,896 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.2108s
+2025-11-05 12:17:17,897 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.2113s
+2025-11-05 12:17:17,897 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.2113s
+2025-11-05 12:17:17,897 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.2174s
+2025-11-05 12:17:17,906 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 12:17:17,909 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 12:17:17,912 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:17:21,087 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1756s
+2025-11-05 12:17:21,088 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1760s
+2025-11-05 12:17:21,088 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1760s
+2025-11-05 12:17:21,088 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1815s
+2025-11-05 12:17:21,098 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 12:17:21,100 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 12:17:21,104 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 12:17:24,334 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.2306s
+2025-11-05 12:17:24,335 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.2313s
+2025-11-05 12:17:24,335 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.2313s
+2025-11-05 12:17:24,335 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.2373s
+2025-11-05 12:17:24,344 - src.system - INFO - [System] Simulation complete: 192 steps in 28.95s
+2025-11-05 12:17:24,344 - src.system - INFO - [System] Step time stats - Avg: 150.79ms, Min: 0.25ms, Max: 6066.98ms, P95: 0.74ms
+2025-11-05 12:17:24,345 - root - INFO - [Main] Simulation completed in 28.95s
+2025-11-05 12:17:26,661 - root - INFO - [Main] Total execution time: 33.73s
+2025-11-05 12:20:07,025 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 12:20:09,166 - root - INFO - [Main] Setup completed in 2.13s
+2025-11-05 12:20:09,166 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 12:20:09,166 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 12:20:09,169 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 12:20:09,418 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2490s
+2025-11-05 12:20:14,882 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.4647s
+2025-11-05 12:20:14,935 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.5169s
+2025-11-05 12:20:14,935 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.5170s
+2025-11-05 12:20:14,935 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.7687s
+2025-11-05 12:20:14,944 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 12:20:14,946 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 12:20:14,949 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:20:17,878 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9290s
+2025-11-05 12:20:17,879 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9294s
+2025-11-05 12:20:17,879 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9295s
+2025-11-05 12:20:17,879 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9348s
+2025-11-05 12:20:17,888 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 12:20:17,891 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:20:17,894 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:20:20,864 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9700s
+2025-11-05 12:20:20,864 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9706s
+2025-11-05 12:20:20,864 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9706s
+2025-11-05 12:20:20,864 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9764s
+2025-11-05 12:20:20,875 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 12:20:20,877 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 12:20:20,880 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 12:20:23,799 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9183s
+2025-11-05 12:20:23,799 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9187s
+2025-11-05 12:20:23,799 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9187s
+2025-11-05 12:20:23,799 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9244s
+2025-11-05 12:20:23,808 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 12:20:23,811 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 12:20:23,814 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:20:26,763 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9491s
+2025-11-05 12:20:26,763 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9496s
+2025-11-05 12:20:26,764 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9496s
+2025-11-05 12:20:26,764 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9556s
+2025-11-05 12:20:26,773 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 12:20:26,775 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 12:20:26,779 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:20:29,687 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9083s
+2025-11-05 12:20:29,687 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9087s
+2025-11-05 12:20:29,687 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9087s
+2025-11-05 12:20:29,687 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9143s
+2025-11-05 12:20:29,696 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 12:20:29,699 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 12:20:29,702 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:20:32,642 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9398s
+2025-11-05 12:20:32,642 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9402s
+2025-11-05 12:20:32,642 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9402s
+2025-11-05 12:20:32,642 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9462s
+2025-11-05 12:20:32,651 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 12:20:32,654 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 12:20:32,657 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 12:20:35,682 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0251s
+2025-11-05 12:20:35,682 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0255s
+2025-11-05 12:20:35,682 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0256s
+2025-11-05 12:20:35,682 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0314s
+2025-11-05 12:20:35,692 - src.system - INFO - [System] Simulation complete: 192 steps in 26.53s
+2025-11-05 12:20:35,692 - src.system - INFO - [System] Step time stats - Avg: 138.15ms, Min: 0.25ms, Max: 5769.20ms, P95: 0.70ms
+2025-11-05 12:20:35,693 - root - INFO - [Main] Simulation completed in 26.53s
+2025-11-05 12:20:37,932 - root - INFO - [Main] Total execution time: 30.90s
+2025-11-05 12:22:04,124 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 12:22:06,407 - root - INFO - [Main] Setup completed in 2.28s
+2025-11-05 12:22:06,407 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 12:22:06,408 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 12:22:06,410 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 12:22:06,661 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2507s
+2025-11-05 12:22:12,229 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.5679s
+2025-11-05 12:22:12,282 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.6208s
+2025-11-05 12:22:12,282 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.6210s
+2025-11-05 12:22:12,282 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8743s
+2025-11-05 12:22:12,291 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 12:22:12,294 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 12:22:12,297 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 12:22:15,769 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.4726s
+2025-11-05 12:22:15,770 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.4731s
+2025-11-05 12:22:15,770 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.4731s
+2025-11-05 12:22:15,770 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.4786s
+2025-11-05 12:22:15,784 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 12:22:15,787 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0032s
+2025-11-05 12:22:15,793 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0036s
+2025-11-05 12:22:19,057 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.2630s
+2025-11-05 12:22:19,057 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.2634s
+2025-11-05 12:22:19,057 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.2634s
+2025-11-05 12:22:19,057 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.2728s
+2025-11-05 12:22:19,066 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 12:22:19,069 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0029s
+2025-11-05 12:22:19,072 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:22:23,366 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 4.2946s
+2025-11-05 12:22:23,367 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 4.2950s
+2025-11-05 12:22:23,367 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 4.2950s
+2025-11-05 12:22:23,367 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 4.3010s
+2025-11-05 12:22:23,377 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 12:22:23,380 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0035s
+2025-11-05 12:22:23,384 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:22:26,356 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9727s
+2025-11-05 12:22:26,357 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9731s
+2025-11-05 12:22:26,357 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9731s
+2025-11-05 12:22:26,357 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9801s
+2025-11-05 12:22:26,366 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 12:22:26,368 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 12:22:26,371 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 12:22:29,464 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0929s
+2025-11-05 12:22:29,465 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0934s
+2025-11-05 12:22:29,465 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0934s
+2025-11-05 12:22:29,465 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0993s
+2025-11-05 12:22:29,476 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 12:22:29,478 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 12:22:29,481 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:22:32,586 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1048s
+2025-11-05 12:22:32,586 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1052s
+2025-11-05 12:22:32,586 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1052s
+2025-11-05 12:22:32,586 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1109s
+2025-11-05 12:22:32,596 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 12:22:32,599 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0029s
+2025-11-05 12:22:32,602 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 12:22:35,564 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9620s
+2025-11-05 12:22:35,564 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9625s
+2025-11-05 12:22:35,564 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9625s
+2025-11-05 12:22:35,564 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9685s
+2025-11-05 12:22:35,573 - src.system - INFO - [System] Simulation complete: 192 steps in 29.17s
+2025-11-05 12:22:35,573 - src.system - INFO - [System] Step time stats - Avg: 151.90ms, Min: 0.25ms, Max: 5874.80ms, P95: 1.13ms
+2025-11-05 12:22:35,574 - root - INFO - [Main] Simulation completed in 29.17s
+2025-11-05 12:22:37,817 - root - INFO - [Main] Total execution time: 33.69s
+2025-11-05 12:22:42,737 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 12:22:44,861 - root - INFO - [Main] Setup completed in 2.12s
+2025-11-05 12:22:44,862 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 12:22:44,862 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 12:22:44,864 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 12:22:45,054 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.1895s
+2025-11-05 12:22:50,366 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.3117s
+2025-11-05 12:22:50,419 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.3655s
+2025-11-05 12:22:50,419 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.3656s
+2025-11-05 12:22:50,419 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.5575s
+2025-11-05 12:22:50,429 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 12:22:50,431 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 12:22:50,434 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:22:53,509 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.0746s
+2025-11-05 12:22:53,509 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.0750s
+2025-11-05 12:22:53,509 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.0750s
+2025-11-05 12:22:53,509 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.0804s
+2025-11-05 12:22:53,518 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 12:22:53,521 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 12:22:53,524 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:22:56,436 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9122s
+2025-11-05 12:22:56,437 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9126s
+2025-11-05 12:22:56,437 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9127s
+2025-11-05 12:22:56,437 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9186s
+2025-11-05 12:22:56,446 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 12:22:56,449 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 12:22:56,452 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:22:59,388 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9359s
+2025-11-05 12:22:59,388 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9362s
+2025-11-05 12:22:59,388 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9363s
+2025-11-05 12:22:59,388 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9421s
+2025-11-05 12:22:59,397 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 12:22:59,400 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0033s
+2025-11-05 12:22:59,404 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 12:23:02,357 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9532s
+2025-11-05 12:23:02,357 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9536s
+2025-11-05 12:23:02,357 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9536s
+2025-11-05 12:23:02,357 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9603s
+2025-11-05 12:23:02,366 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 12:23:02,369 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 12:23:02,372 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:23:05,293 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9211s
+2025-11-05 12:23:05,294 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9216s
+2025-11-05 12:23:05,294 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9216s
+2025-11-05 12:23:05,294 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9277s
+2025-11-05 12:23:05,303 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 12:23:05,306 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 12:23:05,309 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 12:23:08,235 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 2.9264s
+2025-11-05 12:23:08,236 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 2.9269s
+2025-11-05 12:23:08,236 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 2.9269s
+2025-11-05 12:23:08,236 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 2.9329s
+2025-11-05 12:23:08,245 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 12:23:08,248 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 12:23:08,251 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 12:23:11,365 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 3.1144s
+2025-11-05 12:23:11,365 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 3.1149s
+2025-11-05 12:23:11,365 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 3.1149s
+2025-11-05 12:23:11,366 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 3.1203s
+2025-11-05 12:23:11,375 - src.system - INFO - [System] Simulation complete: 192 steps in 26.51s
+2025-11-05 12:23:11,375 - src.system - INFO - [System] Step time stats - Avg: 138.09ms, Min: 0.25ms, Max: 5557.96ms, P95: 0.67ms
+2025-11-05 12:23:11,376 - root - INFO - [Main] Simulation completed in 26.51s
+2025-11-05 12:23:13,579 - root - INFO - [Main] Total execution time: 30.84s
+2025-11-05 13:07:30,647 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 13:07:32,691 - root - INFO - [Main] Setup completed in 2.02s
+2025-11-05 13:07:32,691 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 13:07:32,692 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 13:07:32,694 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 13:07:32,943 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2489s
+2025-11-05 13:07:40,652 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 7.7086s
+2025-11-05 13:07:40,705 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 7.7621s
+2025-11-05 13:07:40,705 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 7.7622s
+2025-11-05 13:07:40,705 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 8.0136s
+2025-11-05 13:07:40,715 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 13:07:40,717 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 13:07:40,720 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:07:46,436 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.7153s
+2025-11-05 13:07:46,436 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.7157s
+2025-11-05 13:07:46,436 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.7158s
+2025-11-05 13:07:46,436 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.7213s
+2025-11-05 13:07:46,445 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 13:07:46,447 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 13:07:46,450 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:07:52,352 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.9017s
+2025-11-05 13:07:52,352 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.9021s
+2025-11-05 13:07:52,352 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.9021s
+2025-11-05 13:07:52,352 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.9077s
+2025-11-05 13:07:52,361 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 13:07:52,364 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 13:07:52,367 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:07:58,063 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.6964s
+2025-11-05 13:07:58,064 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.6969s
+2025-11-05 13:07:58,064 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.6969s
+2025-11-05 13:07:58,064 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.7026s
+2025-11-05 13:07:58,074 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 13:07:58,077 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 13:07:58,080 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 13:08:03,697 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.6173s
+2025-11-05 13:08:03,698 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.6177s
+2025-11-05 13:08:03,698 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.6178s
+2025-11-05 13:08:03,698 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.6235s
+2025-11-05 13:08:03,706 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 13:08:03,709 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 13:08:03,712 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 13:08:09,527 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8157s
+2025-11-05 13:08:09,528 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8161s
+2025-11-05 13:08:09,528 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8162s
+2025-11-05 13:08:09,528 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8215s
+2025-11-05 13:08:09,537 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 13:08:09,540 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 13:08:09,542 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:08:15,401 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8584s
+2025-11-05 13:08:15,401 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8588s
+2025-11-05 13:08:15,401 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8589s
+2025-11-05 13:08:15,401 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8643s
+2025-11-05 13:08:15,410 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 13:08:15,413 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 13:08:15,416 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0026s
+2025-11-05 13:08:21,382 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.9666s
+2025-11-05 13:08:21,383 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.9670s
+2025-11-05 13:08:21,383 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.9670s
+2025-11-05 13:08:21,383 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.9724s
+2025-11-05 13:08:21,392 - src.system - INFO - [System] Simulation complete: 192 steps in 48.70s
+2025-11-05 13:08:21,392 - src.system - INFO - [System] Step time stats - Avg: 253.65ms, Min: 0.25ms, Max: 8014.07ms, P95: 0.73ms
+2025-11-05 13:08:21,394 - root - INFO - [Main] Simulation completed in 48.70s
+2025-11-05 13:08:23,618 - root - INFO - [Main] Total execution time: 52.95s
+2025-11-05 13:10:13,807 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 13:10:15,814 - root - INFO - [Main] Setup completed in 2.00s
+2025-11-05 13:10:15,814 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 13:10:15,815 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 13:10:15,817 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0021s
+2025-11-05 13:10:16,037 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2197s
+2025-11-05 13:10:23,955 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 7.9183s
+2025-11-05 13:10:24,009 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 7.9726s
+2025-11-05 13:10:24,010 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 7.9728s
+2025-11-05 13:10:24,010 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 8.1949s
+2025-11-05 13:10:24,019 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 13:10:24,021 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 13:10:24,024 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:10:29,625 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.6004s
+2025-11-05 13:10:29,625 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.6008s
+2025-11-05 13:10:29,625 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.6009s
+2025-11-05 13:10:29,625 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.6062s
+2025-11-05 13:10:29,634 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 13:10:29,637 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 13:10:29,639 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:10:35,490 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8501s
+2025-11-05 13:10:35,491 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8514s
+2025-11-05 13:10:35,491 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8515s
+2025-11-05 13:10:35,491 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8571s
+2025-11-05 13:10:35,500 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 13:10:35,502 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 13:10:35,505 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:10:41,181 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.6737s
+2025-11-05 13:10:41,181 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.6741s
+2025-11-05 13:10:41,181 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.6742s
+2025-11-05 13:10:41,181 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.6817s
+2025-11-05 13:10:41,191 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 13:10:41,194 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 13:10:41,197 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 13:10:47,034 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8378s
+2025-11-05 13:10:47,035 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8383s
+2025-11-05 13:10:47,035 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8383s
+2025-11-05 13:10:47,035 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8438s
+2025-11-05 13:10:47,044 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 13:10:47,047 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 13:10:47,050 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:10:52,646 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.5969s
+2025-11-05 13:10:52,647 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.5973s
+2025-11-05 13:10:52,647 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.5974s
+2025-11-05 13:10:52,647 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.6029s
+2025-11-05 13:10:52,656 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 13:10:52,659 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 13:10:52,662 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 13:10:58,313 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.6514s
+2025-11-05 13:10:58,314 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.6518s
+2025-11-05 13:10:58,314 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.6519s
+2025-11-05 13:10:58,314 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.6576s
+2025-11-05 13:10:58,322 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 13:10:58,325 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 13:10:58,328 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 13:11:04,021 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.6928s
+2025-11-05 13:11:04,021 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.6932s
+2025-11-05 13:11:04,021 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.6933s
+2025-11-05 13:11:04,021 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.6991s
+2025-11-05 13:11:04,031 - src.system - INFO - [System] Simulation complete: 192 steps in 48.22s
+2025-11-05 13:11:04,031 - src.system - INFO - [System] Step time stats - Avg: 251.13ms, Min: 0.25ms, Max: 8195.43ms, P95: 0.68ms
+2025-11-05 13:11:04,032 - root - INFO - [Main] Simulation completed in 48.22s
+2025-11-05 13:11:06,268 - root - INFO - [Main] Total execution time: 52.46s
+2025-11-05 13:12:36,189 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 13:12:38,122 - root - INFO - [Main] Setup completed in 1.93s
+2025-11-05 13:12:38,122 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 13:12:38,123 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 13:12:38,125 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 13:12:38,365 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2403s
+2025-11-05 13:12:46,332 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 7.9666s
+2025-11-05 13:12:46,386 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 8.0210s
+2025-11-05 13:12:46,386 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 8.0211s
+2025-11-05 13:12:46,386 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 8.2638s
+2025-11-05 13:12:46,396 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 13:12:46,398 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 13:12:46,401 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 13:12:52,199 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.7980s
+2025-11-05 13:12:52,200 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.7988s
+2025-11-05 13:12:52,200 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.7988s
+2025-11-05 13:12:52,200 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8041s
+2025-11-05 13:12:52,209 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 13:12:52,212 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 13:12:52,214 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:12:57,905 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.6911s
+2025-11-05 13:12:57,906 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.6916s
+2025-11-05 13:12:57,906 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.6916s
+2025-11-05 13:12:57,906 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.6967s
+2025-11-05 13:12:57,915 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 13:12:57,918 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 13:12:57,921 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 13:13:03,521 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.6002s
+2025-11-05 13:13:03,522 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.6009s
+2025-11-05 13:13:03,522 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.6010s
+2025-11-05 13:13:03,522 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.6069s
+2025-11-05 13:13:03,533 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 13:13:03,535 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 13:13:03,538 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 13:13:09,145 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.6071s
+2025-11-05 13:13:09,146 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.6078s
+2025-11-05 13:13:09,146 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.6078s
+2025-11-05 13:13:09,146 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.6132s
+2025-11-05 13:13:09,155 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 13:13:09,158 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 13:13:09,160 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:13:15,201 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.0404s
+2025-11-05 13:13:15,202 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.0413s
+2025-11-05 13:13:15,202 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.0413s
+2025-11-05 13:13:15,202 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.0465s
+2025-11-05 13:13:15,212 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 13:13:15,215 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0028s
+2025-11-05 13:13:15,218 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 13:13:20,884 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.6659s
+2025-11-05 13:13:20,885 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.6673s
+2025-11-05 13:13:20,885 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.6674s
+2025-11-05 13:13:20,885 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.6734s
+2025-11-05 13:13:20,894 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 13:13:20,897 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 13:13:20,899 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0028s
+2025-11-05 13:13:26,661 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.7614s
+2025-11-05 13:13:26,661 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.7619s
+2025-11-05 13:13:26,661 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.7619s
+2025-11-05 13:13:26,662 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.7672s
+2025-11-05 13:13:26,671 - src.system - INFO - [System] Simulation complete: 192 steps in 48.55s
+2025-11-05 13:13:26,671 - src.system - INFO - [System] Step time stats - Avg: 252.85ms, Min: 0.25ms, Max: 8264.26ms, P95: 0.93ms
+2025-11-05 13:13:26,672 - root - INFO - [Main] Simulation completed in 48.55s
+2025-11-05 13:13:28,915 - root - INFO - [Main] Total execution time: 52.72s
+2025-11-05 13:15:49,793 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 13:15:51,804 - root - INFO - [Main] Setup completed in 1.98s
+2025-11-05 13:15:51,804 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-26 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 13:15:51,805 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 13:15:51,807 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 13:15:52,121 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.3138s
+2025-11-05 13:16:05,654 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 13.5332s
+2025-11-05 13:16:05,726 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 13.6049s
+2025-11-05 13:16:05,726 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 13.6051s
+2025-11-05 13:16:05,726 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 13.9216s
+2025-11-05 13:16:05,736 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 13:16:05,738 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 13:16:05,741 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:16:17,658 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 11.9170s
+2025-11-05 13:16:17,659 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 11.9179s
+2025-11-05 13:16:17,659 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 11.9180s
+2025-11-05 13:16:17,659 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 11.9236s
+2025-11-05 13:16:17,668 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 13:16:17,671 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 13:16:17,674 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:16:29,039 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 11.3654s
+2025-11-05 13:16:29,040 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 11.3660s
+2025-11-05 13:16:29,040 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 11.3660s
+2025-11-05 13:16:29,040 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 11.3715s
+2025-11-05 13:16:29,050 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 13:16:29,052 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 13:16:29,055 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:16:40,800 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 11.7452s
+2025-11-05 13:16:40,801 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 11.7460s
+2025-11-05 13:16:40,801 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 11.7461s
+2025-11-05 13:16:40,801 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 11.7514s
+2025-11-05 13:16:40,812 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 00:00:00
+2025-11-05 13:16:40,814 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 13:16:40,817 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:16:52,573 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 11.7558s
+2025-11-05 13:16:52,573 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 11.7567s
+2025-11-05 13:16:52,574 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 11.7568s
+2025-11-05 13:16:52,574 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 11.7620s
+2025-11-05 13:16:52,583 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 06:00:00
+2025-11-05 13:16:52,585 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 13:16:52,588 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:17:04,365 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 11.7767s
+2025-11-05 13:17:04,365 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 11.7772s
+2025-11-05 13:17:04,365 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 11.7772s
+2025-11-05 13:17:04,365 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 11.7824s
+2025-11-05 13:17:04,375 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 12:00:00
+2025-11-05 13:17:04,377 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 13:17:04,380 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:17:16,218 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 11.8382s
+2025-11-05 13:17:16,219 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 11.8390s
+2025-11-05 13:17:16,219 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 11.8390s
+2025-11-05 13:17:16,219 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 11.8443s
+2025-11-05 13:17:16,229 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-25 18:00:00
+2025-11-05 13:17:16,231 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 13:17:16,234 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0027s
+2025-11-05 13:17:27,890 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 11.6563s
+2025-11-05 13:17:27,891 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 11.6570s
+2025-11-05 13:17:27,891 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 11.6571s
+2025-11-05 13:17:27,891 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 11.6622s
+2025-11-05 13:17:27,901 - src.system - INFO - [System] Simulation complete: 192 steps in 96.10s
+2025-11-05 13:17:27,901 - src.system - INFO - [System] Step time stats - Avg: 500.50ms, Min: 0.25ms, Max: 13922.10ms, P95: 0.71ms
+2025-11-05 13:17:27,903 - root - INFO - [Main] Simulation completed in 96.10s
+2025-11-05 13:17:30,183 - root - INFO - [Main] Total execution time: 100.36s
+2025-11-05 15:42:54,099 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 15:42:56,289 - root - INFO - [Main] Setup completed in 2.17s
+2025-11-05 15:42:56,289 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-24 23:00:00 with controller SDP (Numba JIT)
+2025-11-05 15:42:56,290 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 15:42:56,292 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 15:42:56,579 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2869s
+2025-11-05 15:43:04,953 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 8.3739s
+2025-11-05 15:43:05,008 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 8.4291s
+2025-11-05 15:43:05,008 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 8.4293s
+2025-11-05 15:43:05,008 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 8.7187s
+2025-11-05 15:43:05,018 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 15:43:05,020 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 15:43:05,023 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 15:43:10,905 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8818s
+2025-11-05 15:43:10,905 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8823s
+2025-11-05 15:43:10,905 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8823s
+2025-11-05 15:43:10,906 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8878s
+2025-11-05 15:43:10,915 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 15:43:10,917 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 15:43:10,921 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 15:43:16,676 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.7551s
+2025-11-05 15:43:16,676 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.7558s
+2025-11-05 15:43:16,676 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.7559s
+2025-11-05 15:43:16,676 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.7618s
+2025-11-05 15:43:16,685 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 15:43:16,688 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 15:43:16,691 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 15:43:22,534 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8425s
+2025-11-05 15:43:22,534 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8430s
+2025-11-05 15:43:22,534 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8431s
+2025-11-05 15:43:22,534 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8490s
+2025-11-05 15:43:22,543 - src.system - INFO - [System] Simulation complete: 92 steps in 26.25s
+2025-11-05 15:43:22,543 - src.system - INFO - [System] Step time stats - Avg: 285.36ms, Min: 0.25ms, Max: 8719.16ms, P95: 0.95ms
+2025-11-05 15:43:22,545 - root - INFO - [Main] Simulation completed in 26.26s
+2025-11-05 15:43:24,777 - root - INFO - [Main] Total execution time: 30.66s
+2025-11-05 15:54:19,663 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 15:54:21,689 - root - INFO - [Main] Setup completed in 2.02s
+2025-11-05 15:54:21,689 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-24 23:00:00 with controller SDP (Numba JIT)
+2025-11-05 15:54:21,690 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 15:54:21,692 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 15:54:21,922 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2299s
+2025-11-05 15:54:31,406 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 9.4841s
+2025-11-05 15:54:31,459 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 9.5368s
+2025-11-05 15:54:31,459 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 9.5370s
+2025-11-05 15:54:31,459 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 9.7694s
+2025-11-05 15:54:31,469 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 15:54:31,471 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 15:54:31,474 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 15:54:38,922 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 7.4480s
+2025-11-05 15:54:38,923 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 7.4486s
+2025-11-05 15:54:38,923 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 7.4486s
+2025-11-05 15:54:38,923 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 7.4542s
+2025-11-05 15:54:38,932 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 15:54:38,934 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 15:54:38,938 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0031s
+2025-11-05 15:54:46,350 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 7.4127s
+2025-11-05 15:54:46,351 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 7.4134s
+2025-11-05 15:54:46,351 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 7.4135s
+2025-11-05 15:54:46,351 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 7.4192s
+2025-11-05 15:54:46,360 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 15:54:46,363 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 15:54:46,366 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 15:54:53,851 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 7.4854s
+2025-11-05 15:54:53,852 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 7.4859s
+2025-11-05 15:54:53,852 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 7.4860s
+2025-11-05 15:54:53,852 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 7.4915s
+2025-11-05 15:54:53,860 - src.system - INFO - [System] Simulation complete: 92 steps in 32.17s
+2025-11-05 15:54:53,860 - src.system - INFO - [System] Step time stats - Avg: 349.68ms, Min: 0.25ms, Max: 9769.98ms, P95: 0.66ms
+2025-11-05 15:54:53,861 - root - INFO - [Main] Simulation completed in 32.17s
+2025-11-05 15:54:56,166 - root - INFO - [Main] Total execution time: 36.50s
+2025-11-05 15:58:16,768 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 15:58:18,778 - root - INFO - [Main] Setup completed in 2.00s
+2025-11-05 15:58:18,778 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-24 23:00:00 with controller SDP (Numba JIT)
+2025-11-05 15:58:18,778 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 15:58:18,780 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 15:58:19,017 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2365s
+2025-11-05 15:58:27,208 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 8.1913s
+2025-11-05 15:58:27,262 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 8.2447s
+2025-11-05 15:58:27,262 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 8.2449s
+2025-11-05 15:58:27,262 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 8.4839s
+2025-11-05 15:58:27,272 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 15:58:27,274 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 15:58:27,277 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 15:58:33,065 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.7876s
+2025-11-05 15:58:33,066 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.7883s
+2025-11-05 15:58:33,066 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.7884s
+2025-11-05 15:58:33,066 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.7942s
+2025-11-05 15:58:33,075 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 15:58:33,078 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 15:58:33,081 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 15:58:38,898 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8176s
+2025-11-05 15:58:38,899 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8182s
+2025-11-05 15:58:38,899 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8182s
+2025-11-05 15:58:38,899 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8239s
+2025-11-05 15:58:38,909 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 15:58:38,912 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 15:58:38,915 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 15:58:44,678 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.7623s
+2025-11-05 15:58:44,678 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.7628s
+2025-11-05 15:58:44,678 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.7628s
+2025-11-05 15:58:44,678 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.7688s
+2025-11-05 15:58:44,686 - src.system - INFO - [System] Simulation complete: 92 steps in 25.91s
+2025-11-05 15:58:44,686 - src.system - INFO - [System] Step time stats - Avg: 281.61ms, Min: 0.25ms, Max: 8484.37ms, P95: 1.00ms
+2025-11-05 15:58:44,687 - root - INFO - [Main] Simulation completed in 25.91s
+2025-11-05 15:58:46,875 - root - INFO - [Main] Total execution time: 30.10s
+2025-11-05 16:01:15,928 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 16:01:18,085 - root - INFO - [Main] Setup completed in 2.13s
+2025-11-05 16:01:18,085 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-24 23:00:00 with controller SDP (Numba JIT)
+2025-11-05 16:01:18,085 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 16:01:18,087 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0021s
+2025-11-05 16:01:18,326 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2388s
+2025-11-05 16:01:26,537 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 8.2109s
+2025-11-05 16:01:26,592 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 8.2659s
+2025-11-05 16:01:26,592 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 8.2661s
+2025-11-05 16:01:26,592 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 8.5072s
+2025-11-05 16:01:26,598 - src.controllers.sdp_controller - WARNING -   R=-2.5640 clamped to -1.4952
+2025-11-05 16:01:26,599 - src.controllers.sdp_controller - WARNING -   R=-1.7880 clamped to -1.4952
+2025-11-05 16:01:26,599 - src.controllers.sdp_controller - WARNING -   R=-2.0680 clamped to -1.4952
+2025-11-05 16:01:26,599 - src.controllers.sdp_controller - WARNING -   R=-1.8160 clamped to -1.4952
+2025-11-05 16:01:26,602 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 16:01:26,605 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 16:01:26,608 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0033s
+2025-11-05 16:01:32,502 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8941s
+2025-11-05 16:01:32,503 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8946s
+2025-11-05 16:01:32,503 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8947s
+2025-11-05 16:01:32,503 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.9006s
+2025-11-05 16:01:32,506 - src.controllers.sdp_controller - WARNING -   R=-1.3036 clamped to -1.1063
+2025-11-05 16:01:32,508 - src.controllers.sdp_controller - WARNING -   R=1.4483 clamped to 0.6440
+2025-11-05 16:01:32,509 - src.controllers.sdp_controller - WARNING -   R=1.3563 clamped to 0.6440
+2025-11-05 16:01:32,509 - src.controllers.sdp_controller - WARNING -   R=1.3283 clamped to 0.6440
+2025-11-05 16:01:32,510 - src.controllers.sdp_controller - WARNING -   R=1.4638 clamped to 0.6440
+2025-11-05 16:01:32,510 - src.controllers.sdp_controller - WARNING -   R=1.4278 clamped to 0.6440
+2025-11-05 16:01:32,510 - src.controllers.sdp_controller - WARNING -   R=1.4118 clamped to 0.6440
+2025-11-05 16:01:32,511 - src.controllers.sdp_controller - WARNING -   R=1.4078 clamped to 0.6440
+2025-11-05 16:01:32,511 - src.controllers.sdp_controller - WARNING -   R=1.2601 clamped to 0.6440
+2025-11-05 16:01:32,511 - src.controllers.sdp_controller - WARNING -   R=1.3001 clamped to 0.6440
+2025-11-05 16:01:32,512 - src.controllers.sdp_controller - WARNING -   R=1.3241 clamped to 0.6440
+2025-11-05 16:01:32,512 - src.controllers.sdp_controller - WARNING -   R=1.2801 clamped to 0.6440
+2025-11-05 16:01:32,513 - src.controllers.sdp_controller - WARNING -   R=0.6801 clamped to 0.6440
+2025-11-05 16:01:32,513 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 16:01:32,516 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 16:01:32,519 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 16:01:38,828 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.3093s
+2025-11-05 16:01:38,829 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.3098s
+2025-11-05 16:01:38,829 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.3098s
+2025-11-05 16:01:38,829 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.3154s
+2025-11-05 16:01:38,839 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 16:01:38,842 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 16:01:38,845 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 16:01:39,427 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 16:01:42,059 - root - INFO - [Main] Setup completed in 2.63s
+2025-11-05 16:01:42,059 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-24 23:00:00 with controller SDP (Numba JIT)
+2025-11-05 16:01:42,059 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 16:01:42,061 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0021s
+2025-11-05 16:01:42,311 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2498s
+2025-11-05 16:01:44,936 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.0904s
+2025-11-05 16:01:44,936 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.0908s
+2025-11-05 16:01:44,936 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.0909s
+2025-11-05 16:01:44,936 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.0966s
+2025-11-05 16:01:44,944 - src.system - INFO - [System] Simulation complete: 92 steps in 26.86s
+2025-11-05 16:01:44,944 - src.system - INFO - [System] Step time stats - Avg: 291.94ms, Min: 0.25ms, Max: 8507.64ms, P95: 1.03ms
+2025-11-05 16:01:44,944 - root - INFO - [Main] Simulation completed in 26.86s
+2025-11-05 16:01:47,203 - root - INFO - [Main] Total execution time: 31.25s
+2025-11-05 16:01:51,312 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 9.0010s
+2025-11-05 16:01:51,369 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 9.0580s
+2025-11-05 16:01:51,370 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 9.0581s
+2025-11-05 16:01:51,370 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 9.3103s
+2025-11-05 16:01:51,375 - src.controllers.sdp_controller - WARNING -   R=-2.5640 clamped to -1.4952
+2025-11-05 16:01:51,375 - src.controllers.sdp_controller - WARNING -   R=-1.7880 clamped to -1.4952
+2025-11-05 16:01:51,376 - src.controllers.sdp_controller - WARNING -   R=-2.0680 clamped to -1.4952
+2025-11-05 16:01:51,376 - src.controllers.sdp_controller - WARNING -   R=-1.8160 clamped to -1.4952
+2025-11-05 16:01:51,379 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 16:01:51,381 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 16:01:51,384 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 16:01:57,444 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.0603s
+2025-11-05 16:01:57,447 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.0627s
+2025-11-05 16:01:57,447 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.0627s
+2025-11-05 16:01:57,447 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.0682s
+2025-11-05 16:01:57,450 - src.controllers.sdp_controller - WARNING -   R=-1.3036 clamped to -1.1063
+2025-11-05 16:01:57,452 - src.controllers.sdp_controller - WARNING -   R=1.4483 clamped to 0.6440
+2025-11-05 16:01:57,452 - src.controllers.sdp_controller - WARNING -   R=1.3563 clamped to 0.6440
+2025-11-05 16:01:57,453 - src.controllers.sdp_controller - WARNING -   R=1.3283 clamped to 0.6440
+2025-11-05 16:01:57,453 - src.controllers.sdp_controller - WARNING -   R=1.4638 clamped to 0.6440
+2025-11-05 16:01:57,454 - src.controllers.sdp_controller - WARNING -   R=1.4278 clamped to 0.6440
+2025-11-05 16:01:57,454 - src.controllers.sdp_controller - WARNING -   R=1.4118 clamped to 0.6440
+2025-11-05 16:01:57,455 - src.controllers.sdp_controller - WARNING -   R=1.4078 clamped to 0.6440
+2025-11-05 16:01:57,455 - src.controllers.sdp_controller - WARNING -   R=1.2601 clamped to 0.6440
+2025-11-05 16:01:57,456 - src.controllers.sdp_controller - WARNING -   R=1.3001 clamped to 0.6440
+2025-11-05 16:01:57,456 - src.controllers.sdp_controller - WARNING -   R=1.3241 clamped to 0.6440
+2025-11-05 16:01:57,457 - src.controllers.sdp_controller - WARNING -   R=1.2801 clamped to 0.6440
+2025-11-05 16:01:57,457 - src.controllers.sdp_controller - WARNING -   R=0.6801 clamped to 0.6440
+2025-11-05 16:01:57,457 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 16:01:57,460 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 16:01:57,463 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 16:02:03,446 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.9826s
+2025-11-05 16:02:03,449 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.9857s
+2025-11-05 16:02:03,449 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.9859s
+2025-11-05 16:02:03,449 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.9916s
+2025-11-05 16:02:03,460 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 16:02:03,462 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 16:02:03,465 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 16:02:09,317 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8516s
+2025-11-05 16:02:09,317 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8520s
+2025-11-05 16:02:09,318 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8521s
+2025-11-05 16:02:09,318 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8575s
+2025-11-05 16:02:09,326 - src.system - INFO - [System] Simulation complete: 92 steps in 27.27s
+2025-11-05 16:02:09,326 - src.system - INFO - [System] Step time stats - Avg: 296.38ms, Min: 0.25ms, Max: 9310.91ms, P95: 1.09ms
+2025-11-05 16:02:09,327 - root - INFO - [Main] Simulation completed in 27.27s
+2025-11-05 16:02:11,518 - root - INFO - [Main] Total execution time: 32.09s
+2025-11-05 16:12:02,716 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 16:12:04,779 - root - INFO - [Main] Setup completed in 2.06s
+2025-11-05 16:12:04,779 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-24 23:00:00 with controller SDP (Numba JIT)
+2025-11-05 16:12:04,779 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 16:12:04,781 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0022s
+2025-11-05 16:12:05,007 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2260s
+2025-11-05 16:12:13,197 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 8.1893s
+2025-11-05 16:12:13,251 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 8.2433s
+2025-11-05 16:12:13,251 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 8.2434s
+2025-11-05 16:12:13,251 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 8.4718s
+2025-11-05 16:12:13,261 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 16:12:13,263 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 16:12:13,266 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 16:12:19,127 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8605s
+2025-11-05 16:12:19,128 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8610s
+2025-11-05 16:12:19,128 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8611s
+2025-11-05 16:12:19,128 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8667s
+2025-11-05 16:12:19,136 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 16:12:19,139 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 16:12:19,142 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0033s
+2025-11-05 16:12:24,971 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8287s
+2025-11-05 16:12:24,973 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8305s
+2025-11-05 16:12:24,973 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8306s
+2025-11-05 16:12:24,973 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8368s
+2025-11-05 16:12:24,984 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 16:12:24,986 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 16:12:24,990 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 16:12:30,716 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.7260s
+2025-11-05 16:12:30,716 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.7266s
+2025-11-05 16:12:30,716 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.7266s
+2025-11-05 16:12:30,716 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.7324s
+2025-11-05 16:12:30,724 - src.system - INFO - [System] Simulation complete: 92 steps in 25.94s
+2025-11-05 16:12:30,724 - src.system - INFO - [System] Step time stats - Avg: 282.01ms, Min: 0.25ms, Max: 8472.26ms, P95: 0.99ms
+2025-11-05 16:12:30,724 - root - INFO - [Main] Simulation completed in 25.95s
+2025-11-05 16:12:32,952 - root - INFO - [Main] Total execution time: 30.23s
+2025-11-05 16:16:49,982 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 16:16:51,974 - root - INFO - [Main] Setup completed in 1.99s
+2025-11-05 16:16:51,974 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-24 23:00:00 with controller SDP (Numba JIT)
+2025-11-05 16:16:51,975 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 16:16:51,977 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 16:16:52,198 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2208s
+2025-11-05 16:17:00,339 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 8.1405s
+2025-11-05 16:17:00,396 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 8.1976s
+2025-11-05 16:17:00,396 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 8.1977s
+2025-11-05 16:17:00,396 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 8.4211s
+2025-11-05 16:17:00,406 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 16:17:00,409 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0025s
+2025-11-05 16:17:00,412 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 16:17:06,363 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.9511s
+2025-11-05 16:17:06,364 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.9517s
+2025-11-05 16:17:06,364 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.9517s
+2025-11-05 16:17:06,364 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.9577s
+2025-11-05 16:17:06,374 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 16:17:06,376 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 16:17:06,379 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0032s
+2025-11-05 16:17:12,198 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8184s
+2025-11-05 16:17:12,199 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8192s
+2025-11-05 16:17:12,199 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8192s
+2025-11-05 16:17:12,199 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8250s
+2025-11-05 16:17:12,209 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 16:17:12,211 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 16:17:12,214 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 16:17:18,229 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.0149s
+2025-11-05 16:17:18,230 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.0155s
+2025-11-05 16:17:18,230 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.0156s
+2025-11-05 16:17:18,230 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.0209s
+2025-11-05 16:17:18,237 - src.system - INFO - [System] Simulation complete: 92 steps in 26.26s
+2025-11-05 16:17:18,237 - src.system - INFO - [System] Step time stats - Avg: 285.46ms, Min: 0.25ms, Max: 8421.53ms, P95: 1.16ms
+2025-11-05 16:17:18,238 - root - INFO - [Main] Simulation completed in 26.26s
+2025-11-05 16:17:20,415 - root - INFO - [Main] Total execution time: 30.43s
+2025-11-05 16:23:12,171 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 16:23:15,565 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 16:23:17,604 - root - INFO - [Main] Setup completed in 2.03s
+2025-11-05 16:23:17,606 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-24 23:00:00 with controller SDP (Numba JIT)
+2025-11-05 16:23:17,615 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 16:23:17,626 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0074s
+2025-11-05 16:23:17,850 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2242s
+2025-11-05 16:23:26,075 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 8.2245s
+2025-11-05 16:23:26,134 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 8.2834s
+2025-11-05 16:23:26,134 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 8.2836s
+2025-11-05 16:23:26,134 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 8.5188s
+2025-11-05 16:23:26,139 - src.controllers.sdp_controller - WARNING -   R=-2.5640 clamped to -1.7869
+2025-11-05 16:23:26,140 - src.controllers.sdp_controller - WARNING -   R=-2.0680 clamped to -1.7869
+2025-11-05 16:23:26,141 - src.controllers.sdp_controller - WARNING -   R=-1.8160 clamped to -1.7869
+2025-11-05 16:23:26,144 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 16:23:26,146 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 16:23:26,149 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 16:23:32,208 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.0586s
+2025-11-05 16:23:32,208 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.0592s
+2025-11-05 16:23:32,209 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.0593s
+2025-11-05 16:23:32,209 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.0649s
+2025-11-05 16:23:32,213 - src.controllers.sdp_controller - WARNING -   R=1.4483 clamped to 0.9358
+2025-11-05 16:23:32,214 - src.controllers.sdp_controller - WARNING -   R=1.3563 clamped to 0.9358
+2025-11-05 16:23:32,215 - src.controllers.sdp_controller - WARNING -   R=1.3283 clamped to 0.9358
+2025-11-05 16:23:32,215 - src.controllers.sdp_controller - WARNING -   R=1.4638 clamped to 0.9358
+2025-11-05 16:23:32,215 - src.controllers.sdp_controller - WARNING -   R=1.4278 clamped to 0.9358
+2025-11-05 16:23:32,216 - src.controllers.sdp_controller - WARNING -   R=1.4118 clamped to 0.9358
+2025-11-05 16:23:32,216 - src.controllers.sdp_controller - WARNING -   R=1.4078 clamped to 0.9358
+2025-11-05 16:23:32,217 - src.controllers.sdp_controller - WARNING -   R=1.2601 clamped to 0.9358
+2025-11-05 16:23:32,217 - src.controllers.sdp_controller - WARNING -   R=1.3001 clamped to 0.9358
+2025-11-05 16:23:32,217 - src.controllers.sdp_controller - WARNING -   R=1.3241 clamped to 0.9358
+2025-11-05 16:23:32,218 - src.controllers.sdp_controller - WARNING -   R=1.2801 clamped to 0.9358
+2025-11-05 16:23:32,219 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 16:23:32,221 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0026s
+2025-11-05 16:23:32,224 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 16:23:38,270 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.0461s
+2025-11-05 16:23:38,271 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.0469s
+2025-11-05 16:23:38,271 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.0469s
+2025-11-05 16:23:38,271 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.0526s
+2025-11-05 16:23:38,282 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 16:23:38,284 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 16:23:38,287 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 16:23:44,115 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.8273s
+2025-11-05 16:23:44,115 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.8278s
+2025-11-05 16:23:44,115 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.8279s
+2025-11-05 16:23:44,115 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.8334s
+2025-11-05 16:23:44,123 - src.system - INFO - [System] Simulation complete: 92 steps in 26.52s
+2025-11-05 16:23:44,123 - src.system - INFO - [System] Step time stats - Avg: 288.18ms, Min: 0.25ms, Max: 8523.61ms, P95: 1.14ms
+2025-11-05 16:23:44,123 - root - INFO - [Main] Simulation completed in 26.52s
+2025-11-05 16:23:46,300 - root - INFO - [Main] Total execution time: 30.73s
+2025-11-05 16:54:32,689 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 16:54:34,758 - root - INFO - [Main] Setup completed in 2.06s
+2025-11-05 16:54:34,758 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-24 23:00:00 with controller SDP (Numba JIT)
+2025-11-05 16:54:34,759 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 16:54:34,761 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 16:54:35,029 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2679s
+2025-11-05 16:54:42,954 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 7.9246s
+2025-11-05 16:54:43,008 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 7.9787s
+2025-11-05 16:54:43,008 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 7.9788s
+2025-11-05 16:54:43,008 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 8.2493s
+2025-11-05 16:54:43,017 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 16:54:43,020 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0023s
+2025-11-05 16:54:43,023 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0030s
+2025-11-05 16:54:48,793 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.7706s
+2025-11-05 16:54:48,794 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.7711s
+2025-11-05 16:54:48,794 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.7711s
+2025-11-05 16:54:48,794 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.7765s
+2025-11-05 16:54:48,803 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 16:54:48,806 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0027s
+2025-11-05 16:54:48,809 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 16:54:54,824 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.0150s
+2025-11-05 16:54:54,824 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.0155s
+2025-11-05 16:54:54,824 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.0155s
+2025-11-05 16:54:54,824 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.0212s
+2025-11-05 16:54:54,836 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 16:54:54,838 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0024s
+2025-11-05 16:54:54,841 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0029s
+2025-11-05 16:55:00,575 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 5.7343s
+2025-11-05 16:55:00,576 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 5.7349s
+2025-11-05 16:55:00,576 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 5.7349s
+2025-11-05 16:55:00,576 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 5.7404s
+2025-11-05 16:55:00,585 - src.system - INFO - [System] Simulation complete: 92 steps in 25.83s
+2025-11-05 16:55:00,585 - src.system - INFO - [System] Step time stats - Avg: 280.71ms, Min: 0.25ms, Max: 8249.76ms, P95: 1.39ms
+2025-11-05 16:55:00,586 - root - INFO - [Main] Simulation completed in 25.83s
+2025-11-05 16:55:02,772 - root - INFO - [Main] Total execution time: 30.08s
+2025-11-05 16:57:07,057 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 16:57:09,120 - root - INFO - [Main] Setup completed in 2.06s
+2025-11-05 16:57:09,120 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-24 23:00:00 with controller SDP (Numba JIT)
+2025-11-05 16:57:09,121 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 00:00:00
+2025-11-05 16:57:09,122 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0014s
+2025-11-05 16:57:09,340 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2173s
+2025-11-05 16:57:17,884 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 8.5447s
+2025-11-05 16:57:17,941 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 8.6013s
+2025-11-05 16:57:17,941 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 8.6014s
+2025-11-05 16:57:17,941 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 8.8204s
+2025-11-05 16:57:17,951 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 06:00:00
+2025-11-05 16:57:17,952 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0015s
+2025-11-05 16:57:17,957 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0053s
+2025-11-05 16:57:24,535 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.5779s
+2025-11-05 16:57:24,536 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.5782s
+2025-11-05 16:57:24,536 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.5783s
+2025-11-05 16:57:24,536 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.5853s
+2025-11-05 16:57:24,545 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 12:00:00
+2025-11-05 16:57:24,547 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0017s
+2025-11-05 16:57:24,552 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0050s
+2025-11-05 16:57:30,892 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.3397s
+2025-11-05 16:57:30,892 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.3402s
+2025-11-05 16:57:30,892 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.3403s
+2025-11-05 16:57:30,892 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.3473s
+2025-11-05 16:57:30,901 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-24 18:00:00
+2025-11-05 16:57:30,903 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0015s
+2025-11-05 16:57:30,908 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0054s
+2025-11-05 16:57:37,216 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.3078s
+2025-11-05 16:57:37,217 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.3082s
+2025-11-05 16:57:37,217 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.3083s
+2025-11-05 16:57:37,217 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.3154s
+2025-11-05 16:57:37,225 - src.system - INFO - [System] Simulation complete: 92 steps in 28.10s
+2025-11-05 16:57:37,225 - src.system - INFO - [System] Step time stats - Avg: 305.48ms, Min: 0.25ms, Max: 8820.84ms, P95: 0.68ms
+2025-11-05 16:57:37,225 - root - INFO - [Main] Simulation completed in 28.10s
+2025-11-05 16:57:39,416 - root - INFO - [Main] Total execution time: 32.35s
+2025-11-05 17:01:11,767 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 17:01:12,585 - root - INFO - [Main] Setup completed in 0.81s
+2025-11-05 17:01:12,585 - src.system - INFO - [System] Starting simulation: 2025-04-24 00:00:00 to 2025-04-24 23:00:00 with controller MPC
+2025-11-05 17:01:15,751 - src.system - INFO - [System] Simulation complete: 92 steps in 3.17s
+2025-11-05 17:01:15,752 - src.system - INFO - [System] Step time stats - Avg: 34.41ms, Min: 32.48ms, Max: 62.57ms, P95: 35.82ms
+2025-11-05 17:01:15,752 - root - INFO - [Main] Simulation completed in 3.17s
+2025-11-05 17:01:17,905 - root - INFO - [Main] Total execution time: 6.13s
+2025-11-05 17:06:26,539 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 17:06:27,376 - root - INFO - [Main] Setup completed in 0.83s
+2025-11-05 17:06:27,376 - src.system - INFO - [System] Starting simulation: 2025-04-01 00:00:00 to 2025-04-10 00:00:00 with controller MPC
+2025-11-05 17:06:57,668 - src.system - INFO - [System] Simulation complete: 864 steps in 30.29s
+2025-11-05 17:06:57,669 - src.system - INFO - [System] Step time stats - Avg: 35.06ms, Min: 32.54ms, Max: 83.49ms, P95: 40.49ms
+2025-11-05 17:06:57,671 - root - INFO - [Main] Simulation completed in 30.29s
+2025-11-05 17:07:00,409 - root - INFO - [Main] Total execution time: 33.86s
+2025-11-05 17:09:22,877 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 17:09:24,943 - root - INFO - [Main] Setup completed in 2.04s
+2025-11-05 17:09:24,943 - src.system - INFO - [System] Starting simulation: 2025-04-01 00:00:00 to 2025-04-10 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 17:09:24,944 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-01 00:00:00
+2025-11-05 17:09:24,945 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0013s
+2025-11-05 17:09:25,244 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2984s
+2025-11-05 17:09:33,976 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 8.7317s
+2025-11-05 17:09:34,032 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 8.7881s
+2025-11-05 17:09:34,032 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 8.7882s
+2025-11-05 17:09:34,032 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 9.0882s
+2025-11-05 17:09:34,043 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-01 06:00:00
+2025-11-05 17:09:34,044 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0013s
+2025-11-05 17:09:34,049 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0051s
+2025-11-05 17:09:40,537 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.4872s
+2025-11-05 17:09:40,537 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.4875s
+2025-11-05 17:09:40,537 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.4876s
+2025-11-05 17:09:40,537 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.4942s
+2025-11-05 17:09:40,546 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-01 12:00:00
+2025-11-05 17:09:40,548 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0019s
+2025-11-05 17:09:40,554 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0057s
+2025-11-05 17:09:46,918 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.3642s
+2025-11-05 17:09:46,919 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.3653s
+2025-11-05 17:09:46,919 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.3653s
+2025-11-05 17:09:46,919 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.3732s
+2025-11-05 17:09:46,920 - src.controllers.sdp_controller - WARNING -   R=1.6514 clamped to 1.4178
+2025-11-05 17:09:46,929 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-01 18:00:00
+2025-11-05 17:09:46,930 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0013s
+2025-11-05 17:09:46,936 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0054s
+2025-11-05 17:09:53,385 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.4487s
+2025-11-05 17:09:53,385 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.4490s
+2025-11-05 17:09:53,385 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.4490s
+2025-11-05 17:09:53,385 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.4560s
+2025-11-05 17:09:53,394 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-02 00:00:00
+2025-11-05 17:09:53,396 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0016s
+2025-11-05 17:09:53,401 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0054s
+2025-11-05 17:10:03,004 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 17:10:05,151 - root - INFO - [Main] Setup completed in 2.14s
+2025-11-05 17:10:05,153 - src.system - INFO - [System] Starting simulation: 2025-04-01 00:00:00 to 2025-04-02 00:00:00 with controller SDP (Numba JIT)
+2025-11-05 17:10:05,154 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-01 00:00:00
+2025-11-05 17:10:05,155 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0015s
+2025-11-05 17:10:05,447 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.2914s
+2025-11-05 17:10:14,225 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 8.7782s
+2025-11-05 17:10:14,282 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 8.8349s
+2025-11-05 17:10:14,282 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 8.8351s
+2025-11-05 17:10:14,282 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 9.1283s
+2025-11-05 17:10:14,292 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-01 06:00:00
+2025-11-05 17:10:14,293 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0014s
+2025-11-05 17:10:14,298 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0053s
+2025-11-05 17:10:20,942 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.6435s
+2025-11-05 17:10:20,945 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.6469s
+2025-11-05 17:10:20,946 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.6470s
+2025-11-05 17:10:20,946 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.6539s
+2025-11-05 17:10:20,955 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-01 12:00:00
+2025-11-05 17:10:20,957 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0016s
+2025-11-05 17:10:20,963 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0058s
+2025-11-05 17:10:27,338 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.3748s
+2025-11-05 17:10:27,343 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.3803s
+2025-11-05 17:10:27,343 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.3804s
+2025-11-05 17:10:27,343 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.3880s
+2025-11-05 17:10:27,343 - src.controllers.sdp_controller - WARNING -   R=1.6514 clamped to 1.4178
+2025-11-05 17:10:27,359 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Starting policy update at 2025-04-01 18:00:00
+2025-11-05 17:10:27,360 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Forecast generation: 0.0013s
+2025-11-05 17:10:27,366 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] Grid creation: 0.0055s
+2025-11-05 17:10:33,751 - src.controllers.sdp_controller - INFO -   [SDP] JIT solve time: 6.3854s
+2025-11-05 17:10:33,755 - src.controllers.sdp_controller - INFO -   [SDP] Total solve_sdp time: 6.3892s
+2025-11-05 17:10:33,755 - src.controllers.sdp_controller - INFO -   [SDP (Numba JIT)] SDP solve: 6.3892s
+2025-11-05 17:10:33,755 - src.controllers.sdp_controller - INFO - [SDP (Numba JIT)] Policy update completed in 6.3963s
+2025-11-05 17:10:33,765 - src.system - INFO - [System] Simulation complete: 96 steps in 28.61s
+2025-11-05 17:10:33,765 - src.system - INFO - [System] Step time stats - Avg: 298.03ms, Min: 0.25ms, Max: 9128.92ms, P95: 1.53ms
+2025-11-05 17:10:33,766 - root - INFO - [Main] Simulation completed in 28.61s
+2025-11-05 17:10:35,998 - root - INFO - [Main] Total execution time: 32.99s
+2025-11-05 17:11:16,423 - root - INFO - Loading configuration from: config.yaml
+2025-11-05 17:11:17,237 - root - INFO - [Main] Setup completed in 0.81s
+2025-11-05 17:11:17,238 - src.system - INFO - [System] Starting simulation: 2025-04-01 00:00:00 to 2025-04-02 00:00:00 with controller Rule-Based
+2025-11-05 17:11:17,273 - src.system - INFO - [System] Simulation complete: 96 steps in 0.04s
+2025-11-05 17:11:17,273 - src.system - INFO - [System] Step time stats - Avg: 0.37ms, Min: 0.23ms, Max: 1.45ms, P95: 0.50ms
+2025-11-05 17:11:17,274 - root - INFO - [Main] Simulation completed in 0.04s
+2025-11-05 17:11:19,424 - root - INFO - [Main] Total execution time: 2.99s

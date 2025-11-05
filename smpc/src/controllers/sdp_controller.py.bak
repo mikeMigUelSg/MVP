@@ -130,17 +130,10 @@ def terminal_cost_jit(x: float, soc_target: float, weight: float, C_bat: float, 
     Se c_f <= 0: energia vale apenas evitar comprar (c_s), pois vender dá prejuízo
 
     Fórmula do paper (Eq. 9): g_N(x_N) = -x_N * C_bat * (c_s + c_f) / 2
-
-    CORREÇÃO: Quando c_f <= 0, não deve dividir por 2, pois não há opção de vender.
-    O valor da energia é apenas o custo evitado de compra (c_s).
     """
-    if c_f > 0.0:
-        # Pode vender com lucro: valor é a média entre comprar e vender
-        return -x * C_bat * (c_s + c_f) / 2.0
-    else:
-        # Não pode vender com lucro: valor é apenas evitar comprar
-        # NÃO dividir por 2 neste caso!
-        return -x * C_bat * c_s
+    # Usar max(c_f, 0) para garantir que export price negativo não seja considerado como valor
+    c_f_effective = max(0.0, c_f)
+    return -x * C_bat * (c_s + c_f_effective) / 2.0
 
 
 @jit(nopython=True, cache=False)
@@ -279,7 +272,7 @@ def _expected_future_cost_jit(x_next: float, R_k: float, k: int,
     return E_J
 
 
-@jit(nopython=True, parallel=True, cache=False)
+@jit(nopython=True, parallel=True)
 def _solve_sdp_jit(N: int, X_grid: np.ndarray,
                    R_grids_list: List[np.ndarray],
                    _feasible_actions_cache: List[np.ndarray],
@@ -663,7 +656,7 @@ class SDPController:
         """
         return terminal_cost_jit(x, self.params.soc_target,
                                  self.params.terminal_cost_weight,
-                                 self.plant.C_bat, self.c_s, self.c_f)
+                                 self.plant.C_bat, self.c_s)
 
     def create_grids(self, R_bar: np.ndarray):
         """
@@ -693,17 +686,13 @@ class SDPController:
         self.R_grids = []
         # *** Usa Numba typed List ***
         self.R_grids_list = List.empty_list(types.float64[:])
-
+        
         sigma = self.residual_model.sigma
-
-        # CORREÇÃO: Usar range maior (±10σ em vez de ±3σ) para evitar clamping
-        # quando há erros de previsão grandes
-        sigma_multiplier = 3 # Aumentado de 3 para 10
 
         for k in range(N + 1):
             R_center = R_bar[k]
-            R_min = R_center - sigma_multiplier * sigma
-            R_max = R_center + sigma_multiplier * sigma
+            R_min = R_center - 3 * sigma
+            R_max = R_center + 3 * sigma
             R_grid_k = np.linspace(R_min, R_max, n_R, dtype=np.float64)
             
             # Armazena em ambos os formatos
@@ -867,17 +856,9 @@ class SDPController:
         if self.policy is None or k >= len(self.policy):
             return 0.0
 
-        # DEBUG: Log some policy values to understand what's happening
-        if k == 0:
-            logger.debug(f"  get_action: x={x:.4f}, R={R:.4f}, k={k}")
-            logger.debug(f"  R_grid range: [{self.R_grids[k].min():.4f}, {self.R_grids[k].max():.4f}]")
-
         # Clamping de R se fora do intervalo
         R_grid_k = self.R_grids[k]
-        R_clamped = np.clip(R, R_grid_k.min(), R_grid_k.max())
-
-        if k == 0 and abs(R - R_clamped) > 0.01:
-            logger.warning(f"  R={R:.4f} clamped to {R_clamped:.4f}")
+        R = np.clip(R, R_grid_k.min(), R_grid_k.max())
 
         # Encontrar vizinhos em X_grid
         i_x = np.searchsorted(self.X_grid, x)
@@ -888,8 +869,8 @@ class SDPController:
         x_low = self.X_grid[i_x_low]
         x_high = self.X_grid[i_x_high]
 
-        # Encontrar vizinhos em R_grids[k] - use R_clamped!
-        i_R = np.searchsorted(R_grid_k, R_clamped)
+        # Encontrar vizinhos em R_grids[k]
+        i_R = np.searchsorted(R_grid_k, R)
         i_R = np.clip(i_R, 1, len(R_grid_k) - 1)
         i_R_low = i_R - 1
         i_R_high = i_R
@@ -903,10 +884,6 @@ class SDPController:
         u_hl = self.policy[k][i_x_high, i_R_low]
         u_hh = self.policy[k][i_x_high, i_R_high]
 
-        # DEBUG: Log corner values
-        if k == 0:
-            logger.debug(f"  Corner actions: ll={u_ll:.4f}, lh={u_lh:.4f}, hl={u_hl:.4f}, hh={u_hh:.4f}")
-
         # Interpolação bilinear
         if x_high == x_low:
             w_x = 0.5
@@ -916,15 +893,12 @@ class SDPController:
         if R_high == R_low:
             w_R = 0.5
         else:
-            w_R = (R_clamped - R_low) / (R_high - R_low)
+            w_R = (R - R_low) / (R_high - R_low)
 
         u_interp = (1 - w_x) * (1 - w_R) * u_ll + \
                    (1 - w_x) * w_R * u_lh + \
                    w_x * (1 - w_R) * u_hl + \
                    w_x * w_R * u_hh
-
-        if k == 0:
-            logger.debug(f"  Interpolated action: {u_interp:.4f}, weights: w_x={w_x:.3f}, w_R={w_R:.3f}")
 
         return u_interp
 
@@ -963,14 +937,9 @@ class SDPController:
         # Obter SOC atual
         x_current = battery.get_soc()
 
-        # Determinar passo k no horizonte baseado no tempo desde última atualização
-        if self.last_policy_update is not None:
-            minutes_since_update = (timestamp - self.last_policy_update).total_seconds() / 60
-            k = int(minutes_since_update / self.params.dt_minutes)
-            # Garantir que k não exceda o horizonte
-            k = min(k, self.params.N - 1)
-        else:
-            k = 0
+        # Determinar passo k no horizonte
+        # (Assumindo que sempre recalculamos do início, k=0)
+        k = 0
 
         # Obter ação ótima
         interpolation_start = time.time()
@@ -978,7 +947,7 @@ class SDPController:
         interpolation_time = time.time() - interpolation_start
 
         total_action_time = time.time() - action_start
-        logger.debug(f"  [SDP] compute_action: k={k}, {total_action_time:.6f}s (interpolation: {interpolation_time:.6f}s)")
+        logger.debug(f"  [SDP] compute_action: {total_action_time:.6f}s (interpolation: {interpolation_time:.6f}s)")
 
         # Retornar (note: convenção de sinal pode ser diferente da Battery)
         # Battery: positivo=carga, negativo=descarga

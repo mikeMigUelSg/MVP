@@ -186,7 +186,8 @@ def create_sdp_controller(config: dict, battery: Battery,
         eta_discharge=config['battery']['efficiency_discharge'],
         dt_minutes=sim_config['timestep_minutes'],
         soc_min=config['battery']['min_soc'],
-        soc_max=config['battery']['max_soc']
+        soc_max=config['battery']['max_soc'],
+        c_deg=config['battery']['degradation_cost_per_kwh']
     )
     print(f"   Battery: {plant.C_bat} kWh, {plant.P_nom} kW")
     print(f"   Injection limit: {plant.P_lim} kW")

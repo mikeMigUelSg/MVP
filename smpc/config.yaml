@@ -2,8 +2,8 @@
 
 # Simulation settings
 simulation:
-  start_date: "2025-04-24 00:00:00"
-  end_date: "2025-05-04 00:00:00"  
+  start_date: "2025-04-1 00:00:00"
+  end_date: "2025-04-02 00:00:00"  
   timestep_minutes: 15
 
 # Battery configuration
@@ -22,7 +22,7 @@ battery:
 # Grid configuration
 grid:
   contracted_power_kw: 6.9  # Maximum contracted power from grid in kW
-  export_price: 0.0  # Price for exporting energy to grid in €/kWh
+  export_price: 0.045 # Price for exporting energy to grid in €/kWh
 
 # Solar panel configuration
 solar:
@@ -53,7 +53,7 @@ tariff:
 
 # Controller configuration
 controller:
-  type: "sdp"  # Options: "rule_based", "mpc", or "sdp"
+  type: "rule_based"  # Options: "rule_based", "mpc", or "sdp"
 
   # Rule-based controller settings
   rule_based:
@@ -63,16 +63,16 @@ controller:
 
   # MPC controller settings
   mpc:
-    horizon_steps: 96  # Prediction horizon (96 steps = 24h with 15min timestep)
+    horizon_steps: 48  # Prediction horizon (96 steps = 24h with 15min timestep)
 
   # SDP controller settings
   sdp:
     # Horizon and time step
-    horizon_steps: 96  # Planning horizon (36 steps = 9h with 15min timestep)
+    horizon_steps: 48  # Planning horizon (36 steps = 9h with 15min timestep)
 
     # Discretization
-    n_soc_points: 100  # Number of SOC grid points (higher = more accurate, slower) 150 
-    n_residual_points: 25  # Number of residual grid points 50 
+    n_soc_points: 150  # Number of SOC grid points (higher = more accurate, slower) 150 
+    n_residual_points: 50  # Number of residual grid points 50 
 
     # Residual model (forecast error model)
     half_life_minutes: 40.5  # Half-life of residual persistence (minutes)
