@@ -20,14 +20,20 @@ def plot_system_behavior(df: pd.DataFrame, save_path: str = None):
 
     # Plot 1: Power flows
     ax = axes[0]
-    ax.plot(df.index, df['solar_power'], label='Solar Production', color='orange', linewidth=1.5)
+    # Show available solar (if curtailment data exists)
+    if 'solar_available' in df.columns:
+        ax.fill_between(df.index, df['solar_power'], df['solar_available'],
+                        label='Solar Curtailed', color='gray', alpha=0.3)
+        ax.plot(df.index, df['solar_available'], label='Solar Available',
+                color='orange', linewidth=1, linestyle='--', alpha=0.5)
+    ax.plot(df.index, df['solar_power'], label='Solar Used', color='orange', linewidth=1.5)
     ax.plot(df.index, df['load_power'], label='Load', color='red', linewidth=1.5)
     ax.plot(df.index, df['battery_power'], label='Battery Power', color='blue', linewidth=1.5)
     ax.plot(df.index, df['grid_power'], label='Grid Power', color='green', linewidth=1.5)
     ax.axhline(y=0, color='k', linestyle='--', linewidth=0.5)
     ax.set_ylabel('Power (kW)')
-    ax.set_title('Power Flows')
-    ax.legend(loc='upper right')
+    ax.set_title('Power Flows (with Curtailment)')
+    ax.legend(loc='upper right', fontsize=8)
     ax.grid(True, alpha=0.3)
 
     # Plot 2: Battery State of Charge
@@ -63,10 +69,11 @@ def plot_system_behavior(df: pd.DataFrame, save_path: str = None):
     ax.set_title('Electricity Price and Costs')
     ax.grid(True, alpha=0.3)
 
-    # Format x-axis
+    # Format x-axis with automatic date locator
     for ax in axes:
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
-        ax.xaxis.set_major_locator(mdates.HourLocator(interval=6))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
+        ax.xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=20))
+        ax.xaxis.set_minor_locator(mdates.AutoDateLocator(maxticks=40))
         plt.setp(ax.xaxis.get_majorticklabels(), rotation=45, ha='right')
 
     plt.tight_layout()
@@ -156,18 +163,15 @@ def plot_daily_analysis(df: pd.DataFrame, controller_name: str = None, save_path
         plt.show()
 
 
-def print_invoice(summary: Dict, savings: Dict):
+def print_invoice(summary: Dict, savings: Dict, investment_data: Dict = None):
     """
     Print formatted invoice/bill with detailed comparisons
 
     Args:
         summary: System summary statistics
         savings: Savings information with baseline comparisons
+        investment_data: Optional investment and payback data
     """
-    print("\n" + "=" * 80)
-    print("ENERGY MANAGEMENT SYSTEM - DETAILED COMPARISON".center(80))
-    print("=" * 80)
-
     print(f"\nController: {summary['controller']}")
     print("-" * 80)
 
@@ -200,9 +204,110 @@ def print_invoice(summary: Dict, savings: Dict):
     print("-" * 80)
 
     # Costs
-    print(f"{'Total Cost (€)':<30} {savings['system_cost']:>14.2f} "
+    print(f"{'Total Bill (€)':<30} {savings['system_cost']:>14.2f} "
           f"{savings['baseline_pv_cost']:>14.2f} "
           f"{savings['baseline_no_pv_cost']:>14.2f}")
+
+    print("-" * 80)
+
+    # Battery metrics
+    print(f"{'Battery Cycles (Full)':<30} {summary['battery_cycles']:>14.2f} "
+          f"{'N/A':>14} "
+          f"{'N/A':>14}")
+
+    print(f"{'Battery Cycles (Usable)':<30} {summary['battery_cycles_usable']:>14.2f} "
+          f"{'N/A':>14} "
+          f"{'N/A':>14}")
+
+    print(f"{'Battery Degradation (€)':<30} {summary['battery_degradation_cost']:>14.2f} "
+          f"{'0.00':>14} "
+          f"{'0.00':>14}")
+
+    # Investment and Payback information
+    if investment_data:
+        print("-" * 80)
+
+        print(f"{'Investment (€)':<30} {investment_data['total_investment']:>14.2f} "
+              f"{investment_data['pv_investment']:>14.2f} "
+              f"{'0.00':>14}")
+
+        # Savings for the period
+        pv_only_savings = investment_data['pv_only_savings']
+        total_savings = savings['savings_vs_no_pv']
+
+        print(f"{'Savings - Period (€)':<30} {total_savings:>14.2f} "
+              f"{pv_only_savings:>14.2f} "
+              f"{'0.00':>14}")
+
+        # Monthly savings
+        print(f"{'Monthly Savings (€/month)':<30} {investment_data['total_monthly_savings']:>14.2f} "
+              f"{investment_data['pv_monthly_savings']:>14.2f} "
+              f"{'0.00':>14}")
+
+        # Payback period
+        total_payback_str = f"{investment_data['total_payback_years']:.2f}y" if investment_data['total_payback_years'] < 999 else "Infinite"
+        pv_payback_str = f"{investment_data['pv_payback_years']:.2f}y" if investment_data['pv_payback_years'] < 999 else "Infinite"
+
+        print(f"{'Payback Period (years)':<30} {total_payback_str:>14} "
+              f"{pv_payback_str:>14} "
+              f"{'N/A':>14}")
+
+        # Incremental Payback (Battery only)
+        # Calculate monthly savings from battery (vs PV only)
+        battery_monthly_savings = investment_data['total_monthly_savings'] - investment_data['pv_monthly_savings']
+
+        if battery_monthly_savings > 0:
+            incremental_payback_years = (investment_data['battery_investment'] / battery_monthly_savings) / 12
+            incremental_payback_str = f"{incremental_payback_years:.2f}y" if incremental_payback_years < 999 else "Infinite"
+        else:
+            incremental_payback_str = "Infinite"
+
+        print(f"{'Incremental Payback (years)':<30} {incremental_payback_str:>14} "
+              f"{'N/A':>14} "
+              f"{'N/A':>14}")
+
+        # Investment Breakdown
+        print("\n" + "-" * 80)
+        print("\nINVESTMENT BREAKDOWN:")
+        print("-" * 80)
+        print(f"{'Component':<30} {'PV+Battery':<15} {'PV Only':<15} {'Grid Only':<15}")
+        print("-" * 80)
+
+        # Battery costs
+        print(f"{'Battery System':<30} {investment_data['battery_cost']:>14.2f} "
+              f"{'0.00':>14} "
+              f"{'0.00':>14}")
+
+        # Solar costs
+        print(f"{'Solar Panels':<30} {investment_data['solar_cost']:>14.2f} "
+              f"{investment_data['solar_cost']:>14.2f} "
+              f"{'0.00':>14}")
+
+        # Inverter costs
+        print(f"{'Inverter':<30} {investment_data['inverter_cost']:>14.2f} "
+              f"{investment_data['inverter_cost_pv']:>14.2f} "
+              f"{'0.00':>14}")
+
+        # Structure costs
+        print(f"{'Structure':<30} {investment_data['structure_cost']:>14.2f} "
+              f"{investment_data['structure_cost']:>14.2f} "
+              f"{'0.00':>14}")
+
+        # Labor costs
+        print(f"{'Labor':<30} {investment_data['labor_cost']:>14.2f} "
+              f"{investment_data['labor_cost']:>14.2f} "
+              f"{'0.00':>14}")
+
+        # Balance of System costs
+        bos_total = investment_data['bos_pv_cost'] + investment_data['bos_bss_cost']
+        print(f"{'Balance of System':<30} {bos_total:>14.2f} "
+              f"{investment_data['bos_pv_cost']:>14.2f} "
+              f"{'0.00':>14}")
+
+        print("-" * 80)
+        print(f"{'TOTAL':<30} {investment_data['total_investment']:>14.2f} "
+              f"{investment_data['pv_investment']:>14.2f} "
+              f"{'0.00':>14}")
 
     print("\n" + "=" * 80)
 
@@ -222,7 +327,8 @@ def print_invoice(summary: Dict, savings: Dict):
     print(f"  House Consumption:       {summary['total_consumption_kwh']:>10.2f} kWh")
     print(f"  Self-Consumption Rate:   {summary['self_consumption_rate']*100:>10.1f} %")
     print(f"  Self-Sufficiency Rate:   {summary['self_sufficiency_rate']*100:>10.1f} %")
-    print(f"  Battery Cycles:          {summary['battery_cycles']:>10.2f}")
+    print(f"  Battery Cycles (Full):   {summary['battery_cycles']:>10.2f}")
+    print(f"  Battery Cycles (Usable): {summary['battery_cycles_usable']:>10.2f}")
     print(f"  Degradation Cost:        {summary['battery_degradation_cost']:>10.2f} €")
 
     print("\n" + "=" * 80 + "\n")
@@ -254,8 +360,6 @@ def print_summary(summary: Dict):
     print(f"Grid Export: {summary['total_grid_export_kwh']:.2f} kWh")
     print(f"Solar Production: {summary['total_solar_production_kwh']:.2f} kWh")
     print(f"Total Consumption: {summary['total_consumption_kwh']:.2f} kWh")
-    print(f"Battery Cycles: {summary['battery_cycles']:.2f}")
-    print(f"Battery Degradation Cost: {summary['battery_degradation_cost']:.2f} €")
     print(f"Self-Consumption Rate: {summary['self_consumption_rate']*100:.1f}%")
     print(f"Self-Sufficiency Rate: {summary['self_sufficiency_rate']*100:.1f}%")
 
@@ -280,6 +384,8 @@ def compare_controllers(results_dict: Dict[str, pd.DataFrame], save_path: str = 
     ax.set_title('Cumulative Cost Comparison')
     ax.legend()
     ax.grid(True, alpha=0.3)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
+    ax.xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=20))
 
     # Plot average SOC
     ax = axes[0, 1]
@@ -290,6 +396,8 @@ def compare_controllers(results_dict: Dict[str, pd.DataFrame], save_path: str = 
     ax.set_title('Battery SOC Comparison')
     ax.legend()
     ax.grid(True, alpha=0.3)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
+    ax.xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=20))
 
     # Plot grid import comparison
     ax = axes[1, 0]

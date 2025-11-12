@@ -22,7 +22,7 @@ import time
 import logging
 
 # --- Importações Numba ---
-from numba import jit, prange
+from numba import jit, prange, njit
 from numba.typed import List
 import numba.types as types
 
@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 # --- Funções JIT do Modelo da Planta ---
 
-@jit(nopython=True, cache=False)
+@jit(nopython=True, cache=True)
 def p_eff_jit(u: float, eta_c: float, eta_d: float) -> float:
     """Potência efetiva (JIT)."""
     if u < 0:  # Carregando
@@ -47,7 +47,7 @@ def p_eff_jit(u: float, eta_c: float, eta_d: float) -> float:
     else:
         return 0.0
 
-@jit(nopython=True, cache=False)
+@jit(nopython=True, cache=True)
 def next_soc_jit(x: float, u: float, C_bat: float, dt_hours: float,
                  eta_c: float, eta_d: float,
                  soc_min: float, soc_max: float) -> float:
@@ -61,12 +61,12 @@ def next_soc_jit(x: float, u: float, C_bat: float, dt_hours: float,
         x_next = soc_max
     return x_next
 
-@jit(nopython=True, cache=False)
+@jit(nopython=True, cache=True)
 def curtailment_jit(u: float, R: float, P_lim: float) -> float:
     """Curtailment (JIT)."""
     return max(0.0, u + R - P_lim)
 
-@jit(nopython=True, cache=False)
+@jit(nopython=True, cache=True)
 def grid_power_jit(u: float, R: float, P_lim: float) -> float:
     """Potência da rede (JIT)."""
     phi = curtailment_jit(u, R, P_lim)
@@ -75,7 +75,7 @@ def grid_power_jit(u: float, R: float, P_lim: float) -> float:
 
 # --- Funções JIT do Controlador SDP ---
 
-@jit(nopython=True, cache=False)
+@jit(nopython=True, cache=True)
 def stage_cost_jit(u: float, R: float, P_lim: float, c_s: float, c_f: float, dt_hours: float,
                    c_deg: float, eta_c: float, eta_d: float) -> float:
     """
@@ -118,10 +118,155 @@ def stage_cost_jit(u: float, R: float, P_lim: float, c_s: float, c_f: float, dt_
 
     return grid_cost + degradation_cost
 
+@njit(parallel=False, cache=True)
+def _interp_in_R_at_xindex(R: float,
+                           x_index: int,
+                           R_grid: np.ndarray,
+                           J: np.ndarray) -> float:
+    """
+    Interpola J(x_index, R) apenas ao longo de R (x fixo por índice).
+    Evita bilinear por ação quando x_next cai exatamente na grelha.
+    """
+    iR = np.searchsorted(R_grid, R)
+    if iR < 1:
+        iR = 1
+    elif iR > len(R_grid) - 1:
+        iR = len(R_grid) - 1
+
+    lo = iR - 1
+    hi = iR
+    Rl = R_grid[lo]
+    Rh = R_grid[hi]
+
+    if Rh == Rl:
+        w = 0.5
+    else:
+        w = (R - Rl) / (Rh - Rl)
+
+    return (1.0 - w) * J[x_index, lo] + w * J[x_index, hi]
+
+
+@njit(parallel=True, cache=True)
+def _solve_sdp_jit_fast(N: int,
+                        X_grid: np.ndarray,
+                        R_grids_list: List[np.ndarray],
+                        feasible_actions_list: List[np.ndarray],
+                        next_x_index_list: List[np.ndarray],
+                        R_bar: np.ndarray,
+                        # Plant params
+                        C_bat: float, dt_hours: float, eta_c: float, eta_d: float,
+                        soc_min: float, soc_max: float, P_nom: float, P_lim: float,
+                        # Residual params
+                        kappa: float, sigma: float,
+                        # Cost params
+                        c_s: float, c_f: float, c_deg: float,
+                        soc_target: float, terminal_cost_weight: float
+                        ) -> Tuple[List[np.ndarray], List[np.ndarray]]:
+    """
+    Versão rápida do loop SDP:
+      - Para cada (k, j) pré-calcula EJ_cache[x_next, j] = E[J_{k+1}(x_next, R_{k+1})]
+      - Minimização por ação vira: custo_imediato(u) + EJ_cache[idx_x_next(u), j]
+    Preserva a mesma precisão do original.
+    """
+    n_x = len(X_grid)
+
+    value_list = List.empty_list(types.float64[:, :])
+    policy_list = List.empty_list(types.float64[:, :])
+
+    for _ in range(N):
+        policy_list.append(np.empty((0, 0), dtype=np.float64))
+    for _ in range(N + 1):
+        value_list.append(np.empty((0, 0), dtype=np.float64))
+
+    # --- Terminal (k = N) ---
+    n_R_N = len(R_grids_list[N])
+    JN = np.empty((n_x, n_R_N), dtype=np.float64)
+    for i in prange(n_x):
+        JN[i, :] = terminal_cost_jit(X_grid[i], soc_target, terminal_cost_weight,
+                                     C_bat, c_s, c_f)
+    value_list[N] = JN
+
+    # --- Backward DP ---
+    for k in range(N - 1, -1, -1):
+        Rk  = R_grids_list[k]
+        Rk1 = R_grids_list[k + 1]
+        n_Rk = len(Rk)
+
+        Jk  = np.empty((n_x, n_Rk), dtype=np.float64)
+        Muk = np.empty((n_x, n_Rk), dtype=np.float64)
+
+        # 1) Pré-cálculo: EJ_cache[x_next_idx, j] para todos x_next, j
+        EJ_cache = np.empty((n_x, n_Rk), dtype=np.float64)
+
+        for j in prange(n_Rk):
+            R_kj = Rk[j]
+            rho = transition_mean_jit(R_kj, R_bar[k + 1], R_bar[k], kappa)
+            pts, wts = gaussian_quadrature_5pt_jit(rho, sigma, Rk1)
+
+            # Integra para CADA x_next (índice m) contra os pontos de quadratura
+            for m in range(n_x):
+                acc = 0.0
+                for q in range(len(pts)):
+                    acc += wts[q] * _interp_in_R_at_xindex(pts[q], m, Rk1, value_list[k + 1])
+                EJ_cache[m, j] = acc
+
+        # 2) Minimização por ação usando apenas lookups + custo imediato
+        for i in prange(n_x):
+            U_i      = feasible_actions_list[i]
+            next_idx = next_x_index_list[i]
+
+            if len(U_i) == 0:
+                for j in range(n_Rk):
+                    Jk[i, j]  = np.inf
+                    Muk[i, j] = 0.0
+                continue
+
+            for j in range(n_Rk):
+                R_kj = Rk[j]
+                best_cost = 1e300
+                best_u    = 0.0
+
+                for a in range(len(U_i)):
+                    u = U_i[a]
+
+                    # custo imediato (inline do stage_cost_jit para evitar alocação)
+                    phi = 0.0
+                    tmp = u + R_kj - P_lim
+                    if tmp > 0.0:
+                        phi = tmp
+
+                    P_g = -u - R_kj + phi
+                    P_g_plus  = P_g if P_g > 0.0 else 0.0
+                    P_g_minus = -P_g if P_g < 0.0 else 0.0
+                    grid_cost = (P_g_plus * c_s - P_g_minus * c_f) * dt_hours
+
+                    if u < 0.0:
+                        throughput = -u * eta_c
+                    elif u > 0.0:
+                        throughput =  u / eta_d
+                    else:
+                        throughput = 0.0
+
+                    deg_cost = throughput * dt_hours * c_deg
+
+                    total = grid_cost + deg_cost + EJ_cache[next_idx[a], j]
+
+                    if total < best_cost:
+                        best_cost = total
+                        best_u    = u
+
+                Jk[i, j]  = best_cost
+                Muk[i, j] = best_u
+
+        value_list[k] = Jk
+        policy_list[k] = Muk
+
+    return policy_list, value_list
 
 
 
-@jit(nopython=True, cache=False)
+
+@jit(nopython=True, cache=True)
 def terminal_cost_jit(x: float, soc_target: float, weight: float, C_bat: float, c_s: float, c_f: float) -> float:
     """
     Terminal cost: valor da energia armazenada no final do horizonte.
@@ -143,12 +288,12 @@ def terminal_cost_jit(x: float, soc_target: float, weight: float, C_bat: float, 
         return -x * C_bat * c_s
 
 
-@jit(nopython=True, cache=False)
+@jit(nopython=True, cache=True)
 def transition_mean_jit(R_current: float, R_bar_next: float, R_bar_current: float, kappa: float) -> float:
     """Média da transição do resíduo (JIT)."""
     return R_bar_next + kappa * (R_current - R_bar_current)
 
-@jit(nopython=True, cache=False)
+@jit(nopython=True, cache=True)
 def gaussian_quadrature_5pt_jit(rho: float, sigma: float,
                                 R_grid: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """Quadratura Gaussiana 5 pontos (JIT)."""
@@ -189,7 +334,7 @@ def gaussian_quadrature_5pt_jit(rho: float, sigma: float,
 
     return valid_points, valid_weights
 
-@jit(nopython=True, cache=False)
+@jit(nopython=True, cache=True)
 def _interpolate_value_function_jit(x: float, R: float,
                                     X_grid: np.ndarray,
                                     R_grid_k: np.ndarray,
@@ -249,7 +394,7 @@ def _interpolate_value_function_jit(x: float, R: float,
 
     return J_interp
 
-@jit(nopython=True, cache=False)
+@jit(nopython=True, cache=True)
 def _expected_future_cost_jit(x_next: float, R_k: float, k: int,
                               R_bar: np.ndarray, kappa: float, sigma: float,
                               X_grid: np.ndarray,
@@ -279,7 +424,95 @@ def _expected_future_cost_jit(x_next: float, R_k: float, k: int,
     return E_J
 
 
-@jit(nopython=True, parallel=True, cache=False)
+# ############################################################################
+# Funções Vetorizadas para Processamento em Batch de Ações
+# ############################################################################
+
+@jit(nopython=True, cache=True)
+def p_eff_vectorized(u_array: np.ndarray, eta_c: float, eta_d: float) -> np.ndarray:
+    """Potência efetiva vetorizada para array de ações."""
+    n = len(u_array)
+    p_eff = np.empty(n, dtype=np.float64)
+    for i in range(n):
+        u = u_array[i]
+        if u < 0:  # Carregando
+            p_eff[i] = u * eta_c
+        elif u > 0:  # Descarregando
+            p_eff[i] = u / eta_d
+        else:
+            p_eff[i] = 0.0
+    return p_eff
+
+
+@jit(nopython=True, cache=True)
+def next_soc_vectorized(x: float, u_array: np.ndarray, C_bat: float, dt_hours: float,
+                        eta_c: float, eta_d: float, soc_min: float, soc_max: float) -> np.ndarray:
+    """Próximo SOC vetorizado para array de ações."""
+    p_eff_array = p_eff_vectorized(u_array, eta_c, eta_d)
+    x_next_array = x - (p_eff_array * dt_hours) / C_bat
+    # Clip
+    for i in range(len(x_next_array)):
+        if x_next_array[i] < soc_min:
+            x_next_array[i] = soc_min
+        elif x_next_array[i] > soc_max:
+            x_next_array[i] = soc_max
+    return x_next_array
+
+
+@jit(nopython=True, cache=True)
+def stage_cost_vectorized(u_array: np.ndarray, R: float, P_lim: float,
+                          c_s: float, c_f: float, dt_hours: float,
+                          c_deg: float, eta_c: float, eta_d: float) -> np.ndarray:
+    """Custo por etapa vetorizado para array de ações."""
+    n = len(u_array)
+    costs = np.empty(n, dtype=np.float64)
+
+    for i in range(n):
+        u = u_array[i]
+        # Grid power
+        phi = max(0.0, u + R - P_lim)
+        P_g = -u - R + phi
+        P_g_plus = max(0.0, P_g)
+        P_g_minus = max(0.0, -P_g)
+
+        # Grid cost
+        grid_cost = (P_g_plus * c_s - P_g_minus * c_f) * dt_hours
+
+        # Degradation cost
+        if u < 0:  # Carregando
+            throughput = abs(u) * eta_c
+        elif u > 0:  # Descarregando
+            throughput = abs(u) / eta_d
+        else:
+            throughput = 0.0
+
+        degradation_cost = throughput * dt_hours * c_deg
+        costs[i] = grid_cost + degradation_cost
+
+    return costs
+
+
+@jit(nopython=True, cache=True)
+def expected_future_cost_vectorized(x_next_array: np.ndarray, R_k: float, k: int,
+                                    R_bar: np.ndarray, kappa: float, sigma: float,
+                                    X_grid: np.ndarray,
+                                    R_grids_list: List[np.ndarray],
+                                    value_function_list: List[np.ndarray]) -> np.ndarray:
+    """Custo futuro esperado vetorizado para array de estados futuros."""
+    n = len(x_next_array)
+    E_J_array = np.empty(n, dtype=np.float64)
+
+    for i in range(n):
+        E_J_array[i] = _expected_future_cost_jit(
+            x_next_array[i], R_k, k,
+            R_bar, kappa, sigma,
+            X_grid, R_grids_list, value_function_list
+        )
+
+    return E_J_array
+
+
+@jit(nopython=True, parallel=True, cache=True)
 def _solve_sdp_jit(N: int, X_grid: np.ndarray,
                    R_grids_list: List[np.ndarray],
                    _feasible_actions_cache: List[np.ndarray],
@@ -340,37 +573,33 @@ def _solve_sdp_jit(N: int, X_grid: np.ndarray,
             for j in range(n_R_k):
                 R_kj = R_grids_list[k][j]
 
-                min_cost = np.inf
-                best_u = 0.0
+                # VERSÃO VETORIZADA: Calcular custos de todas as ações de uma vez
+                # Custo imediato de todas as ações
+                g_array = stage_cost_vectorized(
+                    U_i, R_kj, P_lim, c_s, c_f, dt_hours,
+                    c_deg, eta_c, eta_d
+                )
 
-                # Loop sobre ações (não pode ser paralelizado, é uma minimização)
-                for u_idx in range(len(U_i)):
-                    u = U_i[u_idx]
+                # Próximo estado para todas as ações
+                x_next_array = next_soc_vectorized(
+                    x_i, U_i, C_bat, dt_hours, eta_c, eta_d, soc_min, soc_max
+                )
 
-                    # Custo imediato
-                    g = stage_cost_jit(
-                        u, R_kj, P_lim, c_s, c_f, dt_hours,
-                        c_deg, eta_c, eta_d
-                    )
+                # Custo futuro esperado para todos os estados futuros
+                E_J_array = expected_future_cost_vectorized(
+                    x_next_array, R_kj, k, R_bar, kappa, sigma,
+                    X_grid,
+                    R_grids_list,
+                    value_function_list
+                )
 
-                    # Próximo estado
-                    x_next = next_soc_jit(
-                        x_i, u, C_bat, dt_hours, eta_c, eta_d, soc_min, soc_max
-                    )
+                # Custo total para cada ação
+                total_cost_array = g_array + E_J_array
 
-                    # Custo futuro esperado
-                    E_J = _expected_future_cost_jit(
-                        x_next, R_kj, k, R_bar, kappa, sigma,
-                        X_grid,
-                        R_grids_list,
-                        value_function_list
-                    )
-                    
-                    total_cost = g + E_J
-
-                    if total_cost < min_cost:
-                        min_cost = total_cost
-                        best_u = u
+                # Encontrar ação ótima
+                best_idx = np.argmin(total_cost_array)
+                min_cost = total_cost_array[best_idx]
+                best_u = U_i[best_idx]
 
                 J_k[i, j] = min_cost
                 mu_k[i, j] = best_u
@@ -635,6 +864,7 @@ class SDPController:
         # --- Listas tipadas Numba para JIT ---
         self.R_grids_list: List[np.ndarray] = None
         self._feasible_actions_cache: List[np.ndarray] = None
+        self._next_x_index_cache: List[np.ndarray] = None   
 
         # Política ótima (listas Python padrão)
         self.policy: PythonList[np.ndarray] = None
@@ -646,6 +876,39 @@ class SDPController:
 
         # Nome do controlador
         self.name = "SDP (Numba JIT)"
+
+        # Interactive visualization (optional)
+        self.visualizer = None
+        self.enable_visualization = False
+
+    def enable_interactive_visualization(self, output_dir: str = "results/interactive_plots"):
+        """
+        Enable interactive 3D visualization of interpolation.
+
+        Args:
+            output_dir: Directory to save HTML plots
+        """
+        try:
+            from src.interactive_visualization import InterpolationVisualizer
+            self.visualizer = InterpolationVisualizer(output_dir=output_dir)
+            self.enable_visualization = True
+            print(f"[SDP] Interactive visualization enabled. Plots will be saved to {output_dir}")
+        except ImportError as e:
+            print(f"[SDP] Warning: Could not enable visualization: {e}")
+            print("[SDP] Make sure plotly is installed: pip install plotly")
+            self.enable_visualization = False
+
+    def save_visualizations(self, prefix: str = "interpolation"):
+        """
+        Save all collected visualization data to HTML files.
+
+        Args:
+            prefix: Prefix for output filenames
+        """
+        if self.visualizer is not None and self.enable_visualization:
+            self.visualizer.save_all_plots(prefix=prefix)
+        else:
+            print("[SDP] Visualization not enabled or no data collected.")
 
     def stage_cost(self, u: float, R: float) -> float:
         """
@@ -667,48 +930,74 @@ class SDPController:
 
     def create_grids(self, R_bar: np.ndarray):
         """
-        Criar grelhas de discretização.
-
-        *** MODIFICADO ***
-        Cria listas tipadas Numba para JIT.
-
-        Args:
-            R_bar: Previsão base R̄ para cada passo k (tamanho N+1)
+        Criar grelhas de discretização + caches de ações/índices.
+        Agora também pré-calcula, para cada ação viável em x_i, o índice do x_next na X_grid.
         """
-        N = self.params.N
+        N   = self.params.N
         n_x = self.params.n_x
         n_R = self.params.n_R
 
-        # Grelha de SOC (uniforme em [soc_min, soc_max])
+        # --- Grelha de SOC ---
         self.X_grid = np.linspace(self.plant.soc_min, self.plant.soc_max, n_x, dtype=np.float64)
 
-        # Pre-compute feasible actions
-        # *** Usa Numba typed List ***
+        # --- Caches de ações e índices (typed lists Numba) ---
         self._feasible_actions_cache = List.empty_list(types.float64[:])
-        for x_i in self.X_grid:
-            actions = self.plant.feasible_actions(x_i, self.X_grid)
-            self._feasible_actions_cache.append(actions)
+        self._next_x_index_cache     = List.empty_list(types.int64[:])
 
-        # Grelhas de resíduo (uma por passo k, incluindo k=N)
-        self.R_grids = []
-        # *** Usa Numba typed List ***
+        dt   = self.plant.dt_hours
+        C    = self.plant.C_bat
+        eta_c, eta_d = self.plant.eta_c, self.plant.eta_d
+
+        for x_i in self.X_grid:
+            # ações viáveis que levam exatamente a pontos da grelha (sua função já faz isso)
+            actions = np.ascontiguousarray(self.plant.feasible_actions(x_i, self.X_grid))
+
+            # mapeia cada ação para o índice do x_next correspondente (sem recomputar depois)
+            idx_arr = np.empty(len(actions), dtype=np.int64)
+            for a_idx in range(len(actions)):
+                u = actions[a_idx]
+                # p_eff(u)
+                if u < 0.0:
+                    p_eff = u * eta_c
+                elif u > 0.0:
+                    p_eff = u / eta_d
+                else:
+                    p_eff = 0.0
+
+                x_next = x_i - (p_eff * dt) / C
+
+                # escolhe o índice de grelha mais próximo (evita drift de arredondamento)
+                iR = np.searchsorted(self.X_grid, x_next)
+                if iR < 1:
+                    iR = 1
+                elif iR > len(self.X_grid) - 1:
+                    iR = len(self.X_grid) - 1
+                lo = iR - 1
+                hi = iR
+                idx_best = lo if abs(self.X_grid[lo] - x_next) <= abs(self.X_grid[hi] - x_next) else hi
+                idx_arr[a_idx] = idx_best
+
+            self._feasible_actions_cache.append(actions)                  # float64[:]
+            self._next_x_index_cache.append(np.ascontiguousarray(idx_arr))# int64[:]
+
+        # --- Grelhas de resíduo (uma por k) ---
+        self.R_grids      = []
         self.R_grids_list = List.empty_list(types.float64[:])
 
         sigma = self.residual_model.sigma
 
-        # CORREÇÃO: Usar range maior (±10σ em vez de ±3σ) para evitar clamping
-        # quando há erros de previsão grandes
-        sigma_multiplier = 3 # Aumentado de 3 para 10
+        # Usar ±3σ: boa cobertura sem perder resolução (se observar clamping, subir p/ 4–5)
+        sigma_multiplier = 3
 
         for k in range(N + 1):
             R_center = R_bar[k]
             R_min = R_center - sigma_multiplier * sigma
             R_max = R_center + sigma_multiplier * sigma
             R_grid_k = np.linspace(R_min, R_max, n_R, dtype=np.float64)
-            
-            # Armazena em ambos os formatos
+
             self.R_grids.append(R_grid_k)
-            self.R_grids_list.append(R_grid_k)
+            self.R_grids_list.append(np.ascontiguousarray(R_grid_k))
+
 
     def gaussian_quadrature_5pt(self,
                                  rho: float,
@@ -725,26 +1014,20 @@ class SDPController:
     def solve_sdp(self, R_bar: np.ndarray, verbose: bool = False):
         """
         Resolver SDP usando backward DP com quadratura.
-
-        *** MODIFICADO ***
-        Este método agora é um "wrapper" que chama a função _solve_sdp_jit.
-
-        Args:
-            R_bar: Previsão base R̄ para cada passo k (tamanho N+1)
-            verbose: Imprimir progresso
+        Wrapper que chama a versão _fast (pré-cálculo de E[J]).
         """
         solve_start_time = time.time()
-        
-        if verbose:
-            print(f"  [SDP] Chamando _solve_sdp_jit (pode compilar na 1ª execução)...")
 
-        # Chama a função JIT principal com todos os parâmetros
+        if verbose:
+            print(f" [SDP] Chamando _solve_sdp_jit_fast (pode compilar na 1ª execução)...")
+
         jit_start = time.time()
-        policy_list_jit, value_function_list_jit = _solve_sdp_jit(
+        policy_list_jit, value_function_list_jit = _solve_sdp_jit_fast(
             self.params.N,
             self.X_grid,
-            self.R_grids_list, # Passa a lista tipada
-            self._feasible_actions_cache, # Passa a lista tipada
+            self.R_grids_list,
+            self._feasible_actions_cache,
+            self._next_x_index_cache,               # <— novo argumento
             R_bar,
             # Plant params
             self.plant.C_bat, self.plant.dt_hours, self.plant.eta_c, self.plant.eta_d,
@@ -756,20 +1039,20 @@ class SDPController:
             self.params.soc_target, self.params.terminal_cost_weight
         )
         jit_time = time.time() - jit_start
-        logger.info(f"  [SDP] JIT solve time: {jit_time:.4f}s")
-        
-        if verbose:
-             print(f"  [SDP] JIT solve concluído em {jit_time:.4f}s")
+        logger.info(f" [SDP] JIT fast solve time: {jit_time:.4f}s")
 
-        # Converte Numba Lists de volta para listas Python padrão
-        # para compatibilidade com o resto do código (ex: get_action)
+        if verbose:
+            print(f" [SDP] JIT fast solve concluído em {jit_time:.4f}s")
+
+        # converter para listas Python para compatibilidade externa
         self.policy = [policy_list_jit[i] for i in range(len(policy_list_jit))]
         self.value_function = [value_function_list_jit[i] for i in range(len(value_function_list_jit))]
 
         total_solve_time = time.time() - solve_start_time
-        logger.info(f"  [SDP] Total solve_sdp time: {total_solve_time:.4f}s")
+        logger.info(f" [SDP] Total solve_sdp time: {total_solve_time:.4f}s")
         if verbose:
-            print(f"  SDP solved in {total_solve_time:.2f}s!")
+            print(f" SDP solved in {total_solve_time:.2f}s!")
+
 
     def _expected_future_cost(self,
                              x_next: float,
@@ -858,7 +1141,8 @@ class SDPController:
     def get_action(self,
                    x: float,
                    R: float,
-                   k: int) -> float:
+                   k: int,
+                   timestamp: datetime) -> float:
         """
         Obter ação ótima por interpolação.
         (Função original mantida, pois é rápida o suficiente
@@ -876,8 +1160,8 @@ class SDPController:
         R_grid_k = self.R_grids[k]
         R_clamped = np.clip(R, R_grid_k.min(), R_grid_k.max())
 
-        if k == 0 and abs(R - R_clamped) > 0.01:
-            logger.warning(f"  R={R:.4f} clamped to {R_clamped:.4f}")
+        if R != R_clamped:
+            logger.warning(f"  R={R:.4f} clamped to {R_clamped:.4f} at {timestamp} k={k}")
 
         # Encontrar vizinhos em X_grid
         i_x = np.searchsorted(self.X_grid, x)
@@ -974,11 +1258,30 @@ class SDPController:
 
         # Obter ação ótima
         interpolation_start = time.time()
-        u_star = self.get_action(x_current, R_current, k)
+        u_star = self.get_action(x_current, R_current, k, timestamp)
         interpolation_time = time.time() - interpolation_start
 
         total_action_time = time.time() - action_start
         logger.debug(f"  [SDP] compute_action: k={k}, {total_action_time:.6f}s (interpolation: {interpolation_time:.6f}s)")
+
+        # Collect visualization data if enabled
+        if self.enable_visualization and self.visualizer is not None:
+            # Get value function for current state
+            J_star = self._interpolate_value_function(x_current, R_current, k)
+
+            # Store data for visualization
+            self.visualizer.add_timestep_data(
+                timestamp=timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                x_current=x_current,
+                R_current=R_current,
+                k=k,
+                X_grid=self.X_grid,
+                R_grid=self.R_grids[k],
+                policy=self.policy[k],
+                value_function=self.value_function[k],
+                u_star=u_star,
+                J_star=J_star
+            )
 
         # Retornar (note: convenção de sinal pode ser diferente da Battery)
         # Battery: positivo=carga, negativo=descarga

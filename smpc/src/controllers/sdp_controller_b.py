@@ -320,6 +320,39 @@ class SDPController:
         # Nome do controlador
         self.name = "SDP"
 
+        # Interactive visualization (optional)
+        self.visualizer = None
+        self.enable_visualization = False
+
+    def enable_interactive_visualization(self, output_dir: str = "results/interactive_plots"):
+        """
+        Enable interactive 3D visualization of interpolation.
+
+        Args:
+            output_dir: Directory to save HTML plots
+        """
+        try:
+            from src.interactive_visualization import InterpolationVisualizer
+            self.visualizer = InterpolationVisualizer(output_dir=output_dir)
+            self.enable_visualization = True
+            print(f"[SDP] Interactive visualization enabled. Plots will be saved to {output_dir}")
+        except ImportError as e:
+            print(f"[SDP] Warning: Could not enable visualization: {e}")
+            print("[SDP] Make sure plotly is installed: pip install plotly")
+            self.enable_visualization = False
+
+    def save_visualizations(self, prefix: str = "interpolation"):
+        """
+        Save all collected visualization data to HTML files.
+
+        Args:
+            prefix: Prefix for output filenames
+        """
+        if self.visualizer is not None and self.enable_visualization:
+            self.visualizer.save_all_plots(prefix=prefix)
+        else:
+            print("[SDP] Visualization not enabled or no data collected.")
+
     def stage_cost(self, u: float, R: float) -> float:
         """
         Custo por etapa.
@@ -754,6 +787,25 @@ class SDPController:
 
         total_action_time = time.time() - action_start
         logger.debug(f"  [SDP] compute_action: {total_action_time:.6f}s (interpolation: {interpolation_time:.6f}s)")
+
+        # Collect visualization data if enabled
+        if self.enable_visualization and self.visualizer is not None:
+            # Get value function for current state
+            J_star = self._interpolate_value_function(x_current, R_current, k)
+
+            # Store data for visualization
+            self.visualizer.add_timestep_data(
+                timestamp=timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                x_current=x_current,
+                R_current=R_current,
+                k=k,
+                X_grid=self.X_grid,
+                R_grid=self.R_grids[k],
+                policy=self.policy[k],
+                value_function=self.value_function[k],
+                u_star=u_star,
+                J_star=J_star
+            )
 
         # Retornar (note: convenção de sinal pode ser diferente da Battery)
         # Battery: positivo=carga, negativo=descarga

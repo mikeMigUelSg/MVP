@@ -1,0 +1,14 @@
+Mês,Produção Média (kWh / kWp)
+Janeiro,71 kWh
+Fevereiro,84 kWh
+Março,124 kWh
+Abril,150 kWh
+Maio,171 kWh
+Junho,180 kWh
+Julho,192 kWh
+Agosto,186 kWh
+Setembro,150 kWh
+Outubro,109 kWh
+Novembro,75 kWh
+Dezembro,62 kWh
+Total Anual,~1.554 kWh

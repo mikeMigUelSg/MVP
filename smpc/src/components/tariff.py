@@ -31,6 +31,10 @@ class SimpleTariff(Tariff):
     def get_price(self, timestamp: datetime) -> float:
         return self.price
 
+    def get_prices_for_horizon(self, start_time: datetime, n_steps: int, dt_minutes: int = 15) -> np.ndarray:
+        """Return a constant price array for the horizon."""
+        return np.full(n_steps, self.price)
+
 
 class BiHorariaTariff(Tariff):
     """Bi-horária tariff with peak and off-peak hours"""

@@ -2,32 +2,39 @@
 
 # Simulation settings
 simulation:
-  start_date: "2025-04-1 00:00:00"
-  end_date: "2025-04-02 00:00:00"  
+  start_date: "2025-06-01 00:00:00"
+  end_date: "2025-07-01 23:00:00"  
   timestep_minutes: 15
 
 # Battery configuration
 battery:
-  capacity_kwh: 10.0  # Battery capacity in kWh
+  capacity_kwh: 5.0  # Battery capacity in kWh
   max_power_kw: 5.0   # Maximum charge/discharge power in kW
   max_charge_current_kw: 5.0   # Maximum charging power in kW
   max_discharge_current_kw: 5.0  # Maximum discharging power in kW
-  efficiency_charge: 0.90  # Charging efficiency
-  efficiency_discharge: 0.90  # Discharging efficiency
+  efficiency_charge: 0.94  # Charging efficiency
+  efficiency_discharge: 0.94  # Discharging efficiency
   initial_soc: 0.0  # Initial state of charge (0-1)
   min_soc: 0.1  # Minimum state of charge (0-1)
   max_soc: 0.9  # Maximum state of charge (0-1)
   degradation_cost_per_kwh: 0.01  # Degradation cost in €/kWh throughput
 
+# Inverter configuration
+inverter:
+  max_power_kw: 3.0  # Maximum AC power output in kW (options: 3.0 or 5.0)
+  price_3kw: 550  # Price for 3kW inverter in €
+  price_5kw: 800  # Price for 5kW inverter in €
+
 # Grid configuration
 grid:
   contracted_power_kw: 6.9  # Maximum contracted power from grid in kW
-  export_price: 0.045 # Price for exporting energy to grid in €/kWh
+  export_price: 0.04 # Price for exporting energy to grid in €/kWh
+  max_export_kw: 10.0  # Maximum power export to grid in kW (can cause curtailment if limited)
 
 # Solar panel configuration
 solar:
-  capacity_kw: 5.0  # Installed solar capacity in kW
-  scale_factor: 0.57  # Scale factor for solar production (1.0 = 100%, 0.5 = 50%, etc.)
+  solar_capacity_kwp: 3 # Solar panel capacity in kWp (actual installed capacity)
+  scale_factor_for_1kwp: 0.19  # Scale factor per 1 kWp of installed capacity
   data_file: "data/solar/pvdata.csv"  # Path to historical production data
 
 # House configuration
@@ -57,9 +64,11 @@ controller:
 
   # Rule-based controller settings
   rule_based:
-    high_price_threshold: 0.15  # €/kWh - threshold to consider high price
+    strategy: "simple"  # Options: "simple", "dynamic_threshold"
+    high_price_threshold: 0.15  # €/kWh - threshold for 'simple' strategy
     low_soc_threshold: 0.1  # Minimum SOC to allow discharge
-    high_soc_threshold: 0.9  # Maximum SOC to allow charge 
+    high_soc_threshold: 0.9  # Maximum SOC to allow charge
+    charge_soc_min: 0.5  # Minimum SOC to start charging from grid in 'dynamic_threshold' strategy
 
   # MPC controller settings
   mpc:
@@ -68,18 +77,18 @@ controller:
   # SDP controller settings
   sdp:
     # Horizon and time step
-    horizon_steps: 48  # Planning horizon (36 steps = 9h with 15min timestep)
+    horizon_steps: 96  # Planning horizon (36 steps = 9h with 15min timestep)
 
     # Discretization
-    n_soc_points: 150  # Number of SOC grid points (higher = more accurate, slower) 150 
-    n_residual_points: 50  # Number of residual grid points 50 
+    n_soc_points: 100  # Number of SOC grid points (higher = more accurate, slower) 150 
+    n_residual_points: 25  # Number of residual grid points 50 
 
     # Residual model (forecast error model)
-    half_life_minutes: 40.5  # Half-life of residual persistence (minutes)
+    half_life_minutes: 30  # Half-life of residual persistence (minutes)
     sigma_residual_kw: 0.9  # Noise standard deviation (kW)
 
     # Policy update
-    policy_update_hours: 6  # Recalculate policy every N hours
+    policy_update_hours: 12  # Recalculate policy every N hours
 
     # Terminal cost
     soc_target: 0.5  # Target SOC at end of horizon (0-1)
@@ -92,23 +101,36 @@ controller:
 
     # Calibration settings (auto-calibrate half_life and sigma if enabled)
     calibration:
-      enabled: true  # Set to true to auto-calibrate parameters
+      enabled: false  # Set to true to auto-calibrate parameters
       calibration_days: 30  # Number of days for calibration
 
     # Grid limit
     injection_limit_kw: 10.0  # Maximum injection to grid (kW)
 
+    # Interactive visualization
+    interactive_plots:
+      enabled: false  # Enable interactive 3D plots for interpolation visualization
+      save_html: true  # Save plots as HTML files
+      output_directory: "results/interactive_plots"
+
 
 
 optimize:
-  simulation_days: 100  # Number of days to simulate for optimization (e.g., 150 = ~5 months)
+  simulation_days: 180  # Number of days to simulate for optimization (e.g., 150 = ~5 months)
   solar:
     scale_factor_for_1kwp: 0.19
-    price_per_kwp: 600
+    price_per_kwp: 230
+    structure_cost_per_panel: 50 # Custo da estrutura por painel
   batery:
-    price_per_kwh: 120
+    price_per_kwh: 90
   inverter:
-    price: 900
+    price_3kw: 600  # Price for 3kW inverter in €
+    price_5kw: 900  # Price for 5kW inverter in €
+  labor:
+    base_cost: 149
+    cost_per_panel: 115
+  balance_of_system_pv: 516  # Custos fixos adicionais do sistema PV (cabeamento, conectores, proteções, etc.)
+  balance_of_system_bss: 100  # Custos fixos adicionais do sistema de armazenamento
 
 # Output configuration
 output:

@@ -1,0 +1,142 @@
+baseline_no_pv_cost: !!python/object/apply:numpy._core.multiarray.scalar
+- &id001 !!python/object/apply:numpy.dtype
+  args:
+  - f8
+  - false
+  - true
+  state: !!python/tuple
+  - 3
+  - <
+  - null
+  - null
+  - null
+  - -1
+  - -1
+  - 0
+- !!binary |
+  95kIG55aT0A=
+baseline_no_pv_import_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  ASuHFtkgekA=
+baseline_pv_cost: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  Bnt/KD15M0A=
+baseline_pv_export_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  IkYIjxaYdEA=
+baseline_pv_import_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  oLZ/ZSU2a0A=
+battery_cycles: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  Oiz6+sk4OUA=
+battery_cycles_usable: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  SLe4efyGP0A=
+battery_degradation_cost: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  +rxhYm4tBEA=
+controller: Rule-Based (simple)
+curtailment_rate: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  Unt8AKwFXDw=
+energy_balance_comparison:
+  no_pv_no_battery:
+    grid_export_kwh: 0.0
+    grid_import_kwh: 418.05299999999994
+    load_consumed_kwh: 418.053
+    load_self_sufficiency_pct: 0.0
+    solar_produced_kwh: 0.0
+    solar_self_consumption_pct: 0.0
+    solar_to_load_ratio_pct: 0.0
+  pv_without_battery:
+    grid_export_kwh: 329.50550750000014
+    grid_import_kwh: 217.69206500000018
+    load_consumed_kwh: 418.053
+    load_self_sufficiency_pct: 47.92716114942359
+    solar_produced_kwh: 529.8664425
+    solar_self_consumption_pct: 37.813478818296716
+    solar_to_load_ratio_pct: 126.74623612317097
+  system_with_battery:
+    battery_charged_kwh: 133.0948509362268
+    battery_discharged_kwh: 119.48261028725
+    battery_roundtrip_efficiency_pct: 89.77252647023948
+    grid_export_kwh: 196.4106565637733
+    grid_import_kwh: 98.20945471274997
+    load_consumed_kwh: 418.053
+    load_self_sufficiency_pct: 76.5078938046731
+    solar_produced_kwh: 529.8664425
+    solar_self_consumption_pct: 62.932044604094116
+    solar_to_load_ratio_pct: 126.74623612317097
+savings_pct_vs_no_pv: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  lxTKmetAVUA=
+savings_pct_vs_pv: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  5X88bDvfSUA=
+savings_vs_no_pv: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  NNh1eMenSkA=
+savings_vs_pv: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  Ae+zxh8nJEA=
+self_consumption_rate: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  M2bOoWQj5D8=
+self_sufficiency_rate: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  oJw404Z76D8=
+system_cost: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  CwdLilrLIkA=
+system_export_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  aek7GSSNaEA=
+system_import_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  RVC9tGeNWEA=
+total_consumption_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  ASuHFtkgekA=
+total_cost: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  CwdLilrLIkA=
+total_grid_export_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  aek7GSSNaEA=
+total_grid_import_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  RVC9tGeNWEA=
+total_solar_available_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  7Mpnee6OgEA=
+total_solar_curtailed_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  AAAAAAAA7Tw=
+total_solar_production_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  7Mpnee6OgEA=

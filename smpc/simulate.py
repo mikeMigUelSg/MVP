@@ -21,6 +21,7 @@ from src.components.battery import Battery
 from src.components.solar import SolarPanel
 from src.components.house import House
 from src.components.tariff import SimpleTariff, BiHorariaTariff
+from src.components.inverter import Inverter
 
 # Import controllers
 from src.controllers.rule_based import RuleBasedController
@@ -35,7 +36,8 @@ from src.system import EnergyManagementSystem
 from src.visualization import (
     plot_simulation_results,
     plot_daily_analysis,
-    print_summary
+    print_summary,
+    print_invoice
 )
 
 
@@ -66,10 +68,11 @@ def create_battery(config: dict) -> Battery:
 def create_solar(config: dict) -> SolarPanel:
     """Create solar panel component from config."""
     solar_config = config['solar']
+    scale_factor = solar_config.get('solar_capacity_kwp', 1.0) * solar_config.get('scale_factor_for_1kwp', 1.0)
     return SolarPanel(
-        capacity_kw=solar_config['capacity_kw'],
+        capacity_kw=solar_config.get('solar_capacity_kwp', 1.0),
         data_file=solar_config['data_file'],
-        scale_factor=solar_config.get('scale_factor', 1.0)
+        scale_factor=scale_factor
     )
 
 
@@ -78,6 +81,23 @@ def create_house(config: dict) -> House:
     house_config = config['house']
     return House(
         data_file=house_config['data_file']
+    )
+
+
+def create_inverter(config: dict) -> Inverter:
+    """Create inverter component from config."""
+    inverter_config = config['inverter']
+    max_power_kw = inverter_config['max_power_kw']
+
+    # Select price based on power rating
+    if max_power_kw <= 3.0:
+        price = inverter_config['price_3kw']
+    else:
+        price = inverter_config['price_5kw']
+
+    return Inverter(
+        max_power_kw=max_power_kw,
+        price=price
     )
 
 
@@ -304,6 +324,12 @@ def create_sdp_controller(config: dict, battery: Battery,
     controller.pv_forecaster = pv_forecaster
     controller.load_forecaster = load_forecaster
 
+    # 8. Enable interactive visualization if configured
+    if sdp_config.get('interactive_plots', {}).get('enabled', False):
+        print("\n8. Enabling interactive visualization...")
+        output_dir = sdp_config['interactive_plots'].get('output_directory', 'results/interactive_plots')
+        controller.enable_interactive_visualization(output_dir=output_dir)
+
     print("   SDP controller created successfully!")
     print("="*70 + "\n")
 
@@ -320,9 +346,11 @@ def create_controller(config: dict, battery: Battery,
         print("\nCreating Rule-Based controller...")
         rb_config = config['controller']['rule_based']
         return RuleBasedController(
+            strategy=rb_config.get('strategy', 'simple'),
             high_price_threshold=rb_config['high_price_threshold'],
             low_soc_threshold=rb_config['low_soc_threshold'],
-            high_soc_threshold=rb_config['high_soc_threshold']
+            high_soc_threshold=rb_config['high_soc_threshold'],
+            charge_soc_min=rb_config.get('charge_soc_min', 0.5)
         )
 
     elif controller_type == 'mpc':
@@ -373,6 +401,9 @@ def run_simulation(config: dict):
     house = create_house(config)
     print(f"✓ House: Load data loaded")
 
+    inverter = create_inverter(config)
+    print(f"✓ Inverter: {inverter.max_power_kw} kW, price: {inverter.price} €")
+
     tariff = create_tariff(config)
     print(f"✓ Tariff: {tariff.name}")
 
@@ -392,8 +423,10 @@ def run_simulation(config: dict):
         solar=solar,
         house=house,
         tariff=tariff,
+        inverter=inverter,
         controller=controller,
-        export_price=config['grid']['export_price']
+        export_price=config['grid']['export_price'],
+        max_export_kw=config['grid'].get('max_export_kw', float('inf'))
     )
 
     setup_time = time.time() - setup_start
@@ -413,13 +446,10 @@ def run_simulation(config: dict):
     simulation_time = time.time() - simulation_start
     logging.info(f"[Main] Simulation completed in {simulation_time:.2f}s")
 
-    # Get summary
-    print("\n" + "-"*70)
-    print("SIMULATION RESULTS")
-    print("-"*70 + "\n")
+    
 
     summary = system.get_summary()
-    print_summary(summary)
+    # print_summary(summary)  # Commented out - info is in comparison table
 
     # Calculate additional energy metrics for battery
     dt_hours = timestep / 60.0
@@ -430,62 +460,110 @@ def run_simulation(config: dict):
     # Get energy balance comparison across all scenarios
     energy_balance = system.get_energy_balance_comparison(results_df)
 
-    print("\n" + "-"*70)
-    print("ENERGY BALANCE COMPARISON")
-    print("-"*70)
-
-    # Extract data for each scenario
+    # Extract data for each scenario (for saving to file later)
     with_bat = energy_balance['system_with_battery']
     pv_only = energy_balance['pv_without_battery']
     no_pv = energy_balance['no_pv_no_battery']
 
-    # Column widths
-    metric_width = 30
-    value_width = 18
-
-    # Header
-    print(f"\n{'Metric':<{metric_width}} | {'With Battery':^{value_width}} | {'PV Only':^{value_width}} | {'No PV':^{value_width}}")
-    print("-" * metric_width + "-+-" + "-" * value_width + "-+-" + "-" * value_width + "-+-" + "-" * value_width)
-
-    # Helper function to format values
-    def fmt_kwh(val):
-        return f"{val:>10.2f} kWh"
-
-    def fmt_pct(val):
-        return f"{val:>10.1f} %"
-
-    # Energy flows
-    print(f"{'Total Solar Produced':<{metric_width}} | {fmt_kwh(with_bat['solar_produced_kwh']):^{value_width}} | {fmt_kwh(pv_only['solar_produced_kwh']):^{value_width}} | {fmt_kwh(no_pv['solar_produced_kwh']):^{value_width}}")
-    print(f"{'Total Load Consumed':<{metric_width}} | {fmt_kwh(with_bat['load_consumed_kwh']):^{value_width}} | {fmt_kwh(pv_only['load_consumed_kwh']):^{value_width}} | {fmt_kwh(no_pv['load_consumed_kwh']):^{value_width}}")
-    print(f"{'Total Grid Import':<{metric_width}} | {fmt_kwh(with_bat['grid_import_kwh']):^{value_width}} | {fmt_kwh(pv_only['grid_import_kwh']):^{value_width}} | {fmt_kwh(no_pv['grid_import_kwh']):^{value_width}}")
-    print(f"{'Total Grid Export':<{metric_width}} | {fmt_kwh(with_bat['grid_export_kwh']):^{value_width}} | {fmt_kwh(pv_only['grid_export_kwh']):^{value_width}} | {fmt_kwh(no_pv['grid_export_kwh']):^{value_width}}")
-
-    print()
-
-    # Efficiency metrics
-    print(f"{'Solar/Load Ratio':<{metric_width}} | {fmt_pct(with_bat['solar_to_load_ratio_pct']):^{value_width}} | {fmt_pct(pv_only['solar_to_load_ratio_pct']):^{value_width}} | {fmt_pct(no_pv['solar_to_load_ratio_pct']):^{value_width}}")
-    print(f"{'Solar Self-Consumption':<{metric_width}} | {fmt_pct(with_bat['solar_self_consumption_pct']):^{value_width}} | {fmt_pct(pv_only['solar_self_consumption_pct']):^{value_width}} | {fmt_pct(no_pv['solar_self_consumption_pct']):^{value_width}}")
-    print(f"{'Load Self-Sufficiency':<{metric_width}} | {fmt_pct(with_bat['load_self_sufficiency_pct']):^{value_width}} | {fmt_pct(pv_only['load_self_sufficiency_pct']):^{value_width}} | {fmt_pct(no_pv['load_self_sufficiency_pct']):^{value_width}}")
-
-    # Battery-specific metrics (only for "With Battery" scenario)
-    print()
-    print(f"{'Total Battery Charged':<{metric_width}} | {fmt_kwh(total_battery_charged):^{value_width}} | {'N/A':^{value_width}} | {'N/A':^{value_width}}")
-    print(f"{'Total Battery Discharged':<{metric_width}} | {fmt_kwh(total_battery_discharged):^{value_width}} | {'N/A':^{value_width}} | {'N/A':^{value_width}}")
-    print(f"{'Battery Round-Trip Eff':<{metric_width}} | {fmt_pct(battery_roundtrip_eff):^{value_width}} | {'N/A':^{value_width}} | {'N/A':^{value_width}}")
-
     # Calculate savings
     savings = system.get_savings(results_df)
 
-    print("\n" + "-"*70)
-    print("COST COMPARISON")
-    print("-"*70)
+    # Calculate investment cost and payback time
+    investment_data = None
+    if 'optimize' in config:
+        optimize_config = config['optimize']
 
-    print(f"\nSystem with battery: {savings['system_cost']:.2f} €")
-    print(f"PV without battery:  {savings['baseline_pv_cost']:.2f} €")
-    print(f"No PV, no battery:   {savings['baseline_no_pv_cost']:.2f} €")
+        # Get system configuration
+        battery_kwh = config['battery']['capacity_kwh']
+        solar_kwp = config['solar'].get('solar_capacity_kwp', 0)
 
-    print(f"\nSavings vs PV only:  {savings['savings_vs_pv']:.2f} € ({savings['savings_pct_vs_pv']:.1f}%)")
-    print(f"Savings vs no PV:    {savings['savings_vs_no_pv']:.2f} € ({savings['savings_pct_vs_no_pv']:.1f}%)")
+        # Calculate number of panels (assuming 0.5 kWp per panel)
+        num_panels = solar_kwp / 0.5 if solar_kwp > 0 else 0
+
+        # Calculate investment costs
+        battery_cost = battery_kwh * optimize_config['batery']['price_per_kwh']
+        solar_cost = solar_kwp * optimize_config['solar']['price_per_kwp']
+
+        # Get actual inverter price based on power rating
+        inverter_power = config['inverter']['max_power_kw']
+        if inverter_power <= 3.0:
+            inverter_cost = optimize_config['inverter']['price_3kw']
+        else:
+            inverter_cost = optimize_config['inverter']['price_5kw']
+
+        structure_cost = num_panels * optimize_config['solar'].get('structure_cost_per_panel', 0)
+
+        labor_config = optimize_config.get('labor', {})
+        labor_cost = labor_config.get('base_cost', 0) + num_panels * labor_config.get('cost_per_panel', 0)
+
+        # Add Balance of System costs (fixed additional costs)
+        bos_pv_cost = optimize_config.get('balance_of_system_pv', 0) if solar_kwp > 0 else 0
+        bos_bss_cost = optimize_config.get('balance_of_system_bss', 0) if battery_kwh > 0 else 0
+
+        # Inverter cost belongs to PV system (needed regardless of battery)
+        has_pv = solar_kwp > 0
+        has_battery = battery_kwh > 0
+
+        if has_pv:
+            inverter_cost_pv = inverter_cost
+            inverter_cost_battery = 0
+        else:
+            inverter_cost_pv = 0
+            inverter_cost_battery = inverter_cost
+
+        # Calculate subtotals
+        pv_investment = solar_cost + inverter_cost_pv + structure_cost + labor_cost + bos_pv_cost
+        battery_investment = battery_cost + inverter_cost_battery + bos_bss_cost
+        total_investment = pv_investment + battery_investment
+
+        # Get simulation duration in days
+        sim_days = (end_date - start_date).days
+
+        # Calculate payback for PV only system
+        pv_only_savings = savings['baseline_no_pv_cost'] - savings['baseline_pv_cost']
+
+        # Normalize to monthly savings (30 days)
+        if sim_days > 0:
+            pv_monthly_savings = (pv_only_savings / sim_days) * 30
+            total_monthly_savings = (savings['savings_vs_no_pv'] / sim_days) * 30
+        else:
+            pv_monthly_savings = 0
+            total_monthly_savings = 0
+
+        # Calculate payback periods
+        if pv_monthly_savings > 0:
+            pv_payback_years = (pv_investment / pv_monthly_savings) / 12
+        else:
+            pv_payback_years = 999  # Infinite
+
+        if total_monthly_savings > 0:
+            total_payback_years = (total_investment / total_monthly_savings) / 12
+        else:
+            total_payback_years = 999  # Infinite
+
+        investment_data = {
+            'total_investment': total_investment,
+            'pv_investment': pv_investment,
+            'battery_investment': battery_investment,
+            'pv_only_savings': pv_only_savings,
+            'pv_monthly_savings': pv_monthly_savings,
+            'total_monthly_savings': total_monthly_savings,
+            'pv_payback_years': pv_payback_years,
+            'total_payback_years': total_payback_years,
+            # Breakdown components
+            'battery_cost': battery_cost,
+            'solar_cost': solar_cost,
+            'inverter_cost': inverter_cost,
+            'inverter_cost_pv': inverter_cost_pv,
+            'inverter_cost_battery': inverter_cost_battery,
+            'structure_cost': structure_cost,
+            'labor_cost': labor_cost,
+            'bos_pv_cost': bos_pv_cost,
+            'bos_bss_cost': bos_bss_cost
+        }
+
+    # Print comprehensive comparison table
+    print_invoice(summary, savings, investment_data)
 
     # Save results
     if config['output']['save_results']:
@@ -557,6 +635,17 @@ def run_simulation(config: dict):
         daily_file = plots_dir / f'daily_analysis_{controller.name.lower()}.png'
         plot_daily_analysis(results_df, controller.name, str(daily_file))
         print(f"✓ Daily analysis plot saved to: {daily_file}")
+
+    # Generate interactive 3D visualization for SDP controller
+    if ("SDP" in controller.name and
+        config['controller']['sdp'].get('interactive_plots', {}).get('enabled', False) and
+        config['controller']['sdp']['interactive_plots'].get('save_html', True)):
+        print("\nGenerating interactive 3D visualizations...")
+        try:
+            controller.save_visualizations(prefix="sdp_interpolation")
+            print("✓ Interactive visualizations saved!")
+        except Exception as e:
+            print(f"⚠ Warning: Could not save interactive visualizations: {e}")
 
     overall_time = time.time() - overall_start_time
     logging.info(f"[Main] Total execution time: {overall_time:.2f}s")

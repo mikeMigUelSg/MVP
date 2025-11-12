@@ -23,6 +23,7 @@ from src.components.battery import Battery
 from src.components.solar import SolarPanel
 from src.components.house import House
 from src.components.tariff import SimpleTariff, BiHorariaTariff
+from src.components.inverter import Inverter
 
 # Import controllers
 from src.controllers.rule_based import RuleBasedController
@@ -42,8 +43,7 @@ def simulate_single_configuration(
     battery_kwh: float,
     solar_kwp: float,
     config: dict,
-    house_shared: House,
-    days: int = 30
+    house_shared: House
 ) -> Dict:
     """
     Simulate a single battery/solar configuration.
@@ -53,7 +53,6 @@ def simulate_single_configuration(
         solar_kwp: Solar capacity in kWp
         config: Configuration dictionary
         house_shared: Shared House object (read-only)
-        days: Number of days to simulate
 
     Returns:
         Dictionary with results
@@ -103,19 +102,36 @@ def simulate_single_configuration(
         high_soc_threshold=config['controller']['rule_based']['high_soc_threshold']
     )
 
+    # Create inverter
+    inverter_power = config['inverter']['max_power_kw']
+    if inverter_power <= 3.0:
+        inverter_price = config['optimize']['inverter']['price_3kw']
+    else:
+        inverter_price = config['optimize']['inverter']['price_5kw']
+
+    inverter = Inverter(
+        max_power_kw=inverter_power,
+        price=inverter_price
+    )
+
     # Create system
     system = EnergyManagementSystem(
         battery=battery,
         solar=solar,
         house=house,
         tariff=tariff,
+        inverter=inverter,
         controller=controller,
-        export_price=config['grid']['export_price']
+        export_price=config['grid']['export_price'],
+        max_export_kw=config['grid'].get('max_export_kw', float('inf'))
     )
 
-    # Simulate for specified days
+    # Use start_date and end_date from config
     start_date = datetime.strptime(config['simulation']['start_date'], '%Y-%m-%d %H:%M:%S')
-    end_date = start_date + timedelta(days=days)
+    end_date = datetime.strptime(config['simulation']['end_date'], '%Y-%m-%d %H:%M:%S')
+
+    # Calculate actual simulation days
+    simulation_days = (end_date - start_date).days
 
     results_df = system.simulate(
         start_time=start_date,
@@ -138,7 +154,8 @@ def simulate_single_configuration(
         'monthly_savings': savings['baseline_no_pv_cost'] - savings['system_cost'],
         'grid_import_kwh': savings['system_import_kwh'],
         'grid_export_kwh': savings['system_export_kwh'],
-        'solar_production_kwh': total_solar_kwh
+        'solar_production_kwh': total_solar_kwh,
+        'simulation_days': simulation_days
     }
 
 
@@ -156,23 +173,41 @@ def calculate_investment_cost(battery_kwh: float, solar_kwp: float, config: dict
     """
     optimize_config = config['optimize']
 
+    # Calculate number of panels (assuming 0.5 kWp per panel)
+    num_panels = solar_kwp / 0.5 if solar_kwp > 0 else 0
+
     battery_cost = battery_kwh * optimize_config['batery']['price_per_kwh']
     solar_cost = solar_kwp * optimize_config['solar']['price_per_kwp']
-    inverter_cost = optimize_config['inverter']['price']
 
-    total_cost = battery_cost + solar_cost + inverter_cost
+    # Get actual inverter price based on power rating
+    inverter_power = config['inverter']['max_power_kw']
+    if inverter_power <= 3.0:
+        inverter_cost = optimize_config['inverter']['price_3kw']
+    else:
+        inverter_cost = optimize_config['inverter']['price_5kw']
+
+    # Add structure and labor costs
+    structure_cost = num_panels * optimize_config['solar'].get('structure_cost_per_panel', 0)
+
+    labor_config = optimize_config.get('labor', {})
+    labor_cost = labor_config.get('base_cost', 0) + num_panels * labor_config.get('cost_per_panel', 0)
+
+    # Add Balance of System costs (fixed additional costs)
+    bos_pv_cost = optimize_config.get('balance_of_system_pv', 0) if solar_kwp > 0 else 0
+    bos_bss_cost = optimize_config.get('balance_of_system_bss', 0) if battery_kwh > 0 else 0
+
+    total_cost = battery_cost + solar_cost + inverter_cost + structure_cost + labor_cost + bos_pv_cost + bos_bss_cost
 
     return total_cost
 
 
-def worker_function(params: Tuple, config: dict, days: int) -> Dict:
+def worker_function(params: Tuple, config: dict) -> Dict:
     """
     Worker function for multiprocessing.
 
     Args:
         params: Tuple of (battery_kwh, solar_kwp)
         config: Configuration dictionary
-        days: Days to simulate
 
     Returns:
         Results dictionary
@@ -180,7 +215,10 @@ def worker_function(params: Tuple, config: dict, days: int) -> Dict:
     battery_kwh, solar_kwp = params
 
     # Simulate
-    result = simulate_single_configuration(battery_kwh, solar_kwp, config, None, days)
+    result = simulate_single_configuration(battery_kwh, solar_kwp, config, None)
+
+    # Get actual simulation days from result
+    days = result['simulation_days']
 
     # Calculate investment and payback
     investment_cost = calculate_investment_cost(battery_kwh, solar_kwp, config)
@@ -194,10 +232,13 @@ def worker_function(params: Tuple, config: dict, days: int) -> Dict:
     monthly_grid_export = (result['grid_export_kwh'] / days) * 30
     monthly_solar_production = (result['solar_production_kwh'] / days) * 30
 
+    # Calculate payback periods (matching simulate.py logic)
     if monthly_savings > 0:
+        payback_years = (investment_cost / monthly_savings) / 12
         payback_months = investment_cost / monthly_savings
     else:
-        payback_months = float('inf')
+        payback_years = 999  # Infinite
+        payback_months = 999 * 12  # Infinite
 
     result['investment_cost'] = investment_cost
     result['monthly_savings'] = monthly_savings  # Now correctly normalized to monthly
@@ -207,14 +248,13 @@ def worker_function(params: Tuple, config: dict, days: int) -> Dict:
     result['solar_production_kwh'] = monthly_solar_production  # Monthly average
     result['simulation_days'] = days
     result['payback_months'] = payback_months
-    result['payback_years'] = payback_months / 12 if payback_months < float('inf') else float('inf')
+    result['payback_years'] = payback_years
 
     return result
 
 
 def optimize_system(config: dict, battery_range: Tuple[float, float, float],
                    solar_range: Tuple[float, float, float],
-                   simulation_days: int = 150,
                    n_processes: int = None) -> pd.DataFrame:
     """
     Optimize system sizing using multiprocessing.
@@ -223,12 +263,16 @@ def optimize_system(config: dict, battery_range: Tuple[float, float, float],
         config: Configuration dictionary
         battery_range: (min_kwh, max_kwh, step_kwh)
         solar_range: (min_kwp, max_kwp, step_kwp)
-        simulation_days: Number of days to simulate (default: 150)
         n_processes: Number of parallel processes (None = use all CPUs)
 
     Returns:
         DataFrame with all evaluated configurations sorted by payback
     """
+    # Calculate simulation days from config
+    start_date = datetime.strptime(config['simulation']['start_date'], '%Y-%m-%d %H:%M:%S')
+    end_date = datetime.strptime(config['simulation']['end_date'], '%Y-%m-%d %H:%M:%S')
+    simulation_days = (end_date - start_date).days
+
     print("\n" + "="*80)
     print("SYSTEM SIZING OPTIMIZATION - PAYBACK ANALYSIS")
     print("="*80)
@@ -236,7 +280,7 @@ def optimize_system(config: dict, battery_range: Tuple[float, float, float],
     print(f"\nOptimization parameters:")
     print(f"  Battery range: {battery_range[0]:.1f} to {battery_range[1]:.1f} kWh (step: {battery_range[2]:.1f} kWh)")
     print(f"  Solar range: {solar_range[0]:.1f} to {solar_range[1]:.1f} kWp (step: {solar_range[2]:.1f} kWp)")
-    print(f"  Simulation period: {simulation_days} days (~{simulation_days/30:.1f} months)")
+    print(f"  Simulation period: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')} ({simulation_days} days, ~{simulation_days/30:.1f} months)")
 
     # Generate ranges
     battery_sizes = np.arange(battery_range[0], battery_range[1] + battery_range[2], battery_range[2])
@@ -256,8 +300,8 @@ def optimize_system(config: dict, battery_range: Tuple[float, float, float],
     print("\nStarting parallel optimization...")
     start_time = time.time()
 
-    # Create partial function with fixed config and days
-    worker = partial(worker_function, config=config, days=simulation_days)
+    # Create partial function with fixed config
+    worker = partial(worker_function, config=config)
 
     # Run in parallel
     with mp.Pool(processes=n_processes) as pool:
@@ -307,7 +351,7 @@ def print_top_results(df: pd.DataFrame, n: int = 10):
         payback_months = row['payback_months']
         payback_years = row['payback_years']
 
-        if payback_months < float('inf'):
+        if payback_years < 999:
             print(f"{rank:<6} {battery:<10.1f} {solar:<10.1f} {solar_prod:<12.1f} {investment:<12.2f} {savings:<12.2f} {payback_months:<12.1f} {payback_years:<10.2f}")
         else:
             print(f"{rank:<6} {battery:<10.1f} {solar:<10.1f} {solar_prod:<12.1f} {investment:<12.2f} {savings:<12.2f} {'Infinite':<12} {'Infinite':<10}")
@@ -331,16 +375,13 @@ def main():
 
     # Define optimization ranges
     # Battery: 0 to 30 kWh, step 1 kWh
-    battery_range = (0, 15, 5)
+    battery_range = (0, 10, 5)
 
     # Solar: 0 to 15 kWp, step 0.5 kWp
     solar_range = (0, 5, 1)
 
-    # Get simulation days from config or use default
-    simulation_days = config.get('optimize', {}).get('simulation_days', 150)
-
-    # Run optimization
-    results_df = optimize_system(config, battery_range, solar_range, simulation_days=simulation_days)
+    # Run optimization (uses start_date and end_date from config)
+    results_df = optimize_system(config, battery_range, solar_range)
 
     # Print top results
     print_top_results(results_df, n=15)
@@ -366,7 +407,7 @@ def main():
         print(f"Average monthly savings (estimated): {best['monthly_savings']:.2f} €")
         print(f"  Based on {best['simulation_days']} days simulation (~{best['simulation_days']/30:.1f} months)")
 
-        if best['payback_months'] < float('inf'):
+        if best['payback_years'] < 999:
             print(f"Payback period: {best['payback_years']:.2f} years ({best['payback_months']:.1f} months)")
         else:
             print(f"Payback period: Infinite (no savings)")
@@ -382,8 +423,8 @@ def main():
                 'solar_kwp': float(best['solar_kwp']),
                 'investment_cost_eur': float(best['investment_cost']),
                 'monthly_savings_eur': float(best['monthly_savings']),
-                'payback_months': float(best['payback_months']) if best['payback_months'] < float('inf') else None,
-                'payback_years': float(best['payback_years']) if best['payback_years'] < float('inf') else None,
+                'payback_months': float(best['payback_months']) if best['payback_years'] < 999 else None,
+                'payback_years': float(best['payback_years']) if best['payback_years'] < 999 else None,
                 'monthly_solar_production_kwh': float(best['solar_production_kwh']),
                 'monthly_grid_import_kwh': float(best['grid_import_kwh']),
                 'monthly_grid_export_kwh': float(best['grid_export_kwh']),
