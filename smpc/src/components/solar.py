@@ -5,6 +5,9 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SolarPanel:
@@ -13,19 +16,24 @@ class SolarPanel:
     def __init__(self,
                  capacity_kw: float,
                  data_file: Optional[str] = None,
-                 scale_factor: float = 1.0):
+                 scale_factor: float = 1.0,
+                 preloaded_data: Optional[pd.DataFrame] = None):
         """
         Args:
             capacity_kw: Installed solar capacity in kW
             data_file: Path to CSV file with historical production data
             scale_factor: Scaling factor for solar production (1.0 = 100%, 0.5 = 50%, etc.)
+            preloaded_data: Pre-loaded DataFrame (for performance optimization)
         """
         self.capacity_kw = capacity_kw
         self.scale_factor = scale_factor
         self.production_data = None
         self.total_production_kwh = 0.0
 
-        if data_file:
+        if preloaded_data is not None:
+            # Use pre-loaded data directly (should already be indexed)
+            self.production_data = preloaded_data
+        elif data_file:
             self.load_production_data(data_file)
 
     def load_production_data(self, file_path: str):
@@ -60,9 +68,9 @@ class SolarPanel:
             self.production_data.set_index(['month', 'day', 'hour', 'minute'], inplace=True)
             self.production_data.sort_index(inplace=True)
 
-            print(f"Loaded solar data: {len(self.production_data)} time steps")
-            print(f"Original date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
-            print(f"Data will be matched by month/day/hour, ignoring year")
+            logger.debug(f"Loaded solar data: {len(self.production_data)} time steps")
+            logger.debug(f"Original date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
+            logger.debug(f"Data will be matched by month/day/hour, ignoring year")
 
         except Exception as e:
             print(f"Error loading solar data: {e}")

@@ -1,0 +1,30 @@
+
+# Default configuration (edit paths before running)
+data:
+  csv_path: data/data.csv   # must exist
+  seq_len: 192       # Contexto: 2 dias (192 x 15min = 48h) - mais rápido!
+  label_len: 48     # Overlap entre encoder e decoder
+  pred_len: 96      # Previsão: 1 dia completo à frente (day-ahead)
+  target_col: target
+  feature_cols: []
+
+model:
+  d_model: 128      # Reduzido de 256 (mais rápido)
+  n_heads: 4
+  e_layers: 2
+  d_layers: 1
+  d_ff: 256         # Reduzido de 512 (mais rápido)
+  top_k: 5          # Reduzido de 8 (mais rápido)
+  kernel_size: 25
+  dropout: 0.1
+  add_deep_mlp: true
+
+train:
+  lr: 0.0003
+  weight_decay: 0.0001
+  batch_size: 128    # Aumentado de 64 (menos batches = mais rápido)
+  epochs: 30
+  train_ratio: 0.7
+  val_ratio: 0.15
+  patience: 5  # Para treino mais cedo se val loss não melhorar por 5 epochs
+  device: mps  # Options: auto, mps (Mac GPU), cuda (NVIDIA GPU), cpu

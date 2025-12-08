@@ -1,0 +1,142 @@
+baseline_no_pv_cost: !!python/object/apply:numpy._core.multiarray.scalar
+- &id001 !!python/object/apply:numpy.dtype
+  args:
+  - f8
+  - false
+  - true
+  state: !!python/tuple
+  - 3
+  - <
+  - null
+  - null
+  - null
+  - -1
+  - -1
+  - 0
+- !!binary |
+  yNRrxJ0IjkA=
+baseline_no_pv_import_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  In9qvJTBtUA=
+baseline_pv_cost: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  Mu5D8vpxeUA=
+baseline_pv_export_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  sSreyGhcsEA=
+baseline_pv_import_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  V7MHWmmTq0A=
+battery_cycles: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  60rwCkjzbkA=
+battery_cycles_usable: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  F1oZmnwbdkA=
+battery_degradation_cost: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  ZISf++CWQEA=
+controller: SDP (Numba JIT)
+curtailment_rate: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  e0IfX26tYDw=
+energy_balance_comparison:
+  no_pv_no_battery:
+    grid_export_kwh: 0.0
+    grid_import_kwh: 5569.5810000000365
+    load_consumed_kwh: 5569.581
+    load_self_sufficiency_pct: 0.0
+    solar_produced_kwh: 0.0
+    solar_self_consumption_pct: 0.0
+    solar_to_load_ratio_pct: 0.0
+  pv_without_battery:
+    grid_export_kwh: 4188.4093149999835
+    grid_import_kwh: 3529.705765000002
+    load_consumed_kwh: 5569.581
+    load_self_sufficiency_pct: 36.62529075346957
+    solar_produced_kwh: 6228.284549999999
+    solar_self_consumption_pct: 32.75179896846582
+    solar_to_load_ratio_pct: 111.82680618164991
+  system_with_battery:
+    battery_charged_kwh: 1763.7574964528103
+    battery_discharged_kwh: 1560.345523865703
+    battery_roundtrip_efficiency_pct: 88.46712357020733
+    grid_export_kwh: 2632.232932466081
+    grid_import_kwh: 2176.941355053207
+    load_consumed_kwh: 5569.581
+    load_self_sufficiency_pct: 60.91373201946059
+    solar_produced_kwh: 6228.284549999999
+    solar_self_consumption_pct: 57.737432974765404
+    solar_to_load_ratio_pct: 111.82680618164991
+savings_pct_vs_no_pv: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  SEQqS3rLU0A=
+savings_pct_vs_pv: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  +P40rMJsSUA=
+savings_vs_no_pv: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  P58OqsvHh0A=
+savings_vs_pv: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  QQYTe63gaUA=
+self_consumption_rate: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  gx36utl54j8=
+self_sufficiency_rate: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  GkmgjA1+4z8=
+system_cost: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  I9Z0aUgDaUA=
+system_export_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  /ZfsQneQpEA=
+system_import_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  5h5K+eEBoUA=
+total_consumption_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  In9qvJTBtUA=
+total_cost: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  I9Z0aUgDaUA=
+total_grid_export_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  /ZfsQneQpEA=
+total_grid_import_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  5h5K+eEBoUA=
+total_solar_available_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  NNBE2EhUuEA=
+total_solar_curtailed_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  AAAAAABcKT0=
+total_solar_production_kwh: !!python/object/apply:numpy._core.multiarray.scalar
+- *id001
+- !!binary |
+  NNBE2EhUuEA=

@@ -1,145 +1,106 @@
-# Energy Management System Configuration
-
-# Simulation settings
 simulation:
-  start_date: "2025-06-01 00:00:00"
-  end_date: "2025-07-01 23:00:00"  
+  start_date: '2025-01-01 00:00:00'
+  end_date: '2025-12-31 23:00:00'
   timestep_minutes: 15
-
-# Battery configuration
 battery:
-  capacity_kwh: 5.0  # Battery capacity in kWh
-  max_power_kw: 5.0   # Maximum charge/discharge power in kW
-  max_charge_current_kw: 5.0   # Maximum charging power in kW
-  max_discharge_current_kw: 5.0  # Maximum discharging power in kW
-  efficiency_charge: 0.94  # Charging efficiency
-  efficiency_discharge: 0.94  # Discharging efficiency
-  initial_soc: 0.0  # Initial state of charge (0-1)
-  min_soc: 0.1  # Minimum state of charge (0-1)
-  max_soc: 0.9  # Maximum state of charge (0-1)
-  degradation_cost_per_kwh: 0.01  # Degradation cost in €/kWh throughput
-
-# Inverter configuration
+  capacity_kwh: 10
+  max_power_kw: 5.0
+  charge_rate_factor: 0.25
+  discharge_rate_factor: 0.25
+  efficiency_charge: 0.94
+  efficiency_discharge: 0.94
+  initial_soc: 0.0
+  min_soc: 0.2
+  max_soc: 0.9
+  degradation_cost_per_kwh: 0.01
 inverter:
-  max_power_kw: 3.0  # Maximum AC power output in kW (options: 3.0 or 5.0)
-  price_3kw: 550  # Price for 3kW inverter in €
-  price_5kw: 800  # Price for 5kW inverter in €
-
-# Grid configuration
+  max_power_kw: 3.0
+  price_3kw: 550
+  price_5kw: 850
 grid:
-  contracted_power_kw: 6.9  # Maximum contracted power from grid in kW
-  export_price: 0.04 # Price for exporting energy to grid in €/kWh
-  max_export_kw: 10.0  # Maximum power export to grid in kW (can cause curtailment if limited)
-
-# Solar panel configuration
+  contracted_power_kw: 6.9
+  export_price: 0.04
+  max_export_kw: 3
 solar:
-  solar_capacity_kwp: 3 # Solar panel capacity in kWp (actual installed capacity)
-  scale_factor_for_1kwp: 0.19  # Scale factor per 1 kWp of installed capacity
-  data_file: "data/solar/pvdata.csv"  # Path to historical production data
-
-# House configuration
+  solar_capacity_kwp: 4
+  scale_factor_for_1kwp: 0.19
+  data_file: data/solar/pvdata.csv
 house:
-  data_file: "data/load/merged_consumos.xlsx"  # Path to consumption data
-
-# Tariff configuration
+  data_file: data/load/c2024.xlsx
+  scale_factor: 1
+load_forecaster:
+  method: profile_persistence
+  profile_persistence:
+    n_weeks: 3
+  deep_autoformer:
+    base_path: deep_autoformer_minimal
+    model_path: deep_autoformer_minimal/configs/best_model.pt
+    config_path: deep_autoformer_minimal/configs/config.yaml
+    data_path: deep_autoformer_minimal/data/c2024_autoformer.csv
 tariff:
-  type: "simple"  # Options: "simple" or "bihoraria"
-
-  # Simple tariff (flat rate)
+  type: simple
   simple:
-    price: 0.15  # €/kWh
-
-  # Bi-horária tariff
+    price: 0.15
   bihoraria:
-    peak_price: 0.2008  # €/kWh during peak hours
-    off_peak_price: 0.1094  # €/kWh during off-peak hours
-    # Peak hours for weekdays (Monday-Friday)
+    peak_price: 0.2008
+    off_peak_price: 0.1094
     peak_hours_weekday: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
-    # Peak hours for weekends (Saturday-Sunday)
-    peak_hours_weekend: [9, 10, 11, 12, 13, 20, 21]
-
-# Controller configuration
+    peak_hours_weekend: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
 controller:
-  type: "rule_based"  # Options: "rule_based", "mpc", or "sdp"
-
-  # Rule-based controller settings
+  type: rule_based
   rule_based:
-    strategy: "simple"  # Options: "simple", "dynamic_threshold"
-    high_price_threshold: 0.15  # €/kWh - threshold for 'simple' strategy
-    low_soc_threshold: 0.1  # Minimum SOC to allow discharge
-    high_soc_threshold: 0.9  # Maximum SOC to allow charge
-    charge_soc_min: 0.5  # Minimum SOC to start charging from grid in 'dynamic_threshold' strategy
-
-  # MPC controller settings
+    strategy: simple
+    high_price_threshold: 0.15
+    low_soc_threshold: 0.2
+    high_soc_threshold: 0.9
+    charge_soc_min: 0.5
+    bihoraria_target_soc: 0.85
   mpc:
-    horizon_steps: 48  # Prediction horizon (96 steps = 24h with 15min timestep)
-
-  # SDP controller settings
+    horizon_steps: 48
   sdp:
-    # Horizon and time step
-    horizon_steps: 96  # Planning horizon (36 steps = 9h with 15min timestep)
-
-    # Discretization
-    n_soc_points: 100  # Number of SOC grid points (higher = more accurate, slower) 150 
-    n_residual_points: 25  # Number of residual grid points 50 
-
-    # Residual model (forecast error model)
-    half_life_minutes: 30  # Half-life of residual persistence (minutes)
-    sigma_residual_kw: 0.9  # Noise standard deviation (kW)
-
-    # Policy update
-    policy_update_hours: 12  # Recalculate policy every N hours
-
-    # Terminal cost
-    soc_target: 0.5  # Target SOC at end of horizon (0-1)
-    terminal_cost_weight: 1.0  # Weight for terminal cost penalty
-
-    # Forecaster settings
+    horizon_steps: 96
+    n_soc_points: 100
+    n_residual_points: 50
+    half_life_minutes: 45
+    sigma_residual_kw: 1.2
+    policy_update_hours: 12
+    soc_target: 0.5
+    terminal_cost_weight: 1.0
+    residual_match_threshold: 0.5
     forecaster:
-      type: "profile_persistence"  # Type of forecaster
-      n_weeks: 3  # Number of weeks for profile averaging
-
-    # Calibration settings (auto-calibrate half_life and sigma if enabled)
+      type: load_forecaster
+      n_weeks: 3
     calibration:
-      enabled: false  # Set to true to auto-calibrate parameters
-      calibration_days: 30  # Number of days for calibration
-
-    # Grid limit
-    injection_limit_kw: 10.0  # Maximum injection to grid (kW)
-
-    # Interactive visualization
+      enabled: false
+      calibration_days: 30
+    injection_limit_kw: 3.0
     interactive_plots:
-      enabled: false  # Enable interactive 3D plots for interpolation visualization
-      save_html: true  # Save plots as HTML files
-      output_directory: "results/interactive_plots"
-
-
-
+      enabled: false
+      save_html: true
+      output_directory: results/interactive_plots
 optimize:
-  simulation_days: 180  # Number of days to simulate for optimization (e.g., 150 = ~5 months)
   solar:
     scale_factor_for_1kwp: 0.19
-    price_per_kwp: 230
-    structure_cost_per_panel: 50 # Custo da estrutura por painel
+    price_per_kwp: 200
+    structure_cost_per_panel: 50
   batery:
-    price_per_kwh: 90
+    material_cost: 500
+    repurpose_kwh: 80
   inverter:
-    price_3kw: 600  # Price for 3kW inverter in €
-    price_5kw: 900  # Price for 5kW inverter in €
+    price_3kw: 550
+    price_5kw: 800
   labor:
-    base_cost: 149
-    cost_per_panel: 115
-  balance_of_system_pv: 516  # Custos fixos adicionais do sistema PV (cabeamento, conectores, proteções, etc.)
-  balance_of_system_bss: 100  # Custos fixos adicionais do sistema de armazenamento
-
-# Output configuration
+    base_cost: 300
+    cost_per_panel: 105
+  balance_of_system_pv: 516
+  balance_of_system_bss: 100
 output:
   save_plots: true
-  plots_directory: "results/plots"
+  plots_directory: results/plots
   save_results: true
-  results_directory: "results/data"
-
-# Comparison mode (optional)
+  results_directory: results/data
 comparison:
-  enabled: false  # Set to true to compare multiple controllers
-  controllers: ["rule_based", "mpc"]  # Controllers to compare
+  enabled: false
+  controllers:
+  - rule_based
+  - mpc

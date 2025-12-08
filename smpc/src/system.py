@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from typing import Optional, Union
 import time
 import logging
+from tqdm import tqdm
 
 from .components.battery import Battery
 from .components.solar import SolarPanel
@@ -36,6 +37,7 @@ class EnergyManagementSystem:
                  tariff: Tariff,
                  inverter: Inverter,
                  controller: Union[RuleBasedController, MPCController, SDPController],
+                 hvac = None,
                  export_price: float = 0.05,
                  max_export_kw: float = float('inf')):
         """
@@ -46,6 +48,7 @@ class EnergyManagementSystem:
             tariff: Electricity tariff
             inverter: Inverter component
             controller: Control strategy (rule-based or MPC)
+            hvac: HVAC component (optional)
             export_price: Price for exporting energy to grid in €/kWh
             max_export_kw: Maximum power export to grid in kW (can cause curtailment)
         """
@@ -55,6 +58,7 @@ class EnergyManagementSystem:
         self.tariff = tariff
         self.inverter = inverter
         self.controller = controller
+        self.hvac = hvac
         self.export_price = export_price
         self.max_export_kw = max_export_kw
 
@@ -73,7 +77,11 @@ class EnergyManagementSystem:
             'grid_export': [],
             'cost': [],
             'degradation_cost': [],
-            'inverter_utilization': []
+            'inverter_utilization': [],
+            'hvac_power': [],
+            'hvac_mode': [],
+            'T_in': [],
+            'T_out': []
         }
 
         self.total_cost = 0.0
@@ -88,6 +96,8 @@ class EnergyManagementSystem:
         self.solar.reset()
         self.house.reset()
         self.inverter.reset()
+        if self.hvac:
+            self.hvac.reset()
 
         for key in self.history:
             self.history[key] = []
@@ -120,6 +130,21 @@ class EnergyManagementSystem:
 
         solar_available = solar_result['power_kw']  # Available solar power (before curtailment)
         load_power = house_result['power_kw']
+
+        # Get HVAC power (if enabled)
+        hvac_power = 0.0
+        hvac_mode = 'off'
+        T_in = None
+        T_out = None
+        if self.hvac:
+            hvac_result = self.hvac.step(timestamp, dt_hours)
+            hvac_power = hvac_result['power_kw']
+            hvac_mode = hvac_result['hvac_mode']
+            T_in = hvac_result['T_in']
+            T_out = hvac_result['T_out']
+
+            # Add HVAC to total load
+            load_power += hvac_power
 
         # Get electricity price
         price = self.tariff.get_price(timestamp)
@@ -301,7 +326,7 @@ class EnergyManagementSystem:
             # Discharging
             degradation_cost = abs(battery_power) * dt_hours / self.battery.efficiency_discharge * self.battery.degradation_cost_per_kwh
 
-        total_step_cost = step_cost + degradation_cost
+        total_step_cost = step_cost #+ degradation_cost
 
         # Update totals
         self.total_cost += total_step_cost
@@ -324,6 +349,10 @@ class EnergyManagementSystem:
         self.history['cost'].append(total_step_cost)
         self.history['degradation_cost'].append(degradation_cost)
         self.history['inverter_utilization'].append(inverter_result['utilization'])
+        self.history['hvac_power'].append(hvac_power)
+        self.history['hvac_mode'].append(hvac_mode)
+        self.history['T_in'].append(T_in if T_in is not None else np.nan)
+        self.history['T_out'].append(T_out if T_out is not None else np.nan)
 
         # Verify power balance
         power_balance_error = abs(
@@ -350,7 +379,8 @@ class EnergyManagementSystem:
     def simulate(self,
                 start_time: datetime,
                 end_time: datetime,
-                dt_minutes: int = 15) -> pd.DataFrame:
+                dt_minutes: int = 15,
+                show_progress: bool = True) -> pd.DataFrame:
         """
         Run full simulation
 
@@ -358,6 +388,7 @@ class EnergyManagementSystem:
             start_time: Simulation start time
             end_time: Simulation end time
             dt_minutes: Time step in minutes
+            show_progress: Whether to display progress bar
 
         Returns:
             DataFrame with simulation results
@@ -370,28 +401,35 @@ class EnergyManagementSystem:
         step_count = 0
         step_times = []
 
-        print(f"Starting simulation: {start_time} to {end_time}")
-        print(f"Controller: {self.controller.name}")
-        print(f"Time step: {dt_minutes} minutes")
+        # Calculate total number of steps
+        total_steps = int((end_time - start_time).total_seconds() / (dt_minutes * 60))
+
         logger.info(f"[System] Starting simulation: {start_time} to {end_time} with controller {self.controller.name}")
 
-        last_progress_time = time.time()
+        # Create progress bar only if requested
+        if show_progress:
+            with tqdm(total=total_steps, desc=f"{self.controller.name}",
+                      unit="steps", ncols=100, leave=True) as pbar:
 
-        while current_time < end_time:
-            step_start = time.time()
-            self.step(current_time, dt_minutes)
-            step_time = time.time() - step_start
-            step_times.append(step_time)
+                while current_time < end_time:
+                    step_start = time.time()
+                    self.step(current_time, dt_minutes)
+                    step_time = time.time() - step_start
+                    step_times.append(step_time)
 
-            current_time += timedelta(minutes=dt_minutes)
-            step_count += 1
+                    current_time += timedelta(minutes=dt_minutes)
+                    step_count += 1
+                    pbar.update(1)
+        else:
+            # No progress bar - just run the simulation
+            while current_time < end_time:
+                step_start = time.time()
+                self.step(current_time, dt_minutes)
+                step_time = time.time() - step_start
+                step_times.append(step_time)
 
-            if step_count % 1000 == 0:
-                progress_time = time.time() - last_progress_time
-                avg_step_time = progress_time / 1000
-                print(f"Progress: {step_count} steps, {current_time} (avg step time: {avg_step_time*1000:.2f}ms)")
-                logger.info(f"[System] Progress: {step_count} steps (last 1000 steps in {progress_time:.2f}s, avg {avg_step_time*1000:.2f}ms/step)")
-                last_progress_time = time.time()
+                current_time += timedelta(minutes=dt_minutes)
+                step_count += 1
 
         total_simulation_time = time.time() - simulation_start_time
 
@@ -400,12 +438,6 @@ class EnergyManagementSystem:
         max_step_time = np.max(step_times)
         min_step_time = np.min(step_times)
         p95_step_time = np.percentile(step_times, 95)
-
-        print(f"\nSimulation complete: {step_count} steps")
-        print(f"Total simulation time: {total_simulation_time:.2f}s")
-        print(f"Average step time: {avg_step_time*1000:.2f}ms")
-        print(f"Min/Max step time: {min_step_time*1000:.2f}ms / {max_step_time*1000:.2f}ms")
-        print(f"95th percentile step time: {p95_step_time*1000:.2f}ms")
 
         logger.info(f"[System] Simulation complete: {step_count} steps in {total_simulation_time:.2f}s")
         logger.info(f"[System] Step time stats - Avg: {avg_step_time*1000:.2f}ms, Min: {min_step_time*1000:.2f}ms, Max: {max_step_time*1000:.2f}ms, P95: {p95_step_time*1000:.2f}ms")

@@ -1,0 +1,12 @@
+optimal_sizing:
+  battery_kwh: 9.99
+  investment_cost_eur: 5825.2
+  monthly_grid_export_kwh: 359.9117687856473
+  monthly_grid_import_kwh: 103.82193305736276
+  monthly_savings_eur: 67.67789095765752
+  monthly_solar_production_kwh: 737.7939354152157
+  note: Monthly values are estimated averages based on simulation period
+  payback_months: 86.07242213922594
+  payback_years: 7.172701844935495
+  simulation_days: 364
+  solar_kwp: 6.0

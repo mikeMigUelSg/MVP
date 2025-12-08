@@ -163,7 +163,7 @@ def plot_daily_analysis(df: pd.DataFrame, controller_name: str = None, save_path
         plt.show()
 
 
-def print_invoice(summary: Dict, savings: Dict, investment_data: Dict = None):
+def print_invoice(summary: Dict, savings: Dict, investment_data: Dict = None, energy_balance: Dict = None, simulation_days: int = None):
     """
     Print formatted invoice/bill with detailed comparisons
 
@@ -171,6 +171,8 @@ def print_invoice(summary: Dict, savings: Dict, investment_data: Dict = None):
         summary: System summary statistics
         savings: Savings information with baseline comparisons
         investment_data: Optional investment and payback data
+        energy_balance: Optional energy balance comparison data for all scenarios
+        simulation_days: Optional number of simulation days for monthly calculations
     """
     print(f"\nController: {summary['controller']}")
     print("-" * 80)
@@ -200,6 +202,24 @@ def print_invoice(summary: Dict, savings: Dict, investment_data: Dict = None):
     print(f"{'Net Import (kWh)':<30} {net_import_sys:>14.2f} "
           f"{net_import_pv:>14.2f} "
           f"{net_import_no_pv:>14.2f}")
+
+    # Self-Sufficiency Rate and Self-Consumption Rate
+    if energy_balance:
+        print("-" * 80)
+
+        system_self_suff = energy_balance['system_with_battery']['load_self_sufficiency_pct']
+        pv_self_suff = energy_balance['pv_without_battery']['load_self_sufficiency_pct']
+
+        print(f"{'Self-Sufficiency Rate (%)':<30} {system_self_suff:>14.2f} "
+              f"{pv_self_suff:>14.2f} "
+              f"{'0.00':>14}")
+
+        system_self_cons = energy_balance['system_with_battery']['solar_self_consumption_pct']
+        pv_self_cons = energy_balance['pv_without_battery']['solar_self_consumption_pct']
+
+        print(f"{'Self-Consumption Rate (%)':<30} {system_self_cons:>14.2f} "
+              f"{pv_self_cons:>14.2f} "
+              f"{'N/A':>14}")
 
     print("-" * 80)
 
@@ -323,13 +343,44 @@ def print_invoice(summary: Dict, savings: Dict, investment_data: Dict = None):
 
     # Solar and Battery performance
     print("\nSOLAR & BATTERY PERFORMANCE:")
-    print(f"  Solar Production:        {summary['total_solar_production_kwh']:>10.2f} kWh")
-    print(f"  House Consumption:       {summary['total_consumption_kwh']:>10.2f} kWh")
-    print(f"  Self-Consumption Rate:   {summary['self_consumption_rate']*100:>10.1f} %")
-    print(f"  Self-Sufficiency Rate:   {summary['self_sufficiency_rate']*100:>10.1f} %")
-    print(f"  Battery Cycles (Full):   {summary['battery_cycles']:>10.2f}")
-    print(f"  Battery Cycles (Usable): {summary['battery_cycles_usable']:>10.2f}")
-    print(f"  Degradation Cost:        {summary['battery_degradation_cost']:>10.2f} €")
+    print(f"  Solar Production:           {summary['total_solar_production_kwh']:>10.2f} kWh")
+
+    # Add monthly solar production if simulation_days is available
+    if simulation_days:
+        monthly_solar = (summary['total_solar_production_kwh'] / simulation_days) * 30
+        print(f"  Monthly Solar Production:   {monthly_solar:>10.2f} kWh/month")
+
+    print(f"  House Consumption:          {summary['total_consumption_kwh']:>10.2f} kWh")
+
+    # Add monthly consumption if simulation_days is available
+    if simulation_days:
+        monthly_consumption = (summary['total_consumption_kwh'] / simulation_days) * 30
+        print(f"  Monthly Consumption:        {monthly_consumption:>10.2f} kWh/month")
+
+    # Add solar curtailed information for both scenarios
+    if energy_balance and 'total_solar_curtailed_kwh' in summary:
+        # With battery
+        curtailed_with_battery = energy_balance['system_with_battery']['solar_curtailed_kwh']
+        total_solar_available = summary['total_solar_available_kwh']
+        curtailment_pct_with_battery = (curtailed_with_battery / total_solar_available * 100) if total_solar_available > 0 else 0
+
+        # Without battery (PV only)
+        curtailed_without_battery = energy_balance['pv_without_battery']['solar_curtailed_kwh']
+        curtailment_pct_without_battery = (curtailed_without_battery / total_solar_available * 100) if total_solar_available > 0 else 0
+
+        print(f"  Solar Curtailed (with battery):   {curtailed_with_battery:>10.2f} kWh ({curtailment_pct_with_battery:.1f}%)")
+        print(f"  Solar Curtailed (without battery): {curtailed_without_battery:>10.2f} kWh ({curtailment_pct_without_battery:.1f}%)")
+    elif 'total_solar_curtailed_kwh' in summary:
+        # Fallback if energy_balance is not available
+        curtailed = summary['total_solar_curtailed_kwh']
+        curtailment_pct = summary.get('curtailment_rate', 0) * 100
+        print(f"  Solar Curtailed:            {curtailed:>10.2f} kWh ({curtailment_pct:.1f}%)")
+
+    print(f"  Self-Consumption Rate:      {summary['self_consumption_rate']*100:>10.1f} %")
+    print(f"  Self-Sufficiency Rate:      {summary['self_sufficiency_rate']*100:>10.1f} %")
+    print(f"  Battery Cycles (Full):      {summary['battery_cycles']:>10.2f}")
+    print(f"  Battery Cycles (Usable):    {summary['battery_cycles_usable']:>10.2f}")
+    print(f"  Degradation Cost:           {summary['battery_degradation_cost']:>10.2f} €")
 
     print("\n" + "=" * 80 + "\n")
 

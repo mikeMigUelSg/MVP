@@ -8,6 +8,8 @@ Baseado nos métodos baseline do deep_autoformer_minimal.
 import numpy as np
 from datetime import datetime, timedelta
 from typing import Optional
+import os
+import sys
 
 
 class LoadForecaster:
@@ -18,12 +20,23 @@ class LoadForecaster:
     dados históricos de consumo.
     """
 
-    def __init__(self, house=None):
+    def __init__(self, house=None, deep_autoformer_config=None, profile_persistence_config=None):
         """
         Args:
             house: Instância da classe House com dados históricos
+            deep_autoformer_config: Configuração para o Deep Autoformer
+                                   {'model_path': ..., 'config_path': ..., 'data_path': ...}
+            profile_persistence_config: Configuração para Profile Persistence
+                                       {'n_weeks': 3}
         """
         self.house = house
+        self.deep_autoformer_config = deep_autoformer_config
+        self.profile_persistence_config = profile_persistence_config or {'n_weeks': 3}
+        self._deep_model = None
+        self._deep_scaler_y = None
+        self._deep_scaler_x = None
+        self._deep_cfg = None
+        self._profile_forecaster = None
 
     def mean_forecast(self,
                      context: np.ndarray,
@@ -98,6 +111,231 @@ class LoadForecaster:
         ma_value = np.mean(context[-window:])
         return np.full(n_steps, ma_value)
 
+    def _load_deep_autoformer_model(self):
+        """
+        Carrega o modelo Deep Autoformer, configuração e scalers (lazy loading).
+        """
+        if self._deep_model is not None:
+            return  # Já carregado
+
+        if self.deep_autoformer_config is None:
+            raise ValueError("Deep Autoformer config not provided during initialization")
+
+        try:
+            import torch
+            import yaml
+            import pandas as pd
+            from sklearn.preprocessing import StandardScaler
+
+            # Adicionar path do deep_autoformer ao sys.path
+            deep_autoformer_path = self.deep_autoformer_config.get('base_path')
+            if deep_autoformer_path is None:
+                raise ValueError("base_path must be provided in deep_autoformer_config")
+            if deep_autoformer_path not in sys.path:
+                sys.path.insert(0, deep_autoformer_path)
+
+            from deep_autoformer.model import DeepAutoformer
+            from deep_autoformer.dataset import SlidingWindowDataset
+
+            # Carregar configuração
+            config_path = self.deep_autoformer_config.get('config_path')
+            with open(config_path, 'r') as f:
+                self._deep_cfg = yaml.safe_load(f)
+
+            # Detectar device
+            if torch.cuda.is_available():
+                device = torch.device("cuda")
+            elif torch.backends.mps.is_available():
+                device = torch.device("mps")
+            else:
+                device = torch.device("cpu")
+
+            # Carregar dataset original para obter scalers
+            original_data_path = self.deep_autoformer_config.get('data_path')
+            ds_original = SlidingWindowDataset(
+                csv_path=original_data_path,
+                seq_len=int(self._deep_cfg["data"]["seq_len"]),
+                label_len=int(self._deep_cfg["data"]["label_len"]),
+                pred_len=int(self._deep_cfg["data"]["pred_len"]),
+                target_col=self._deep_cfg["data"]["target_col"],
+                feature_cols=self._deep_cfg["data"].get("feature_cols")
+            )
+
+            self._deep_scaler_y = ds_original.scaler_y
+            self._deep_scaler_x = ds_original.scaler_x
+
+            # Criar modelo
+            feature_cols = self._deep_cfg["data"].get("feature_cols", [])
+            self._deep_model = DeepAutoformer(
+                enc_in=1 + len(feature_cols),
+                dec_in=1 + len(feature_cols),
+                d_model=int(self._deep_cfg["model"]["d_model"]),
+                n_heads=int(self._deep_cfg["model"]["n_heads"]),
+                e_layers=int(self._deep_cfg["model"]["e_layers"]),
+                d_layers=int(self._deep_cfg["model"]["d_layers"]),
+                d_ff=int(self._deep_cfg["model"]["d_ff"]),
+                top_k=int(self._deep_cfg["model"]["top_k"]),
+                kernel_size=int(self._deep_cfg["model"]["kernel_size"]),
+                dropout=float(self._deep_cfg["model"]["dropout"]),
+                pred_len=int(self._deep_cfg["data"]["pred_len"]),
+                label_len=int(self._deep_cfg["data"]["label_len"]),
+                output_dim=1,
+                add_deep_mlp=bool(self._deep_cfg["model"]["add_deep_mlp"])
+            ).to(device)
+
+            # Carregar pesos
+            model_path = self.deep_autoformer_config.get('model_path')
+            self._deep_model.load_state_dict(torch.load(model_path, map_location=device))
+            self._deep_model.eval()
+            self._device = device
+
+            print(f"✓ Deep Autoformer carregado: {model_path}")
+            print(f"  Device: {device}")
+            print(f"  Seq_len: {self._deep_cfg['data']['seq_len']}, Pred_len: {self._deep_cfg['data']['pred_len']}")
+
+        except ImportError as e:
+            raise ImportError(f"Erro ao importar Deep Autoformer. Instale as dependências: {e}")
+        except Exception as e:
+            raise RuntimeError(f"Erro ao carregar Deep Autoformer: {e}")
+
+    def _profile_persistence_forecast(self,
+                                      start_time: datetime,
+                                      n_steps: int,
+                                      dt_minutes: int) -> np.ndarray:
+        """
+        Previsão usando profile persistence (média por dia da semana).
+
+        Args:
+            start_time: Timestamp inicial da previsão
+            n_steps: Número de steps a prever
+            dt_minutes: Duração de cada step
+
+        Returns:
+            Array com previsão de carga em kW
+        """
+        # Lazy loading do profile forecaster
+        if self._profile_forecaster is None:
+            from .profile_persistence_forecaster import ProfilePersistenceForecaster
+            import pandas as pd
+
+            # Criar historical data from house
+            if self.house is None or self.house.consumption_data is None:
+                raise ValueError("House data required for profile persistence forecast")
+
+            # Criar dataframe com dados históricos
+            # Usar dados de várias semanas antes de start_time
+            n_weeks = self.profile_persistence_config.get('n_weeks', 3)
+            history_days = n_weeks * 7 + 7  # Extra dias para garantir dados
+
+            historical_start = start_time - timedelta(days=history_days)
+            timestamps = pd.date_range(
+                start=historical_start,
+                end=start_time - timedelta(minutes=dt_minutes),
+                freq=f'{dt_minutes}min'
+            )
+
+            # Obter valores históricos
+            consumption_values = []
+            for ts in timestamps:
+                consumption_values.append(self.house.get_consumption(ts))
+
+            # Criar DataFrame
+            historical_data = pd.DataFrame({
+                'timestamp': timestamps,
+                'consumption': consumption_values
+            })
+
+            # Criar forecaster
+            self._profile_forecaster = ProfilePersistenceForecaster(
+                n_weeks=n_weeks,
+                dt_minutes=dt_minutes
+            )
+            self._profile_forecaster.set_data(historical_data, value_column='consumption')
+
+        # Fazer previsão (set_data renomeia a coluna para 'value')
+        forecast = self._profile_forecaster.get_forecast(
+            start_time=start_time,
+            n_steps=n_steps,
+            value_column='value'
+        )
+
+        return forecast
+
+    def _deep_autoformer_forecast(self,
+                                   start_time: datetime,
+                                   n_steps: int,
+                                   dt_minutes: int) -> np.ndarray:
+        """
+        Faz previsão usando o modelo Deep Autoformer.
+
+        Args:
+            start_time: Timestamp inicial da previsão
+            n_steps: Número de steps a prever
+            dt_minutes: Duração de cada step (deve ser 15 min)
+
+        Returns:
+            Array com previsão de carga em kW
+        """
+        import torch
+        import pandas as pd
+
+        # Lazy loading do modelo
+        self._load_deep_autoformer_model()
+
+        seq_len = int(self._deep_cfg["data"]["seq_len"])
+        pred_len = int(self._deep_cfg["data"]["pred_len"])
+        label_len = int(self._deep_cfg["data"]["label_len"])
+        feature_cols = self._deep_cfg["data"].get("feature_cols", [])
+
+        # Obter contexto histórico (seq_len steps antes de start_time)
+        context_steps = seq_len
+        context = self._get_historical_context(start_time, context_steps, dt_minutes)
+
+        # Normalizar contexto
+        context_scaled = self._deep_scaler_y.transform(context.reshape(-1, 1)).flatten()
+
+        # Preparar contexto (sem features adicionais)
+        current_context = context_scaled.reshape(-1, 1)
+
+        # Fazer previsões iterativas até cobrir n_steps
+        predictions = []
+        n_iterations = (n_steps + pred_len - 1) // pred_len
+
+        with torch.no_grad():
+            for iter_idx in range(n_iterations):
+                # Preparar encoder input
+                enc_input = torch.FloatTensor(current_context[-seq_len:]).to(self._device)
+
+                # Preparar decoder input
+                num_features = enc_input.shape[1]
+                dec_input = torch.zeros(label_len + pred_len, num_features).to(self._device)
+
+                # Preencher label_len com final do contexto
+                dec_input[:label_len, :] = enc_input[-label_len:, :]
+
+                # Adicionar batch dimension
+                enc_batch = enc_input.unsqueeze(0)
+                dec_batch = dec_input.unsqueeze(0)
+
+                # Fazer previsão
+                pred = self._deep_model(enc_batch, dec_batch)
+                pred_np = pred.cpu().numpy().flatten()
+
+                # Adicionar às previsões
+                predictions.extend(pred_np)
+
+                # Atualizar contexto para próxima iteração
+                if iter_idx < n_iterations - 1:  # Não precisa atualizar na última iteração
+                    current_context = np.concatenate([current_context, pred_np[:pred_len].reshape(-1, 1)])
+
+        # Pegar apenas os primeiros n_steps previstos
+        predictions = np.array(predictions[:n_steps])
+
+        # Desnormalizar
+        predictions_denorm = self._deep_scaler_y.inverse_transform(predictions.reshape(-1, 1)).flatten()
+
+        return predictions_denorm
+
     def get_forecast(self,
                     start_time: datetime,
                     n_steps: int,
@@ -111,12 +349,20 @@ class LoadForecaster:
             start_time: Timestamp inicial da previsão
             n_steps: Número de steps a prever
             dt_minutes: Duração de cada step em minutos (default=15)
-            method: Método de previsão ('mean', 'naive', 'moving_average', 'historical')
+            method: Método de previsão ('mean', 'naive', 'moving_average', 'historical', 'profile_persistence', 'deep_autoformer')
             context_hours: Horas de histórico a usar como contexto (default=24)
 
         Returns:
             Array com previsão de carga em kW
         """
+        # Método 'profile_persistence': média por dia da semana
+        if method == 'profile_persistence':
+            return self._profile_persistence_forecast(start_time, n_steps, dt_minutes)
+
+        # Método 'deep_autoformer': usa modelo Deep Learning treinado
+        if method == 'deep_autoformer':
+            return self._deep_autoformer_forecast(start_time, n_steps, dt_minutes)
+
         if self.house is None or self.house.consumption_data is None:
             # Fallback: usar padrão simples se não houver dados
             return self._simple_pattern_forecast(start_time, n_steps, dt_minutes)

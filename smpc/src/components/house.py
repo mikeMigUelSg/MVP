@@ -5,20 +5,35 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class House:
     """Residential house with electricity consumption"""
 
-    def __init__(self, data_file: Optional[str] = None):
+    def __init__(self, data_file: Optional[str] = None, scale_factor: float = 1.0,
+                 preloaded_data: Optional[pd.DataFrame] = None,
+                 preloaded_mean: Optional[float] = None):
         """
         Args:
             data_file: Path to Excel/CSV file with historical consumption data
+            scale_factor: Scale factor to multiply consumption values
+            preloaded_data: Pre-loaded DataFrame (for performance optimization)
+            preloaded_mean: Pre-computed mean consumption (for performance optimization)
         """
         self.consumption_data = None
         self.total_consumption_kwh = 0.0
+        self.scale_factor = scale_factor
+        self._mean_consumption = preloaded_mean
 
-        if data_file:
+        if preloaded_data is not None:
+            # Use pre-loaded data directly (should already be indexed)
+            self.consumption_data = preloaded_data
+            if preloaded_mean is None and preloaded_data is not None:
+                self._mean_consumption = preloaded_data['consumption'].mean()
+        elif data_file:
             self.load_consumption_data(data_file)
 
     def load_consumption_data(self, file_path: str):
@@ -68,10 +83,10 @@ class House:
             # Pre-compute mean for fallback
             self._mean_consumption = self.consumption_data['consumption'].mean()
 
-            print(f"Loaded consumption data: {len(self.consumption_data)} time steps")
-            print(f"Original date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
-            print(f"Average consumption: {self.consumption_data['consumption'].mean():.3f} kW")
-            print(f"Data will be matched by month/day/hour, ignoring year")
+            logger.debug(f"Loaded consumption data: {len(self.consumption_data)} time steps")
+            logger.debug(f"Original date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
+            logger.debug(f"Average consumption: {self.consumption_data['consumption'].mean():.3f} kW")
+            logger.debug(f"Data will be matched by month/day/hour, ignoring year")
 
         except Exception as e:
             print(f"Error loading consumption data: {e}")
@@ -98,7 +113,7 @@ class House:
                 base_load = 0.3
                 variable_load = 0.2
 
-            return base_load + np.random.uniform(0, variable_load)
+            return (base_load + np.random.uniform(0, variable_load)) * self.scale_factor
 
         try:
             # Extract lookup key from timestamp (ignoring year)
@@ -127,7 +142,7 @@ class House:
                     # Fallback to pre-computed mean
                     consumption = self._mean_consumption
 
-            return max(0.0, consumption)
+            return max(0.0, consumption * self.scale_factor)
 
         except Exception as e:
             print(f"Error getting consumption at {timestamp}: {e}")

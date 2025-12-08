@@ -30,6 +30,9 @@ from src.controllers.sdp_controller import SDPController, SDPParams, PlantModel,
 
 # Import forecasters for SDP
 from src.forecasters.profile_persistence_forecaster import ProfilePersistenceForecaster
+from src.forecasters.load_forecaster import LoadForecaster
+from src.forecasters.solar_forecaster import SolarForecaster
+from src.forecasters.forecaster_factory import ForecastFactory
 
 # Import system and visualization
 from src.system import EnergyManagementSystem
@@ -51,11 +54,17 @@ def load_config(config_path: str = "config.yaml") -> dict:
 def create_battery(config: dict) -> Battery:
     """Create battery component from config."""
     bat_config = config['battery']
+
+    # Calculate max charge/discharge power from capacity and rate factors
+    capacity_kwh = bat_config['capacity_kwh']
+    max_charge_power = capacity_kwh * bat_config['charge_rate_factor']
+    max_discharge_power = capacity_kwh * bat_config['discharge_rate_factor']
+
     return Battery(
-        capacity_kwh=bat_config['capacity_kwh'],
+        capacity_kwh=capacity_kwh,
         max_power_kw=bat_config['max_power_kw'],
-        max_charge_current_kw=bat_config['max_charge_current_kw'],
-        max_discharge_current_kw=bat_config['max_discharge_current_kw'],
+        max_charge_current_kw=max_charge_power,
+        max_discharge_current_kw=max_discharge_power,
         efficiency_charge=bat_config['efficiency_charge'],
         efficiency_discharge=bat_config['efficiency_discharge'],
         initial_soc=bat_config['initial_soc'],
@@ -79,8 +88,10 @@ def create_solar(config: dict) -> SolarPanel:
 def create_house(config: dict) -> House:
     """Create house component from config."""
     house_config = config['house']
+    scale_factor = house_config.get('scale_factor', 1.0)
     return House(
-        data_file=house_config['data_file']
+        data_file=house_config['data_file'],
+        scale_factor=scale_factor
     )
 
 
@@ -190,7 +201,8 @@ def create_sdp_controller(config: dict, battery: Battery,
         sigma_R=sdp_config['sigma_residual_kw'],
         policy_update_hours=sdp_config['policy_update_hours'],
         soc_target=sdp_config['soc_target'],
-        terminal_cost_weight=sdp_config['terminal_cost_weight']
+        terminal_cost_weight=sdp_config['terminal_cost_weight'],
+        residual_match_threshold=sdp_config.get('residual_match_threshold', 0.5)
     )
     print(f"   Horizon: {params.N} steps = {params.N * params.dt_minutes / 60:.1f}h")
     print(f"   Discretization: {params.n_x} SOC points, {params.n_R} residual points")
@@ -236,23 +248,33 @@ def create_sdp_controller(config: dict, battery: Battery,
     print(f"   Historical data created: {len(historical_data)} records ({history_days} days)")
     print(f"   Date range: {historical_data['timestamp'].min()} to {historical_data['timestamp'].max()}")
 
-    # Create PV forecaster
-    pv_forecaster = ProfilePersistenceForecaster(
-        n_weeks=sdp_config['forecaster']['n_weeks'],
-        dt_minutes=sim_config['timestep_minutes']
-    )
-    pv_data = historical_data[['timestamp', 'P_pv']].copy()
-    pv_forecaster.set_data(pv_data, value_column='P_pv')
-    print(f"   PV forecaster created (profile persistence, {sdp_config['forecaster']['n_weeks']} weeks)")
+    # Create forecasters based on config
+    # Check if we should use a specific method (default: profile_persistence for SDP)
+    forecaster_type = sdp_config.get('forecaster', {}).get('type', 'profile_persistence')
 
-    # Create load forecaster
-    load_forecaster = ProfilePersistenceForecaster(
-        n_weeks=sdp_config['forecaster']['n_weeks'],
-        dt_minutes=sim_config['timestep_minutes']
-    )
-    load_data = historical_data[['timestamp', 'P_load']].copy()
-    load_forecaster.set_data(load_data, value_column='P_load')
-    print(f"   Load forecaster created (profile persistence, {sdp_config['forecaster']['n_weeks']} weeks)")
+    if forecaster_type == 'profile_persistence':
+        # Use fast profile persistence forecasters (original SDP behavior)
+        pv_forecaster = ProfilePersistenceForecaster(
+            n_weeks=sdp_config['forecaster']['n_weeks'],
+            dt_minutes=sim_config['timestep_minutes']
+        )
+        pv_data = historical_data[['timestamp', 'P_pv']].copy()
+        pv_forecaster.set_data(pv_data, value_column='P_pv')
+        print(f"   PV forecaster created (profile persistence, {sdp_config['forecaster']['n_weeks']} weeks)")
+
+        load_forecaster = ProfilePersistenceForecaster(
+            n_weeks=sdp_config['forecaster']['n_weeks'],
+            dt_minutes=sim_config['timestep_minutes']
+        )
+        load_data = historical_data[['timestamp', 'P_load']].copy()
+        load_forecaster.set_data(load_data, value_column='P_load')
+        print(f"   Load forecaster created (profile persistence, {sdp_config['forecaster']['n_weeks']} weeks)")
+    else:
+        # Use LoadForecaster/SolarForecaster (pode usar deep_autoformer)
+        load_forecaster = ForecastFactory.create_load_forecaster(config, house)
+        pv_forecaster = ForecastFactory.create_solar_forecaster(config, solar)
+        print(f"   Load forecaster created (using method from config)")
+        print(f"   PV forecaster created (using method from config)")
 
     # 5. Optional: Calibration
     if sdp_config['calibration']['enabled']:
@@ -299,16 +321,34 @@ def create_sdp_controller(config: dict, battery: Battery,
     # 6. Determine buy/sell prices
     print("\n6. Setting tariff prices...")
     if config['tariff']['type'] == 'bihoraria':
-        # Use average of peak and off-peak as buy price
-        buy_price = (config['tariff']['bihoraria']['peak_price'] +
-                    config['tariff']['bihoraria']['off_peak_price']) / 2
-        print(f"   Buy price (average): {buy_price:.3f} €/kWh")
+        # Calculate weighted average buy price based on actual time in each period
+        # This gives a more accurate representation than simple average
+        peak_price = config['tariff']['bihoraria']['peak_price']
+        off_peak_price = config['tariff']['bihoraria']['off_peak_price']
+        peak_hours_weekday = config['tariff']['bihoraria']['peak_hours_weekday']
+        peak_hours_weekend = config['tariff']['bihoraria']['peak_hours_weekend']
+
+        # Calculate average hours in peak for a typical week (5 weekdays + 2 weekend days)
+        weekday_peak_hours = len(peak_hours_weekday)
+        weekend_peak_hours = len(peak_hours_weekend)
+        avg_peak_hours_per_day = (5 * weekday_peak_hours + 2 * weekend_peak_hours) / 7
+        avg_offpeak_hours_per_day = 24 - avg_peak_hours_per_day
+
+        # Weighted average buy price
+        buy_price = (peak_price * avg_peak_hours_per_day +
+                    off_peak_price * avg_offpeak_hours_per_day) / 24
+
+        print(f"   Tariff type: Bi-horária (CERT)")
+        print(f"   Peak price: {peak_price:.4f} €/kWh ({avg_peak_hours_per_day:.1f}h/day avg)")
+        print(f"   Off-peak price: {off_peak_price:.4f} €/kWh ({avg_offpeak_hours_per_day:.1f}h/day avg)")
+        print(f"   Buy price (weighted average): {buy_price:.4f} €/kWh")
     else:
         buy_price = config['tariff']['simple']['price']
-        print(f"   Buy price: {buy_price:.3f} €/kWh")
+        print(f"   Tariff type: Simple")
+        print(f"   Buy price: {buy_price:.4f} €/kWh")
 
     sell_price = config['grid']['export_price']
-    print(f"   Sell price: {sell_price:.3f} €/kWh")
+    print(f"   Sell price: {sell_price:.4f} €/kWh")
 
     # 7. Create SDP controller
     print("\n7. Creating SDP controller...")
@@ -317,7 +357,9 @@ def create_sdp_controller(config: dict, battery: Battery,
         plant=plant,
         residual_model=residual_model,
         c_s=buy_price,
-        c_f=sell_price
+        c_f=sell_price,
+        tariff=tariff,  # Pass tariff object for time-varying buy prices
+        export_price=sell_price  # Pass export price explicitly
     )
 
     # Store forecasters in controller for use during simulation
@@ -336,6 +378,20 @@ def create_sdp_controller(config: dict, battery: Battery,
     return controller
 
 
+def create_load_forecaster(config: dict, house: House) -> LoadForecaster:
+    """
+    Create load forecaster from config using ForecastFactory.
+
+    Args:
+        config: Configuration dictionary
+        house: House object with historical data
+
+    Returns:
+        LoadForecaster instance
+    """
+    return ForecastFactory.create_load_forecaster(config, house)
+
+
 def create_controller(config: dict, battery: Battery,
                      solar: SolarPanel, house: House,
                      tariff):
@@ -350,15 +406,30 @@ def create_controller(config: dict, battery: Battery,
             high_price_threshold=rb_config['high_price_threshold'],
             low_soc_threshold=rb_config['low_soc_threshold'],
             high_soc_threshold=rb_config['high_soc_threshold'],
-            charge_soc_min=rb_config.get('charge_soc_min', 0.5)
+            charge_soc_min=rb_config.get('charge_soc_min', 0.5),
+            bihoraria_target_soc=rb_config.get('bihoraria_target_soc', 0.85)
         )
 
     elif controller_type == 'mpc':
         print("\nCreating MPC controller...")
         mpc_config = config['controller']['mpc']
+
+        # Create forecasters
+        load_forecaster = create_load_forecaster(config, house)
+        solar_forecaster = ForecastFactory.create_solar_forecaster(config, solar)
+
+        # Get forecast method from config
+        forecaster_config = config.get('load_forecaster', {})
+        forecast_method = forecaster_config.get('method', 'historical')
+
+        print(f"   Forecast method: {forecast_method}")
+
         return MPCController(
             horizon_steps=mpc_config['horizon_steps'],
-            export_price=config['grid']['export_price']
+            export_price=config['grid']['export_price'],
+            load_forecaster=load_forecaster,
+            solar_forecaster=solar_forecaster,
+            forecast_method=forecast_method
         )
 
     elif controller_type == 'sdp':
@@ -481,12 +552,12 @@ def run_simulation(config: dict):
         num_panels = solar_kwp / 0.5 if solar_kwp > 0 else 0
 
         # Calculate investment costs
-        battery_cost = battery_kwh * optimize_config['batery']['price_per_kwh']
+        battery_cost = optimize_config['batery']['material_cost'] + optimize_config['batery']['repurpose_kwh'] * battery_kwh
         solar_cost = solar_kwp * optimize_config['solar']['price_per_kwp']
 
         # Get actual inverter price based on power rating
         inverter_power = config['inverter']['max_power_kw']
-        if inverter_power <= 3.0:
+        if inverter_power <= 4.0:
             inverter_cost = optimize_config['inverter']['price_3kw']
         else:
             inverter_cost = optimize_config['inverter']['price_5kw']
@@ -563,7 +634,9 @@ def run_simulation(config: dict):
         }
 
     # Print comprehensive comparison table
-    print_invoice(summary, savings, investment_data)
+    # Get simulation days for monthly calculations
+    sim_days = (end_date - start_date).days
+    print_invoice(summary, savings, investment_data, energy_balance, simulation_days=sim_days)
 
     # Save results
     if config['output']['save_results']:

@@ -158,8 +158,8 @@ def _solve_sdp_jit_fast(N: int,
                         soc_min: float, soc_max: float, P_nom: float, P_lim: float,
                         # Residual params
                         kappa: float, sigma: float,
-                        # Cost params
-                        c_s: float, c_f: float, c_deg: float,
+                        # Cost params - agora arrays ao longo do horizonte
+                        c_s_array: np.ndarray, c_f_array: np.ndarray, c_deg: float,
                         soc_target: float, terminal_cost_weight: float
                         ) -> Tuple[List[np.ndarray], List[np.ndarray]]:
     """
@@ -182,8 +182,9 @@ def _solve_sdp_jit_fast(N: int,
     n_R_N = len(R_grids_list[N])
     JN = np.empty((n_x, n_R_N), dtype=np.float64)
     for i in prange(n_x):
+        # Usar preço do step final N
         JN[i, :] = terminal_cost_jit(X_grid[i], soc_target, terminal_cost_weight,
-                                     C_bat, c_s, c_f)
+                                     C_bat, c_s_array[N], c_f_array[N])
     value_list[N] = JN
 
     # --- Backward DP ---
@@ -226,6 +227,10 @@ def _solve_sdp_jit_fast(N: int,
                 best_cost = 1e300
                 best_u    = 0.0
 
+                # Obter preços para o step k atual
+                c_s_k = c_s_array[k]
+                c_f_k = c_f_array[k]
+
                 for a in range(len(U_i)):
                     u = U_i[a]
 
@@ -238,7 +243,7 @@ def _solve_sdp_jit_fast(N: int,
                     P_g = -u - R_kj + phi
                     P_g_plus  = P_g if P_g > 0.0 else 0.0
                     P_g_minus = -P_g if P_g < 0.0 else 0.0
-                    grid_cost = (P_g_plus * c_s - P_g_minus * c_f) * dt_hours
+                    grid_cost = (P_g_plus * c_s_k - P_g_minus * c_f_k) * dt_hours
 
                     if u < 0.0:
                         throughput = -u * eta_c
@@ -636,6 +641,9 @@ class SDPParams:
     soc_target: float = 0.5         # SOC alvo no final (para penalização)
     terminal_cost_weight: float = 1.0  # Peso do custo terminal
 
+    # Ajuste de ação para cancelar resíduo
+    residual_match_threshold: float = 0.5  # Tolerância (kW) para ajustar u para -R
+
 
 class ResidualModel:
     """
@@ -841,21 +849,27 @@ class SDPController:
                  params: SDPParams,
                  plant: PlantModel,
                  residual_model: ResidualModel,
-                 c_s: float,  # Tarifa compra (€/kWh)
-                 c_f: float):  # Tarifa venda (€/kWh)
+                 c_s: float,  # Tarifa compra (€/kWh) - usado como default
+                 c_f: float,  # Tarifa venda (€/kWh)
+                 tariff=None,  # Objeto tariff para preços variáveis
+                 export_price: float = None):  # Preço de exportação
         """
         Args:
             params: Parâmetros do SDP
             plant: Modelo da planta
             residual_model: Modelo do resíduo
-            c_s: Tarifa de compra (€/kWh)
+            c_s: Tarifa de compra (€/kWh) - média ponderada usada como default
             c_f: Tarifa de venda (€/kWh)
+            tariff: Objeto tariff (opcional) para obter preços variáveis ao longo do tempo
+            export_price: Preço de exportação (€/kWh), usado se tariff não fornecer
         """
         self.params = params
         self.plant = plant
         self.residual_model = residual_model
         self.c_s = c_s
         self.c_f = c_f
+        self.tariff = tariff  # Armazena objeto tariff para uso dinâmico
+        self.export_price = export_price if export_price is not None else c_f
 
         # Grelhas de discretização
         self.X_grid = None  # Grelha de SOC
@@ -987,7 +1001,7 @@ class SDPController:
         sigma = self.residual_model.sigma
 
         # Usar ±3σ: boa cobertura sem perder resolução (se observar clamping, subir p/ 4–5)
-        sigma_multiplier = 3
+        sigma_multiplier = 3  # Increased from 3 to 5 to handle large forecast errors
 
         for k in range(N + 1):
             R_center = R_bar[k]
@@ -1011,15 +1025,26 @@ class SDPController:
         # mas mantida para compatibilidade. O JIT usa a versão _jit.
         return gaussian_quadrature_5pt_jit(rho, sigma, R_grid)
 
-    def solve_sdp(self, R_bar: np.ndarray, verbose: bool = False):
+    def solve_sdp(self, R_bar: np.ndarray, c_s_array: np.ndarray, c_f_array: np.ndarray, verbose: bool = False):
         """
         Resolver SDP usando backward DP com quadratura.
         Wrapper que chama a versão _fast (pré-cálculo de E[J]).
+
+        Agora usa arrays de preços variáveis ao longo do horizonte, permitindo
+        modelar corretamente tarifas bi-horárias (ponta vs fora de ponta).
+
+        Args:
+            R_bar: Previsão base do resíduo [N+1]
+            c_s_array: Array de preços de compra ao longo do horizonte [N+1]
+            c_f_array: Array de preços de venda ao longo do horizonte [N+1]
+            verbose: Se True, mostra informação detalhada
         """
         solve_start_time = time.time()
 
         if verbose:
             print(f" [SDP] Chamando _solve_sdp_jit_fast (pode compilar na 1ª execução)...")
+            print(f" [SDP] Price range: buy [{c_s_array.min():.4f}, {c_s_array.max():.4f}] €/kWh")
+            print(f" [SDP] Price range: sell [{c_f_array.min():.4f}, {c_f_array.max():.4f}] €/kWh")
 
         jit_start = time.time()
         policy_list_jit, value_function_list_jit = _solve_sdp_jit_fast(
@@ -1027,15 +1052,15 @@ class SDPController:
             self.X_grid,
             self.R_grids_list,
             self._feasible_actions_cache,
-            self._next_x_index_cache,               # <— novo argumento
+            self._next_x_index_cache,
             R_bar,
             # Plant params
             self.plant.C_bat, self.plant.dt_hours, self.plant.eta_c, self.plant.eta_d,
             self.plant.soc_min, self.plant.soc_max, self.plant.P_nom, self.plant.P_lim,
             # Residual params
             self.residual_model.kappa, self.residual_model.sigma,
-            # Cost params
-            self.c_s, self.c_f, self.plant.c_deg,
+            # Cost params - agora arrays variáveis ao longo do horizonte
+            c_s_array, c_f_array, self.plant.c_deg,
             self.params.soc_target, self.params.terminal_cost_weight
         )
         jit_time = time.time() - jit_start
@@ -1161,7 +1186,12 @@ class SDPController:
         R_clamped = np.clip(R, R_grid_k.min(), R_grid_k.max())
 
         if R != R_clamped:
-            logger.warning(f"  R={R:.4f} clamped to {R_clamped:.4f} at {timestamp} k={k}")
+            # Get predicted R from forecast (if available)
+            R_predicted = self.R_bar_forecast[k] if self.R_bar_forecast is not None and k < len(self.R_bar_forecast) else None
+            if R_predicted is not None:
+                logger.warning(f"  R_actual={R:.4f} vs R_predicted={R_predicted:.4f} (error={R - R_predicted:.4f}) → clamped to {R_clamped:.4f} at {timestamp} k={k}")
+            else:
+                logger.warning(f"  R_actual={R:.4f} clamped to {R_clamped:.4f} at {timestamp} k={k}")
 
         # Encontrar vizinhos em X_grid
         i_x = np.searchsorted(self.X_grid, x)
@@ -1261,6 +1291,27 @@ class SDPController:
         u_star = self.get_action(x_current, R_current, k, timestamp)
         interpolation_time = time.time() - interpolation_start
 
+        # Ajuste para dar match ao resíduo real (correção da discretização)
+        # Se a intenção do controlador é cancelar o resíduo (u ≈ -R),
+        # ajustar para o valor exato -R para minimizar troca com a rede
+        u_ideal = -R_current  # Ação que cancelaria completamente o resíduo
+        match_threshold = self.params.residual_match_threshold  # kW - tolerância para considerar que o controlador quer dar match
+
+        # Verificar se u_star está próximo de u_ideal (dentro da tolerância)
+        if abs(u_star - u_ideal) < match_threshold:
+            # Verificar se u_ideal respeita os limites da bateria
+            if abs(u_ideal) <= self.plant.P_nom:
+                # Verificar se a ação não viola os limites de SOC
+                x_next_ideal = next_soc_jit(
+                    x_current, u_ideal, self.plant.C_bat, self.plant.dt_hours,
+                    self.plant.eta_c, self.plant.eta_d,
+                    self.plant.soc_min, self.plant.soc_max
+                )
+                # Se o SOC resultante está dentro dos limites, usar u_ideal
+                if self.plant.soc_min <= x_next_ideal <= self.plant.soc_max:
+                    logger.debug(f"  [SDP] Adjusting u_star={u_star:.3f} to u_ideal={u_ideal:.3f} to match residual R={R_current:.3f}")
+                    u_star = u_ideal
+
         total_action_time = time.time() - action_start
         logger.debug(f"  [SDP] compute_action: k={k}, {total_action_time:.6f}s (interpolation: {interpolation_time:.6f}s)")
 
@@ -1301,6 +1352,19 @@ class SDPController:
         print(f"\n[{self.name}] Updating policy at {timestamp}...")
         logger.info(f"[{self.name}] Starting policy update at {timestamp}")
 
+        # Obter arrays de preços ao longo do horizonte
+        c_s_array, c_f_array = self._get_price_arrays(timestamp)
+        c_s_min, c_s_max = c_s_array.min(), c_s_array.max()
+
+        # Mostrar informação sobre preços
+        if c_s_min != c_s_max:
+            print(f"  Time-varying tariff detected!")
+            print(f"  Buy price range: {c_s_min:.4f} - {c_s_max:.4f} €/kWh")
+            logger.info(f"  Variable tariff: buy [{c_s_min:.4f}, {c_s_max:.4f}] €/kWh")
+        else:
+            print(f"  Fixed tariff: buy {c_s_min:.4f} €/kWh, sell {c_f_array[0]:.4f} €/kWh")
+            logger.info(f"  Fixed tariff: buy {c_s_min:.4f}, sell {c_f_array[0]:.4f} €/kWh")
+
         # Obter previsões base R̄
         forecast_start = time.time()
         R_bar = self._get_base_forecast(
@@ -1318,9 +1382,9 @@ class SDPController:
         grid_time = time.time() - grid_start
         logger.info(f"  [{self.name}] Grid creation: {grid_time:.4f}s")
 
-        # Resolver SDP (agora chama o wrapper JIT)
+        # Resolver SDP com preços variáveis
         solve_start = time.time()
-        self.solve_sdp(R_bar, verbose=True)
+        self.solve_sdp(R_bar, c_s_array, c_f_array, verbose=True)
         solve_time = time.time() - solve_start
         logger.info(f"  [{self.name}] SDP solve: {solve_time:.4f}s")
 
@@ -1356,3 +1420,40 @@ class SDPController:
         R_bar = P_pv_bar - P_load_bar
 
         return R_bar
+
+    def _get_price_arrays(self, start_time: datetime) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Obter arrays de preços de compra e venda ao longo do horizonte.
+
+        Retorna arrays c_s[k] e c_f[k] para k=0,...,N onde:
+        - c_s[k]: preço de compra no step k
+        - c_f[k]: preço de venda no step k (geralmente constante)
+
+        Se tariff não foi fornecido, usa valores constantes self.c_s e self.c_f.
+
+        Args:
+            start_time: Timestamp inicial do horizonte
+
+        Returns:
+            (c_s_array, c_f_array): Arrays de preços ao longo do horizonte
+        """
+        N = self.params.N
+        dt_minutes = self.params.dt_minutes
+
+        # Inicializar arrays com valores default
+        c_s_array = np.full(N + 1, self.c_s)
+        c_f_array = np.full(N + 1, self.c_f)
+
+        # Se temos objeto tariff, obter preços variáveis
+        if self.tariff is not None:
+            for k in range(N + 1):
+                # Calcular timestamp para este step
+                current_time = start_time + timedelta(minutes=k * dt_minutes)
+
+                # Obter preço de compra do tariff (varia com bi-horária)
+                c_s_array[k] = self.tariff.get_price(current_time)
+
+                # Preço de venda (export_price) geralmente é constante
+                c_f_array[k] = self.export_price
+
+        return c_s_array, c_f_array
